@@ -703,6 +703,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Tap the \'+\' button to record your first transaction.'**
   String get tapToRecordFirstTransaction;
+
+  /// No description provided for @biometricAuthReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Please authenticate to view your financial data'**
+  String get biometricAuthReason;
+
+  /// No description provided for @lockScreenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Balanza Secure Lock'**
+  String get lockScreenTitle;
+
+  /// No description provided for @lockScreenSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Access is restricted. Please authenticate to continue.'**
+  String get lockScreenSubtitle;
+
+  /// No description provided for @unlockButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock'**
+  String get unlockButton;
 }
 
 class _AppLocalizationsDelegate

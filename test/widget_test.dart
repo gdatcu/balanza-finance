@@ -9,6 +9,7 @@ import 'package:balanza/features/transactions/presentation/home_view.dart';
 import 'package:balanza/features/transactions/repositories/transaction_repository.dart';
 import 'package:balanza/features/transactions/providers/transaction_provider.dart';
 import 'package:balanza/features/transactions/providers/exchange_rate_provider.dart';
+import 'package:balanza/features/auth/providers/biometric_provider.dart';
 import 'package:balanza/models/transaction.dart';
 import 'package:balanza/models/category.dart';
 
@@ -67,6 +68,7 @@ void main() {
             ),
           ])),
           exchangeRateProvider.overrideWith((ref) => Future.value(4.97)),
+          biometricLockProvider.overrideWith(() => FakeBiometricLockNotifier()),
         ],
         child: const MaterialApp(
           localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -122,6 +124,7 @@ void main() {
             ),
           ])),
           exchangeRateProvider.overrideWith((ref) => Future.value(4.97)),
+          biometricLockProvider.overrideWith(() => FakeBiometricLockNotifier()),
         ],
         child: const MaterialApp(
           localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -161,4 +164,9 @@ void main() {
     expect(find.text('Balanza Finance'), findsOneWidget);
     expect(find.text('Spent: RON 50.00 / RON 1500.00'), findsOneWidget);
   });
+}
+
+class FakeBiometricLockNotifier extends BiometricLockNotifier {
+  @override
+  bool build() => false;
 }

@@ -131,5 +131,9 @@
   "noExpensesYet": "No expenses yet",
   "noIncomesYet": "No incomes yet",
   "noTransactionDataYet": "No transaction data yet",
-  "tapToRecordFirstTransaction": "Tap the '+' button to record your first transaction."
+  "tapToRecordFirstTransaction": "Tap the '+' button to record your first transaction.",
+  "biometricAuthReason": "Please authenticate to view your financial data",
+  "lockScreenTitle": "Balanza Secure Lock",
+  "lockScreenSubtitle": "Access is restricted. Please authenticate to continue.",
+  "unlockButton": "Unlock"
 }

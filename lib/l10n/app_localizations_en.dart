@@ -328,4 +328,18 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get tapToRecordFirstTransaction =>
       'Tap the \'+\' button to record your first transaction.';
+
+  @override
+  String get biometricAuthReason =>
+      'Please authenticate to view your financial data';
+
+  @override
+  String get lockScreenTitle => 'Balanza Secure Lock';
+
+  @override
+  String get lockScreenSubtitle =>
+      'Access is restricted. Please authenticate to continue.';
+
+  @override
+  String get unlockButton => 'Unlock';
 }

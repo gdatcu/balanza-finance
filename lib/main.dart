@@ -8,6 +8,7 @@ import 'features/auth/providers/auth_provider.dart';
 import 'features/transactions/presentation/home_view.dart';
 import 'features/transactions/providers/transaction_provider.dart';
 import 'features/settings/providers/locale_provider.dart';
+import 'features/auth/presentation/biometric_lock_wrapper.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -60,7 +61,7 @@ class MyApp extends ConsumerWidget {
       home: authStateAsync.when(
         data: (authState) {
           if (authState.session != null) {
-            return const HomeView();
+            return const BiometricLockWrapper(child: HomeView());
           } else {
             return const LoginView();
           }

@@ -330,4 +330,18 @@ class AppLocalizationsRo extends AppLocalizations {
   @override
   String get tapToRecordFirstTransaction =>
       'Atingeți butonul \'+\' pentru a înregistra prima tranzacție.';
+
+  @override
+  String get biometricAuthReason =>
+      'Vă rugăm să vă autentificați pentru a vizualiza datele financiare';
+
+  @override
+  String get lockScreenTitle => 'Balanza Securizat';
+
+  @override
+  String get lockScreenSubtitle =>
+      'Accesul este restricționat. Te rugăm să te autentifici pentru a continua.';
+
+  @override
+  String get unlockButton => 'Deblochează';
 }
