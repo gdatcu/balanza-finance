@@ -344,4 +344,18 @@ class AppLocalizationsRo extends AppLocalizations {
 
   @override
   String get unlockButton => 'Deblochează';
+
+  @override
+  String get updateAvailableTitle => 'Actualizare Disponibilă';
+
+  @override
+  String updateAvailableMessage(String version) {
+    return 'O nouă versiune a aplicației Balanza Finance ($version) este disponibilă. Dorești să o descarci și să o instalezi acum?';
+  }
+
+  @override
+  String get updateInstallButton => 'Actualizează';
+
+  @override
+  String get downloadingUpdate => 'Se descarcă actualizarea...';
 }

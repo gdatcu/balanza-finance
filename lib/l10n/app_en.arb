@@ -135,5 +135,16 @@
   "biometricAuthReason": "Please authenticate to view your financial data",
   "lockScreenTitle": "Balanza Secure Lock",
   "lockScreenSubtitle": "Access is restricted. Please authenticate to continue.",
-  "unlockButton": "Unlock"
+  "unlockButton": "Unlock",
+  "updateAvailableTitle": "Update Available",
+  "updateAvailableMessage": "A new version of Balanza Finance ({version}) is available. Would you like to download and install it now?",
+  "@updateAvailableMessage": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "updateInstallButton": "Update",
+  "downloadingUpdate": "Downloading update..."
 }

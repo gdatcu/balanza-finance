@@ -342,4 +342,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get unlockButton => 'Unlock';
+
+  @override
+  String get updateAvailableTitle => 'Update Available';
+
+  @override
+  String updateAvailableMessage(String version) {
+    return 'A new version of Balanza Finance ($version) is available. Would you like to download and install it now?';
+  }
+
+  @override
+  String get updateInstallButton => 'Update';
+
+  @override
+  String get downloadingUpdate => 'Downloading update...';
 }

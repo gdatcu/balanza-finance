@@ -13,6 +13,7 @@ import 'categories_data.dart';
 import '../../analytics/presentation/expense_pie_chart.dart';
 import '../../settings/presentation/settings_view.dart';
 import '../../settings/providers/locale_provider.dart';
+import '../../settings/providers/updater_provider.dart';
 import '../../net_worth/presentation/net_worth_view.dart';
 
 enum ToshlSection {
@@ -31,6 +32,14 @@ class HomeView extends ConsumerStatefulWidget {
 
 class _HomeViewState extends ConsumerState<HomeView> {
   ToshlSection _section = ToshlSection.overview;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(updaterProvider).checkForUpdates(context);
+    });
+  }
 
   void _showAddTransaction(BuildContext context) {
     showModalBottomSheet(

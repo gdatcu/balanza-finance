@@ -727,6 +727,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Unlock'**
   String get unlockButton;
+
+  /// No description provided for @updateAvailableTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Update Available'**
+  String get updateAvailableTitle;
+
+  /// No description provided for @updateAvailableMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'A new version of Balanza Finance ({version}) is available. Would you like to download and install it now?'**
+  String updateAvailableMessage(String version);
+
+  /// No description provided for @updateInstallButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Update'**
+  String get updateInstallButton;
+
+  /// No description provided for @downloadingUpdate.
+  ///
+  /// In en, this message translates to:
+  /// **'Downloading update...'**
+  String get downloadingUpdate;
 }
 
 class _AppLocalizationsDelegate

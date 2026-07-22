@@ -135,5 +135,16 @@
   "biometricAuthReason": "Vă rugăm să vă autentificați pentru a vizualiza datele financiare",
   "lockScreenTitle": "Balanza Securizat",
   "lockScreenSubtitle": "Accesul este restricționat. Te rugăm să te autentifici pentru a continua.",
-  "unlockButton": "Deblochează"
+  "unlockButton": "Deblochează",
+  "updateAvailableTitle": "Actualizare Disponibilă",
+  "updateAvailableMessage": "O nouă versiune a aplicației Balanza Finance ({version}) este disponibilă. Dorești să o descarci și să o instalezi acum?",
+  "@updateAvailableMessage": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "updateInstallButton": "Actualizează",
+  "downloadingUpdate": "Se descarcă actualizarea..."
 }
