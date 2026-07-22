@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 import 'package:balanza/l10n/app_localizations.dart';
 import '../providers/transaction_provider.dart';
+import '../providers/exchange_rate_provider.dart';
 import '../../../models/transaction.dart';
 import '../../../core/utils/category_localizer.dart';
 import 'categories_data.dart';
@@ -22,9 +23,20 @@ class _TransactionInputSheetState extends ConsumerState<TransactionInputSheet> {
   bool _isIncome = false;
   String? _selectedCategoryId;
   DateTime _selectedDate = DateTime.now();
+  String _selectedCurrency = 'RON';
 
   // Seeded Account IDs: Main Checking is default
   final String _selectedAccountId = '00000000-0000-0000-0000-000000000001';
+
+  @override
+  void initState() {
+    super.initState();
+    _amountController.addListener(_onAmountChanged);
+  }
+
+  void _onAmountChanged() {
+    setState(() {}); // refresh live currency conversion preview
+  }
 
   final Set<String> _expenseCategoryIds = {
     '00000000-0000-0000-0000-0000000000c1', // Food
@@ -59,7 +71,19 @@ class _TransactionInputSheetState extends ConsumerState<TransactionInputSheet> {
   void _submit() {
     if (_formKey.currentState!.validate()) {
       final double amt = double.parse(_amountController.text);
-      final double finalAmount = _isIncome ? amt : -amt;
+      
+      double finalAmountVal = amt;
+      String originalCurrencyVal = _selectedCurrency;
+
+      if (_selectedCurrency == 'RON') {
+        finalAmountVal = amt;
+      } else {
+        final rate = ref.read(exchangeRateProvider).value ?? 4.97;
+        finalAmountVal = amt * rate;
+      }
+
+      final double finalAmount = _isIncome ? finalAmountVal : -finalAmountVal;
+      final double originalAmount = _isIncome ? amt : -amt;
 
       final transaction = Transaction(
         id: const Uuid().v4(),
@@ -70,6 +94,8 @@ class _TransactionInputSheetState extends ConsumerState<TransactionInputSheet> {
         description: _noteController.text.trim().isEmpty ? null : _noteController.text.trim(),
         date: _selectedDate,
         createdAt: DateTime.now(),
+        originalCurrency: originalCurrencyVal,
+        originalAmount: originalAmount,
       );
 
       ref.read(transactionListProvider.notifier).add(transaction);
@@ -143,35 +169,107 @@ class _TransactionInputSheetState extends ConsumerState<TransactionInputSheet> {
                 ),
                 const SizedBox(height: 16),
 
-                // Amount text input field
-                TextFormField(
-                  controller: _amountController,
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                  decoration: InputDecoration(
-                    labelText: AppLocalizations.of(context)!.amountFieldLabel,
-                    prefixIcon: Icon(Icons.wallet, color: _isIncome ? const Color(0xFF10B981) : const Color(0xFFFF7A5A)),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(
-                        color: _isIncome ? const Color(0xFF10B981) : const Color(0xFFFF7A5A),
-                        width: 2,
+                // Amount text input field with currency selector
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      flex: 3,
+                      child: TextFormField(
+                        controller: _amountController,
+                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        decoration: InputDecoration(
+                          labelText: _selectedCurrency == 'RON'
+                              ? AppLocalizations.of(context)!.amountFieldLabel
+                              : '${AppLocalizations.of(context)!.amount} ($_selectedCurrency)',
+                          prefixIcon: Icon(Icons.wallet, color: _isIncome ? const Color(0xFF10B981) : const Color(0xFFFF7A5A)),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(
+                              color: _isIncome ? const Color(0xFF10B981) : const Color(0xFFFF7A5A),
+                              width: 2,
+                            ),
+                          ),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return AppLocalizations.of(context)!.pleaseEnterAmount;
+                          }
+                          final parsed = double.tryParse(value);
+                          if (parsed == null || parsed <= 0) {
+                            return AppLocalizations.of(context)!.pleaseEnterValidPositiveNumber;
+                          }
+                          return null;
+                        },
                       ),
                     ),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return AppLocalizations.of(context)!.pleaseEnterAmount;
-                    }
-                    final parsed = double.tryParse(value);
-                    if (parsed == null || parsed <= 0) {
-                      return AppLocalizations.of(context)!.pleaseEnterValidPositiveNumber;
-                    }
-                    return null;
-                  },
+                    const SizedBox(width: 12),
+                    Expanded(
+                      flex: 2,
+                      child: Container(
+                        height: 56, // matching TextFormField height
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey.shade700),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton<String>(
+                            value: _selectedCurrency,
+                            dropdownColor: const Color(0xFF1E293B),
+                            items: const [
+                              DropdownMenuItem(value: 'RON', child: Text('RON', style: TextStyle(fontWeight: FontWeight.bold))),
+                              DropdownMenuItem(value: 'EUR', child: Text('EUR', style: TextStyle(fontWeight: FontWeight.bold))),
+                            ],
+                            onChanged: (val) {
+                              if (val != null) {
+                                setState(() {
+                                  _selectedCurrency = val;
+                                });
+                              }
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
+                if (_selectedCurrency == 'EUR') ...[
+                  const SizedBox(height: 8),
+                  Consumer(
+                    builder: (context, ref, _) {
+                      final exchangeRateAsync = ref.watch(exchangeRateProvider);
+                      return exchangeRateAsync.when(
+                        data: (rate) {
+                          final inputAmt = double.tryParse(_amountController.text) ?? 0.0;
+                          final converted = inputAmt * rate;
+                          return Padding(
+                            padding: const EdgeInsets.only(left: 4.0),
+                            child: Text(
+                              '≈ RON ${converted.toStringAsFixed(2)}  (1 EUR = $rate RON)',
+                              style: TextStyle(
+                                color: _isIncome ? const Color(0xFF10B981) : const Color(0xFFFF7A5A),
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          );
+                        },
+                        loading: () => const Padding(
+                          padding: EdgeInsets.only(left: 4.0),
+                          child: Text('Fetching exchange rate...', style: TextStyle(color: Colors.grey, fontSize: 13)),
+                        ),
+                        error: (err, __) => const Padding(
+                          padding: EdgeInsets.only(left: 4.0),
+                          child: Text('Service unavailable. Defaulting to 1 EUR = 4.97 RON.', style: TextStyle(color: Colors.grey, fontSize: 13)),
+                        ),
+                      );
+                    },
+                  ),
+                ],
                 const SizedBox(height: 16),
 
                 // Dynamic Categories Dropdown fetching from Supabase

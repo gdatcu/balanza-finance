@@ -882,15 +882,34 @@ class _HomeViewState extends ConsumerState<HomeView> {
             ] else ...[
               const Spacer(),
             ],
-            Text(
-              tx.amount > 0
-                  ? '+${CurrencyFormatter.format(tx.amount)}'
-                  : CurrencyFormatter.format(tx.amount),
-              style: TextStyle(
-                color: tx.amount > 0 ? const Color(0xFF10B981) : const Color(0xFFFF7A5A),
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  tx.amount > 0
+                      ? '+${CurrencyFormatter.format(tx.amount)}'
+                      : CurrencyFormatter.format(tx.amount),
+                  style: TextStyle(
+                    color: tx.amount > 0 ? const Color(0xFF10B981) : const Color(0xFFFF7A5A),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+                if (tx.originalCurrency == 'EUR' && tx.originalAmount != null) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    tx.originalAmount! > 0
+                        ? '+€${tx.originalAmount!.toStringAsFixed(2)}'
+                        : '-€${tx.originalAmount!.abs().toStringAsFixed(2)}',
+                    style: const TextStyle(
+                      color: Colors.grey,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ],
             ),
           ],
         ),

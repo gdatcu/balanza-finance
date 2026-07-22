@@ -7,6 +7,8 @@ class Transaction {
   final String? description;
   final DateTime date;
   final DateTime createdAt;
+  final String originalCurrency;
+  final double? originalAmount;
 
   const Transaction({
     required this.id,
@@ -17,6 +19,8 @@ class Transaction {
     this.description,
     required this.date,
     required this.createdAt,
+    this.originalCurrency = 'RON',
+    this.originalAmount,
   });
 
   factory Transaction.fromJson(Map<String, dynamic> json) {
@@ -29,6 +33,10 @@ class Transaction {
       description: json['description'] as String?,
       date: DateTime.parse(json['date'] as String),
       createdAt: DateTime.parse(json['created_at'] as String),
+      originalCurrency: json['original_currency'] as String? ?? 'RON',
+      originalAmount: json['original_amount'] != null
+          ? (json['original_amount'] as num).toDouble()
+          : null,
     );
   }
 
@@ -42,6 +50,8 @@ class Transaction {
       'description': description,
       'date': date.toIso8601String(),
       'created_at': createdAt.toIso8601String(),
+      'original_currency': originalCurrency,
+      'original_amount': originalAmount,
     };
   }
 
@@ -54,6 +64,8 @@ class Transaction {
     String? description,
     DateTime? date,
     DateTime? createdAt,
+    String? originalCurrency,
+    double? originalAmount,
   }) {
     return Transaction(
       id: id ?? this.id,
@@ -64,6 +76,8 @@ class Transaction {
       description: description ?? this.description,
       date: date ?? this.date,
       createdAt: createdAt ?? this.createdAt,
+      originalCurrency: originalCurrency ?? this.originalCurrency,
+      originalAmount: originalAmount ?? this.originalAmount,
     );
   }
 }

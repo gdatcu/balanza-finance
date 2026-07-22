@@ -8,6 +8,7 @@ import 'package:balanza/features/auth/providers/auth_provider.dart';
 import 'package:balanza/features/transactions/presentation/home_view.dart';
 import 'package:balanza/features/transactions/repositories/transaction_repository.dart';
 import 'package:balanza/features/transactions/providers/transaction_provider.dart';
+import 'package:balanza/features/transactions/providers/exchange_rate_provider.dart';
 import 'package:balanza/models/transaction.dart';
 import 'package:balanza/models/category.dart';
 
@@ -65,6 +66,7 @@ void main() {
               createdAt: DateTime.now(),
             ),
           ])),
+          exchangeRateProvider.overrideWith((ref) => Future.value(4.97)),
         ],
         child: const MaterialApp(
           localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -119,6 +121,7 @@ void main() {
               createdAt: DateTime.now(),
             ),
           ])),
+          exchangeRateProvider.overrideWith((ref) => Future.value(4.97)),
         ],
         child: const MaterialApp(
           localizationsDelegates: AppLocalizations.localizationsDelegates,

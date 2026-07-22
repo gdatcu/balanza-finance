@@ -186,6 +186,40 @@ void main() {
       expect(updated.accountId, 'a1');
       expect(updated.amount, 150.0);
       expect(updated.description, 'Updated Spend');
+      expect(updated.originalCurrency, 'RON');
+      expect(updated.originalAmount, isNull);
+    });
+
+    test('fromJson parses original_currency and original_amount correctly', () {
+      final json = {
+        'id': 't1',
+        'user_id': 'u1',
+        'account_id': 'a1',
+        'amount': 497.0,
+        'date': '2026-07-22T12:00:00.000Z',
+        'created_at': '2026-07-22T12:00:00.000Z',
+        'original_currency': 'EUR',
+        'original_amount': 100.0,
+      };
+      final tx = Transaction.fromJson(json);
+      expect(tx.originalCurrency, 'EUR');
+      expect(tx.originalAmount, 100.0);
+    });
+
+    test('toJson serializes original_currency and original_amount correctly', () {
+      final tx = Transaction(
+        id: 't1',
+        userId: 'u1',
+        accountId: 'a1',
+        amount: 497.0,
+        date: DateTime.parse('2026-07-22T12:00:00.000Z'),
+        createdAt: DateTime.parse('2026-07-22T12:00:00.000Z'),
+        originalCurrency: 'EUR',
+        originalAmount: 100.0,
+      );
+      final json = tx.toJson();
+      expect(json['original_currency'], 'EUR');
+      expect(json['original_amount'], 100.0);
     });
   });
 
