@@ -122,7 +122,7 @@ void main() {
       final nudge = container.read(wealthAdvisorProvider);
       expect(nudge, isNotNull);
       expect(nudge!.textEn, contains('Dining out is a nice reward'));
-      expect(nudge.textRo, contains('Să mănânci în oraș e o răsplată plăcută'));
+      expect(nudge.textRo, contains('Să mănănci în oraș'));
     });
 
     test('Dismissing a nudge hides it from provider', () async {

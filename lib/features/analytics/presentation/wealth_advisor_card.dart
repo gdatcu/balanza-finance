@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../settings/providers/locale_provider.dart';
 import '../providers/wealth_advisor_provider.dart';
 
-/// Responsive, dark-themed Wealth Advisor card component.
+/// Responsive, dark-themed Wealth Advisor card component with full EN/RO localization support.
 class WealthAdvisorCard extends ConsumerWidget {
   final WealthAdvisorState state;
   final VoidCallback? onDismiss;
@@ -15,8 +16,14 @@ class WealthAdvisorCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final currentLocale = ref.watch(localeProvider);
+    final languageCode = currentLocale.languageCode;
+
     final isNudge = state.type == AdvisorType.nudge;
     final accentColor = isNudge ? const Color(0xFFF59E0B) : const Color(0xFF3B82F6);
+
+    final titleText = state.getLocalizedTitle(languageCode);
+    final messageText = state.getLocalizedText(languageCode);
 
     return Center(
       child: ConstrainedBox(
@@ -50,7 +57,7 @@ class WealthAdvisorCard extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      state.title.toUpperCase(),
+                      titleText.toUpperCase(),
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.bold,
@@ -60,7 +67,7 @@ class WealthAdvisorCard extends ConsumerWidget {
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      state.message,
+                      messageText,
                       softWrap: true,
                       style: const TextStyle(
                         fontSize: 14,

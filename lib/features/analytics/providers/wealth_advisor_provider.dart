@@ -16,6 +16,8 @@ enum AdvisorType {
 class WealthAdvisorState {
   final String id;
   final String title;
+  final String titleEn;
+  final String titleRo;
   final String message;
   final IconData icon;
   final AdvisorType type;
@@ -26,14 +28,22 @@ class WealthAdvisorState {
   const WealthAdvisorState({
     required this.id,
     required this.title,
+    String? titleEn,
+    String? titleRo,
     required this.message,
     required this.icon,
     required this.type,
     this.severity = NudgeSeverity.info,
     String? textEn,
     String? textRo,
-  })  : textEn = textEn ?? message,
+  })  : titleEn = titleEn ?? title,
+        titleRo = titleRo ?? title,
+        textEn = textEn ?? message,
         textRo = textRo ?? message;
+
+  String getLocalizedTitle(String languageCode) {
+    return languageCode == 'ro' ? titleRo : titleEn;
+  }
 
   String getLocalizedText(String languageCode) {
     return languageCode == 'ro' ? textRo : textEn;
@@ -99,7 +109,9 @@ final wealthAdvisorProvider = Provider<WealthAdvisorState?>((ref) {
         candidates.add(
           WealthAdvisorState(
             id: nudgeId,
-            title: 'BUDGET ALERT • $categoryName',
+            title: 'BUDGET ALERT • ${categoryName.toUpperCase()}',
+            titleEn: 'BUDGET ALERT • ${categoryName.toUpperCase()}',
+            titleRo: 'ALERTĂ DE BUGET • ${categoryName.toUpperCase()}',
             message: en,
             textEn: en,
             textRo: ro,
@@ -118,7 +130,9 @@ final wealthAdvisorProvider = Provider<WealthAdvisorState?>((ref) {
         candidates.add(
           WealthAdvisorState(
             id: nudgeId,
-            title: 'WARNING • $categoryName ($pctStr%)',
+            title: 'WARNING • ${categoryName.toUpperCase()} ($pctStr%)',
+            titleEn: 'WARNING • ${categoryName.toUpperCase()} ($pctStr%)',
+            titleRo: 'ATENȚIE • ${categoryName.toUpperCase()} ($pctStr%)',
             message: en,
             textEn: en,
             textRo: ro,
@@ -152,6 +166,8 @@ final wealthAdvisorProvider = Provider<WealthAdvisorState?>((ref) {
           const WealthAdvisorState(
             id: nudgeId,
             title: 'BEHAVIORAL NUDGE • TRANSPORT',
+            titleEn: 'BEHAVIORAL NUDGE • TRANSPORT',
+            titleRo: 'RECOMANDARE COMPORTAMENTALĂ • TRANSPORT',
             message: en,
             textEn: en,
             textRo: ro,
@@ -177,6 +193,8 @@ final wealthAdvisorProvider = Provider<WealthAdvisorState?>((ref) {
           const WealthAdvisorState(
             id: nudgeId,
             title: 'SAVINGS INSIGHT • TRANSPORT',
+            titleEn: 'SAVINGS INSIGHT • TRANSPORT',
+            titleRo: 'ECONOMII RECOMANDATE • TRANSPORT',
             message: en,
             textEn: en,
             textRo: ro,
@@ -196,11 +214,13 @@ final wealthAdvisorProvider = Provider<WealthAdvisorState?>((ref) {
       const nudgeId = 'nudge_food_delivery';
       if (!dismissedIds.contains(nudgeId)) {
         const en = 'Dining out is a nice reward! Cooking at home a bit more this week can help boost your savings goal.';
-        const ro = 'Să mănânci în oraș e o răsplată plăcută! Gătitul acasă puțin mai des în această săptămână te poate ajuta să-ți atingi obiectivul de economisire.';
+        const ro = 'Să mănănci în oraș e o răsplată plăcută! Gătitul acasă puțin mai des în această săptămână te poate ajuta să-ți atingi obiectivul de economisire.';
         candidates.add(
           const WealthAdvisorState(
             id: nudgeId,
             title: 'BEHAVIORAL NUDGE • DINING OUT',
+            titleEn: 'BEHAVIORAL NUDGE • DINING OUT',
+            titleRo: 'RECOMANDARE COMPORTAMENTALĂ • MÂNCARE ÎN ORAȘ',
             message: en,
             textEn: en,
             textRo: ro,
