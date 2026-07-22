@@ -146,5 +146,13 @@
     }
   },
   "updateInstallButton": "Actualizează",
-  "downloadingUpdate": "Se descarcă actualizarea..."
+  "downloadingUpdate": "Se descarcă actualizarea...",
+  "autoTaggedMessage": "Etichetat automat ca {category} pe baza regulilor la distanță.",
+  "@autoTaggedMessage": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      }
+    }
+  }
 }

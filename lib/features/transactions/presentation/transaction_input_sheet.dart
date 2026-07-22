@@ -8,6 +8,9 @@ import '../../../models/transaction.dart';
 import '../../../core/utils/category_localizer.dart';
 import 'categories_data.dart';
 
+import '../providers/tagging_rules_provider.dart';
+import '../utils/transaction_parser.dart';
+
 class TransactionInputSheet extends ConsumerStatefulWidget {
   const TransactionInputSheet({super.key});
 
@@ -24,6 +27,7 @@ class _TransactionInputSheetState extends ConsumerState<TransactionInputSheet> {
   String? _selectedCategoryId;
   DateTime _selectedDate = DateTime.now();
   String _selectedCurrency = 'RON';
+  String? _lastAutoTaggedRuleId;
 
   // Seeded Account IDs: Main Checking is default
   final String _selectedAccountId = '00000000-0000-0000-0000-000000000001';
@@ -32,10 +36,53 @@ class _TransactionInputSheetState extends ConsumerState<TransactionInputSheet> {
   void initState() {
     super.initState();
     _amountController.addListener(_onAmountChanged);
+    _noteController.addListener(_onNoteChanged);
   }
 
   void _onAmountChanged() {
     setState(() {}); // refresh live currency conversion preview
+  }
+
+  void _onNoteChanged() {
+    final rules = ref.read(taggingRulesProvider).value;
+    if (rules == null || rules.isEmpty) return;
+
+    final categories = ref.read(supabaseCategoriesProvider).value;
+    if (categories == null || categories.isEmpty) return;
+
+    final result = TransactionParser.parseText(_noteController.text, rules);
+    if (result != null && result.matchedRule.id != _lastAutoTaggedRuleId) {
+      final matchedCat = categories.firstWhere(
+        (c) =>
+            (result.categoryId != null && c.id == result.categoryId) ||
+            c.name.toLowerCase() == result.category.toLowerCase() ||
+            c.id == result.category,
+        orElse: () => categories.firstWhere(
+          (c) => c.name.toLowerCase().contains(result.category.toLowerCase()),
+          orElse: () => categories.first,
+        ),
+      );
+
+      _lastAutoTaggedRuleId = result.matchedRule.id;
+
+      if (_selectedCategoryId != matchedCat.id) {
+        setState(() {
+          _selectedCategoryId = matchedCat.id;
+        });
+
+        if (mounted) {
+          final localizedCategoryName = CategoryLocalizer.getLocalizedName(context, matchedCat.name);
+          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Auto-tagged as $localizedCategoryName based on remote rules.'),
+              backgroundColor: const Color(0xFF10B981),
+              duration: const Duration(seconds: 3),
+            ),
+          );
+        }
+      }
+    }
   }
 
   final Set<String> _expenseCategoryIds = {

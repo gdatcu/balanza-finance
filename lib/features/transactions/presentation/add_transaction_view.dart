@@ -8,6 +8,9 @@ import '../providers/transaction_provider.dart';
 import 'categories_data.dart';
 import 'accounts_data.dart';
 
+import '../providers/tagging_rules_provider.dart';
+import '../utils/transaction_parser.dart';
+
 class AddTransactionView extends ConsumerStatefulWidget {
   const AddTransactionView({super.key});
 
@@ -25,12 +28,50 @@ class _AddTransactionViewState extends ConsumerState<AddTransactionView> {
   DateTime _selectedDate = DateTime.now();
   bool _isExpense = true;
   bool _isLoading = false;
+  String? _lastAutoTaggedRuleId;
 
   @override
   void initState() {
     super.initState();
     _selectedAccount = defaultAccounts.first;
     _selectedCategory = expenseCategories.first;
+    _descriptionController.addListener(_onDescriptionChanged);
+  }
+
+  void _onDescriptionChanged() {
+    final rules = ref.read(taggingRulesProvider).value;
+    if (rules == null || rules.isEmpty) return;
+
+    final result = TransactionParser.parseText(_descriptionController.text, rules);
+    if (result != null && result.matchedRule.id != _lastAutoTaggedRuleId) {
+      final allCategories = [...expenseCategories, ...incomeCategories];
+      final matchedCat = allCategories.firstWhere(
+        (c) =>
+            (result.categoryId != null && c.id == result.categoryId) ||
+            c.name.toLowerCase() == result.category.toLowerCase() ||
+            c.id == result.category,
+        orElse: () => expenseCategories.first,
+      );
+
+      _lastAutoTaggedRuleId = result.matchedRule.id;
+
+      if (_selectedCategory.id != matchedCat.id) {
+        setState(() {
+          _selectedCategory = matchedCat;
+        });
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Auto-tagged as ${matchedCat.name} based on remote rules.'),
+              backgroundColor: Colors.green,
+              duration: const Duration(seconds: 3),
+            ),
+          );
+        }
+      }
+    }
   }
 
   @override

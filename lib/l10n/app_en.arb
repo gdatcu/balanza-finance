@@ -146,5 +146,13 @@
     }
   },
   "updateInstallButton": "Update",
-  "downloadingUpdate": "Downloading update..."
+  "downloadingUpdate": "Downloading update...",
+  "autoTaggedMessage": "Auto-tagged as {category} based on remote rules.",
+  "@autoTaggedMessage": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      }
+    }
+  }
 }
