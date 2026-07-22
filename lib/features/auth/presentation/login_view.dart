@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -49,10 +50,11 @@ class _LoginViewState extends State<LoginView> {
 
     try {
       // Pass the Web Client ID configured in Google Cloud (do NOT use Android Client ID here)
-      const String webClientId = 'YOUR_WEB_CLIENT_ID.apps.googleusercontent.com';
+      const String webClientId = '932149633166-cv1mmulfifvf2nrs22o0qeqosi7984i0.apps.googleusercontent.com';
 
       final googleSignIn = GoogleSignIn(
-        serverClientId: webClientId,
+        clientId: kIsWeb ? webClientId : null,
+        serverClientId: kIsWeb ? null : webClientId,
       );
 
       final googleUser = await googleSignIn.signIn();
