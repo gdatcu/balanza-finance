@@ -4,6 +4,20 @@ import '../../../models/tagging_rule.dart';
 
 /// AsyncNotifier to fetch and cache remote tagging rules from Supabase.
 class TaggingRulesNotifier extends AsyncNotifier<List<TaggingRule>> {
+  static const List<TaggingRule> defaultFallbackRules = [
+    TaggingRule(id: 'default-1', keyword: 'uber eats', category: 'Food', tag: 'delivery'),
+    TaggingRule(id: 'default-2', keyword: 'uber', category: 'Transport', tag: 'ride'),
+    TaggingRule(id: 'default-3', keyword: 'bolt', category: 'Transport', tag: 'ride'),
+    TaggingRule(id: 'default-4', keyword: 'starbucks', category: 'Food', tag: 'coffee'),
+    TaggingRule(id: 'default-5', keyword: 'lidl', category: 'Food', tag: 'groceries'),
+    TaggingRule(id: 'default-6', keyword: 'kaufland', category: 'Food', tag: 'groceries'),
+    TaggingRule(id: 'default-7', keyword: 'mega image', category: 'Food', tag: 'groceries'),
+    TaggingRule(id: 'default-8', keyword: 'netflix', category: 'Entertainment', tag: 'subscription'),
+    TaggingRule(id: 'default-9', keyword: 'digi', category: 'Utilities', tag: 'internet'),
+    TaggingRule(id: 'default-10', keyword: 'enel', category: 'Utilities', tag: 'electricity'),
+    TaggingRule(id: 'default-11', keyword: 'salariu', category: 'Salary', tag: 'income'),
+  ];
+
   @override
   Future<List<TaggingRule>> build() async {
     try {
@@ -17,10 +31,14 @@ class TaggingRulesNotifier extends AsyncNotifier<List<TaggingRule>> {
           .map((json) => TaggingRule.fromJson(json as Map<String, dynamic>))
           .toList();
 
+      if (rules.isEmpty) {
+        return defaultFallbackRules;
+      }
+
       return rules;
     } catch (_) {
-      // Gracefully return empty list if table does not exist or network fails
-      return <TaggingRule>[];
+      // Return default fallback rules if table does not exist or network fails
+      return defaultFallbackRules;
     }
   }
 
