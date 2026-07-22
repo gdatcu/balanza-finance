@@ -11,6 +11,7 @@ import '../../../core/utils/category_localizer.dart';
 import 'transaction_input_sheet.dart';
 import 'categories_data.dart';
 import '../../analytics/presentation/expense_pie_chart.dart';
+import '../../analytics/presentation/wealth_advisor_banner.dart';
 import '../../settings/presentation/settings_view.dart';
 import '../../settings/providers/locale_provider.dart';
 import '../../settings/providers/updater_provider.dart';
@@ -382,6 +383,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
         _buildMonthSelector(),
 
         if (_section == ToshlSection.overview) ...[
+          const WealthAdvisorBanner(),
           _buildAdvisorWidget(context),
           const SizedBox(height: 16),
           _buildOverviewCard(totalBalance, totalIncome, totalExpenses),

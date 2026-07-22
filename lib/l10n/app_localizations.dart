@@ -751,6 +751,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Downloading update...'**
   String get downloadingUpdate;
+
+  /// No description provided for @autoTaggedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto-tagged as {category} based on remote rules.'**
+  String autoTaggedMessage(String category);
 }
 
 class _AppLocalizationsDelegate

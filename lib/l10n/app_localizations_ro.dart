@@ -358,4 +358,9 @@ class AppLocalizationsRo extends AppLocalizations {
 
   @override
   String get downloadingUpdate => 'Se descarcă actualizarea...';
+
+  @override
+  String autoTaggedMessage(String category) {
+    return 'Etichetat automat ca $category pe baza regulilor la distanță.';
+  }
 }

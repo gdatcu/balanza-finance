@@ -356,4 +356,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get downloadingUpdate => 'Downloading update...';
+
+  @override
+  String autoTaggedMessage(String category) {
+    return 'Auto-tagged as $category based on remote rules.';
+  }
 }
