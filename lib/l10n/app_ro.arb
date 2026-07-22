@@ -1,0 +1,135 @@
+{
+  "@@locale": "ro",
+  "appTitle": "Balanza Finance",
+  "appTagline": "Gestionează-ți registrul personal cu ușurință",
+  "totalBalance": "Balanță Totală",
+  "income": "Venituri",
+  "expenses": "Cheltuieli",
+  "netWorth": "Avere Netă",
+  "addTransaction": "Adaugă Tranzacție",
+  "monthlyBudget": "Buget Lunar",
+  "budgets": "Bugete",
+  "byDate": "După Dată",
+  "byCategory": "După Categorie",
+  "overview": "Prezentare Generală",
+  "advisor": "Consilier",
+  "settings": "Setări",
+  "configureBudget": "Configure Buget",
+  "configureBudgetHelp": "Setează o limită lunară pentru a-ți ține cheltuielile sub control. Graficele și indicatorii de avertizare se vor ajusta la această valoare.",
+  "enterBudgetAmount": "Introduceți suma bugetului",
+  "monthlyLimit": "Limită Lunară",
+  "saveBudget": "Salvează Bugetul",
+  "logOut": "Deconectare",
+  "language": "Limbă",
+  "emailAddress": "Adresă de Email",
+  "password": "Parolă",
+  "signIn": "Conectare",
+  "signUp": "Înregistrare",
+  "assets": "Active",
+  "liabilities": "Pasive",
+  "overallNetWorth": "Avere Netă Totală",
+  "totalAssets": "Total Active",
+  "addNetWorthItem": "Adaugă Element Avere Netă",
+  "name": "Nume",
+  "nameFieldLabel": "Nume (de ex. Cont bancar, Credit auto)",
+  "pleaseEnterName": "Vă rugăm introduceți un nume",
+  "amount": "Sumă",
+  "amountFieldLabel": "Sumă (RON)",
+  "addItem": "Adaugă Element",
+  "deleteItem": "Șterge Element",
+  "confirmDelete": "Sigur doriți să ștergeți acest element?",
+  "cancel": "Anulează",
+  "delete": "Șterge",
+  "itemDeleted": "Element șters",
+  "noAssetsRecorded": "Niciun activ înregistrat",
+  "noLiabilitiesRecorded": "Niciun pasiv înregistrat",
+  "typeAsset": "Activ",
+  "typeLiability": "Pasiv",
+  "type": "Tip",
+  "typeIncome": "Venit",
+  "typeExpense": "Cheltuială",
+  "saveTransaction": "Salvează Tranzacția",
+  "spent": "Cheltuit",
+  "noteOptional": "Notă (Opțional)",
+  "date": "Dată",
+  "category": "Categorie",
+  "pleaseEnterAmount": "Vă rugăm introduceți o sumă",
+  "pleaseSelectCategory": "Vă rugăm selectați o categorie",
+  "pleaseEnterValidPositiveNumber": "Vă rugăm introduceți un număr pozitiv valid",
+  "transactionAddedSuccessfully": "Tranzacție adăugată cu succes!",
+  "deleteTransactionTitle": "Ștergeți tranzacția?",
+  "confirmDeleteTransaction": "Sigur doriți să ștergeți această tranzacție?",
+  "transactionDeleted": "Tranzacție ștearsă",
+  "retry": "Reîncercați",
+  "noCategoryTransactions": "Nicio categorie cu tranzacții în această secțiune.",
+  "pleaseEnterBudgetAmount": "Vă rugăm introduceți limita de buget",
+  "budgetUpdatedSuccessfully": "Buget actualizat cu succes!",
+  "pleaseEnterEmail": "Vă rugăm introduceți adresa de email",
+  "pleaseEnterValidEmail": "Vă rugăm introduceți o adresă de email validă",
+  "pleaseEnterPassword": "Vă rugăm introduceți parola",
+  "passwordTooShort": "Parola trebuie să conțină cel puțin 6 caractere",
+  "unexpectedErrorSignIn": "A apărut o eroare neașteptată la conectare.",
+  "unexpectedErrorRegistration": "A apărut o eroare neașteptată la înregistrare.",
+  "registrationSuccessful": "Înregistrare reușită! Verificați emailul pentru validare sau conectați-vă.",
+  "registrationSubmitted": "Înregistrare trimisă cu succes.",
+  "today": "Astăzi",
+  "yesterday": "Ieri",
+  "totalExpenses": "Total Cheltuieli",
+  "totalIncome": "Total Venituri",
+  "financialInsight": "Analiză Financiară",
+  "categoryFood": "Mâncare",
+  "categoryTransport": "Transport",
+  "categoryRent": "Chirie",
+  "categoryUtilities": "Utilități",
+  "categoryEntertainment": "Divertisment",
+  "categoryShopping": "Cumpărături",
+  "categorySalary": "Salariu",
+  "categoryInvestments": "Investiții",
+  "categoryGifts": "Cadouri",
+  "insightNetWorthGrew": "Excelentă treabă. Averea ta netă a crescut cu {amount} RON în această lună. De ce contează: Aceasta este metrica supremă a impulsului financiar. Fiecare creștere pozitivă înseamnă că îți recumperi activ timpul viitor și construiești o plasă de siguranță permanentă.",
+  "@insightNetWorthGrew": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "insightHighSurplus": "Remarcabil! Ai economisit {percentage}% din veniturile tale în această lună. De ce contează: O rată ridicată de economisire creează un surplus de capital compus, oferindu-ți control asupra timpului tău viitor.",
+  "@insightHighSurplus": {
+    "placeholders": {
+      "percentage": {
+        "type": "String"
+      }
+    }
+  },
+  "insightHighExpenseWarning": "Ai utilizat {percentage}% din bugetul tău. De ce contează: Scurgerile zilnice mici pot scufunda corăbii mari. Controlul cheltuielilor discreționare acum previne un deficit și îți menține motorul de acumulare a averii activ.",
+  "@insightHighExpenseWarning": {
+    "placeholders": {
+      "percentage": {
+        "type": "String"
+      }
+    }
+  },
+  "insightOnTrackBudget": "Ești la {percentage}% din bugetul tău de {budget}. Pe drumul cel bun pentru un surplus puternic. De ce contează: Depășirea constantă a bugetului previne creșterea stilului de viață și construiește rezerva de numerar necesară pentru a-ți asuma riscuri calculate.",
+  "@insightOnTrackBudget": {
+    "placeholders": {
+      "percentage": {
+        "type": "String"
+      },
+      "budget": {
+        "type": "String"
+      }
+    }
+  },
+  "insightDefault": "Continuă să îți urmărești tranzacțiile pentru a câștiga control asupra banilor tăi. De ce contează: Monitorizarea constantă este primul pas către optimizare și libertate financiară.",
+  "insightLoading": "Analizăm finanțele tale... De ce contează: Răbdarea și urmărirea continuă sunt cheia pentru a înțelege traiectoria pe termen lung a averii tale.",
+  "incomeByCategory": "Venituri după Categorie",
+  "expensesByCategory": "Cheltuieli după Categorie",
+  "noIncomeData": "Niciun venit înregistrat încă.",
+  "noExpenseData": "Nicio cheltuială înregistrată încă.",
+  "noTransactionsYet": "Nicio tranzacție înregistrată încă",
+  "noExpensesYet": "Nicio cheltuială înregistrată încă",
+  "noIncomesYet": "Niciun venit înregistrat încă",
+  "noTransactionDataYet": "Nu există date despre tranzacții",
+  "tapToRecordFirstTransaction": "Atingeți butonul '+' pentru a înregistra prima tranzacție."
+}

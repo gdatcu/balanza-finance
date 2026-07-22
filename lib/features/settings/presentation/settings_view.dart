@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:balanza/l10n/app_localizations.dart';
 import '../../transactions/providers/transaction_provider.dart';
 
 class SettingsView extends ConsumerStatefulWidget {
@@ -34,8 +35,8 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
       if (mounted) {
         Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Budget updated successfully!'),
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.budgetUpdatedSuccessfully),
             backgroundColor: Colors.green,
           ),
         );
@@ -65,9 +66,9 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Settings',
-          style: TextStyle(fontWeight: FontWeight.bold),
+        title: Text(
+          AppLocalizations.of(context)!.settings,
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         elevation: 0,
         backgroundColor: Colors.transparent,
@@ -79,18 +80,18 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Text(
-                'Configure Budget',
-                style: TextStyle(
+              Text(
+                AppLocalizations.of(context)!.configureBudget,
+                style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                 ),
               ),
               const SizedBox(height: 8),
-              const Text(
-                'Set your monthly limit to help visualize and control your expenditures.',
-                style: TextStyle(
+              Text(
+                AppLocalizations.of(context)!.configureBudgetHelp,
+                style: const TextStyle(
                   fontSize: 14,
                   color: Colors.grey,
                 ),
@@ -107,9 +108,9 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Monthly Limit',
-                        style: TextStyle(
+                      Text(
+                        AppLocalizations.of(context)!.monthlyLimit,
+                        style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
                           color: Colors.grey,
@@ -121,7 +122,7 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
                         keyboardType: const TextInputType.numberWithOptions(decimal: true),
                         decoration: InputDecoration(
                           prefixIcon: const Icon(Icons.wallet, color: Color(0xFFF59E0B)),
-                          hintText: 'Enter budget amount',
+                          hintText: AppLocalizations.of(context)!.enterBudgetAmount,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -132,11 +133,11 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
                         ),
                         validator: (value) {
                           if (value == null || value.trim().isEmpty) {
-                            return 'Please enter a budget amount';
+                            return AppLocalizations.of(context)!.pleaseEnterBudgetAmount;
                           }
                           final parsed = double.tryParse(value);
                           if (parsed == null || parsed <= 0) {
-                            return 'Please enter a valid positive number';
+                            return AppLocalizations.of(context)!.pleaseEnterValidPositiveNumber;
                           }
                           return null;
                         },
@@ -157,9 +158,9 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
                   ),
                   elevation: 0,
                 ),
-                child: const Text(
-                  'Save Budget',
-                  style: TextStyle(
+                child: Text(
+                  AppLocalizations.of(context)!.saveBudget,
+                  style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
@@ -169,9 +170,9 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
               OutlinedButton.icon(
                 onPressed: _logout,
                 icon: const Icon(Icons.logout, color: Color(0xFFFF7A5A)),
-                label: const Text(
-                  'Log Out',
-                  style: TextStyle(
+                label: Text(
+                  AppLocalizations.of(context)!.logOut,
+                  style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                     color: Color(0xFFFF7A5A),

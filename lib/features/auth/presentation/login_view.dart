@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:balanza/l10n/app_localizations.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -38,7 +39,7 @@ class _LoginViewState extends State<LoginView> {
     } on AuthException catch (e) {
       _showErrorSnackBar(e.message);
     } catch (e) {
-      _showErrorSnackBar('An unexpected error occurred during sign in.');
+      _showErrorSnackBar(AppLocalizations.of(context)!.unexpectedErrorSignIn);
     } finally {
       if (mounted) {
         setState(() {
@@ -61,14 +62,14 @@ class _LoginViewState extends State<LoginView> {
         password: _passwordController.text,
       );
       if (response.user != null) {
-        _showSuccessSnackBar('Registration successful! Check your email for validation or sign in.');
+        _showSuccessSnackBar(AppLocalizations.of(context)!.registrationSuccessful);
       } else {
-        _showSuccessSnackBar('Registration submitted successfully.');
+        _showSuccessSnackBar(AppLocalizations.of(context)!.registrationSubmitted);
       }
     } on AuthException catch (e) {
       _showErrorSnackBar(e.message);
     } catch (e) {
-      _showErrorSnackBar('An unexpected error occurred during registration.');
+      _showErrorSnackBar(AppLocalizations.of(context)!.unexpectedErrorRegistration);
     } finally {
       if (mounted) {
         setState(() {
@@ -101,7 +102,6 @@ class _LoginViewState extends State<LoginView> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final size = MediaQuery.of(context).size;
 
     return Scaffold(
       body: Container(
@@ -145,7 +145,7 @@ class _LoginViewState extends State<LoginView> {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          'Balanza Finance',
+                          AppLocalizations.of(context)!.appTitle,
                           textAlign: TextAlign.center,
                           style: theme.textTheme.headlineMedium?.copyWith(
                             fontWeight: FontWeight.bold,
@@ -155,7 +155,7 @@ class _LoginViewState extends State<LoginView> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'Manage your personal ledger with ease',
+                          AppLocalizations.of(context)!.appTagline,
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 14,
@@ -170,7 +170,7 @@ class _LoginViewState extends State<LoginView> {
                           keyboardType: TextInputType.emailAddress,
                           textInputAction: TextInputAction.next,
                           decoration: InputDecoration(
-                            labelText: 'Email Address',
+                            labelText: AppLocalizations.of(context)!.emailAddress,
                             prefixIcon: const Icon(Icons.email_outlined),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(16),
@@ -185,10 +185,10 @@ class _LoginViewState extends State<LoginView> {
                           ),
                           validator: (value) {
                             if (value == null || value.trim().isEmpty) {
-                              return 'Please enter your email';
+                              return AppLocalizations.of(context)!.pleaseEnterEmail;
                             }
                             if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value.trim())) {
-                              return 'Please enter a valid email address';
+                              return AppLocalizations.of(context)!.pleaseEnterValidEmail;
                             }
                             return null;
                           },
@@ -202,7 +202,7 @@ class _LoginViewState extends State<LoginView> {
                           textInputAction: TextInputAction.done,
                           onFieldSubmitted: (_) => _signIn(),
                           decoration: InputDecoration(
-                            labelText: 'Password',
+                            labelText: AppLocalizations.of(context)!.password,
                             prefixIcon: const Icon(Icons.lock_outlined),
                             suffixIcon: IconButton(
                               icon: Icon(
@@ -229,10 +229,10 @@ class _LoginViewState extends State<LoginView> {
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'Please enter your password';
+                              return AppLocalizations.of(context)!.pleaseEnterPassword;
                             }
                             if (value.length < 6) {
-                              return 'Password must be at least 6 characters';
+                              return AppLocalizations.of(context)!.passwordTooShort;
                             }
                             return null;
                           },
@@ -259,9 +259,9 @@ class _LoginViewState extends State<LoginView> {
                               ),
                               elevation: 2,
                             ),
-                            child: const Text(
-                              'Sign In',
-                              style: TextStyle(
+                            child: Text(
+                              AppLocalizations.of(context)!.signIn,
+                              style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -278,9 +278,9 @@ class _LoginViewState extends State<LoginView> {
                                 borderRadius: BorderRadius.circular(16),
                               ),
                             ),
-                            child: const Text(
-                              'Sign Up',
-                              style: TextStyle(
+                            child: Text(
+                              AppLocalizations.of(context)!.signUp,
+                              style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
                               ),

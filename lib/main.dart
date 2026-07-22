@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:balanza/l10n/app_localizations.dart';
 import 'features/auth/presentation/login_view.dart';
 import 'features/auth/providers/auth_provider.dart';
 import 'features/transactions/presentation/home_view.dart';
 import 'features/transactions/providers/transaction_provider.dart';
+import 'features/settings/providers/locale_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,9 +35,13 @@ class MyApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authStateAsync = ref.watch(authProvider);
+    final locale = ref.watch(localeProvider);
 
     return MaterialApp(
       title: 'Balanza',
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      locale: locale,
       debugShowCheckedModeBanner: false,
       theme: ThemeData.dark().copyWith(
         scaffoldBackgroundColor: const Color(0xFF0F172A),

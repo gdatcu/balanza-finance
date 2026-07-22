@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:balanza/l10n/app_localizations.dart';
+import 'package:intl/intl.dart';
 import '../providers/transaction_provider.dart';
 import '../../../models/transaction.dart';
 import '../../../models/category_summary.dart';
 import '../../../core/utils/currency_formatter.dart';
+import '../../../core/utils/category_localizer.dart';
 import 'transaction_input_sheet.dart';
 import 'categories_data.dart';
 import '../../analytics/presentation/expense_pie_chart.dart';
 import '../../settings/presentation/settings_view.dart';
+import '../../settings/providers/locale_provider.dart';
 import '../../net_worth/presentation/net_worth_view.dart';
 
 enum ToshlSection {
@@ -54,25 +58,22 @@ class _HomeViewState extends ConsumerState<HomeView> {
     );
   }
 
-  String _formatDateHeader(DateTime date) {
+  String _formatDateHeader(BuildContext context, DateTime date) {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final yesterday = today.subtract(const Duration(days: 1));
     final compareDate = DateTime(date.year, date.month, date.day);
 
     if (compareDate == today) {
-      return 'Today';
+      return AppLocalizations.of(context)!.today;
     } else if (compareDate == yesterday) {
-      return 'Yesterday';
+      return AppLocalizations.of(context)!.yesterday;
     } else {
-      final weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-      final months = [
-        'January', 'February', 'March', 'April', 'May', 'June',
-        'July', 'August', 'September', 'October', 'November', 'December'
-      ];
-      final wday = weekdays[date.weekday - 1];
-      final month = months[date.month - 1];
-      return '$wday, $month ${date.day}, ${date.year}';
+      final currentLocale = Localizations.localeOf(context).languageCode;
+      final rawFormatted = DateFormat.yMMMEd(currentLocale).format(date);
+      return rawFormatted.isNotEmpty
+          ? rawFormatted[0].toUpperCase() + rawFormatted.substring(1)
+          : rawFormatted;
     }
   }
 
@@ -105,9 +106,9 @@ class _HomeViewState extends ConsumerState<HomeView> {
           backgroundColor: Colors.transparent,
           elevation: 0,
           foregroundColor: Colors.white,
-          title: const Text(
-            'Balanza Finance',
-            style: TextStyle(fontWeight: FontWeight.bold),
+          title: Text(
+            AppLocalizations.of(context)!.appTitle,
+            style: const TextStyle(fontWeight: FontWeight.bold),
           ),
           bottom: PreferredSize(
             preferredSize: const Size.fromHeight(48),
@@ -119,9 +120,9 @@ class _HomeViewState extends ConsumerState<HomeView> {
                 indicatorWeight: 3,
                 labelColor: Colors.white,
                 unselectedLabelColor: Colors.grey,
-                tabs: const [
-                  Tab(text: 'BY DATE'),
-                  Tab(text: 'BY CATEGORY'),
+                tabs: [
+                  Tab(text: AppLocalizations.of(context)!.byDate.toUpperCase()),
+                  Tab(text: AppLocalizations.of(context)!.byCategory.toUpperCase()),
                 ],
               ),
             ),
@@ -147,9 +148,9 @@ class _HomeViewState extends ConsumerState<HomeView> {
                         size: 48,
                       ),
                       const SizedBox(height: 12),
-                      const Text(
-                        'Balanza Finance',
-                        style: TextStyle(
+                      Text(
+                        AppLocalizations.of(context)!.appTitle,
+                        style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
                           fontSize: 18,
@@ -171,7 +172,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
                     Icons.dashboard,
                     color: _section == ToshlSection.overview ? const Color(0xFFFF7A5A) : Colors.grey,
                   ),
-                  title: const Text('Monthly overview', style: TextStyle(color: Colors.white)),
+                  title: Text(AppLocalizations.of(context)!.overview, style: const TextStyle(color: Colors.white)),
                   selected: _section == ToshlSection.overview,
                   selectedTileColor: Colors.white.withValues(alpha: 0.05),
                   onTap: () {
@@ -183,7 +184,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
                 ),
                 ListTile(
                   leading: const Icon(Icons.trending_down, color: Color(0xFFFF7A5A)),
-                  title: const Text('Expenses', style: TextStyle(color: Color(0xFFFF7A5A))),
+                  title: Text(AppLocalizations.of(context)!.expenses, style: const TextStyle(color: Color(0xFFFF7A5A))),
                   selected: _section == ToshlSection.expenses,
                   selectedTileColor: const Color(0xFFFF7A5A).withValues(alpha: 0.05),
                   onTap: () {
@@ -195,7 +196,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
                 ),
                 ListTile(
                   leading: const Icon(Icons.trending_up, color: Color(0xFF10B981)),
-                  title: const Text('Incomes', style: TextStyle(color: Color(0xFF10B981))),
+                  title: Text(AppLocalizations.of(context)!.income, style: const TextStyle(color: Color(0xFF10B981))),
                   selected: _section == ToshlSection.incomes,
                   selectedTileColor: const Color(0xFF10B981).withValues(alpha: 0.05),
                   onTap: () {
@@ -207,7 +208,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
                 ),
                 ListTile(
                   leading: const Icon(Icons.pie_chart, color: Color(0xFFF59E0B)),
-                  title: const Text('Budgets', style: TextStyle(color: Color(0xFFF59E0B))),
+                  title: Text(AppLocalizations.of(context)!.budgets, style: const TextStyle(color: Color(0xFFF59E0B))),
                   selected: _section == ToshlSection.budgets,
                   selectedTileColor: const Color(0xFFF59E0B).withValues(alpha: 0.05),
                   onTap: () {
@@ -219,7 +220,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
                 ),
                 ListTile(
                   leading: const Icon(Icons.account_balance, color: Color(0xFFF59E0B)),
-                  title: const Text('Net Worth', style: TextStyle(color: Colors.white)),
+                  title: Text(AppLocalizations.of(context)!.netWorth, style: const TextStyle(color: Colors.white)),
                   onTap: () {
                     Navigator.of(context).pop();
                     Navigator.of(context).push(
@@ -228,15 +229,64 @@ class _HomeViewState extends ConsumerState<HomeView> {
                   },
                 ),
                 const Divider(color: Colors.white12),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                  child: Text(
+                    AppLocalizations.of(context)!.settings.toUpperCase(),
+                    style: const TextStyle(color: Colors.grey, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.1),
+                  ),
+                ),
                 ListTile(
                   leading: const Icon(Icons.settings, color: Colors.grey),
-                  title: const Text('Settings', style: TextStyle(color: Colors.white)),
+                  title: Text(AppLocalizations.of(context)!.settings, style: const TextStyle(color: Colors.white)),
                   onTap: () {
                     Navigator.of(context).pop();
                     Navigator.of(context).push(
                       MaterialPageRoute(builder: (context) => const SettingsView()),
                     );
                   },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.language, color: Colors.grey),
+                  title: Text(AppLocalizations.of(context)!.language, style: const TextStyle(color: Colors.white)),
+                  trailing: Consumer(
+                    builder: (context, ref, _) {
+                      final currentLocale = ref.watch(localeProvider);
+                      final isRo = currentLocale.languageCode == 'ro';
+                      return Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          GestureDetector(
+                            onTap: () => ref.read(localeProvider.notifier).setLocale('en'),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                              child: Text(
+                                'EN',
+                                style: TextStyle(
+                                  color: !isRo ? const Color(0xFFFF7A5A) : Colors.grey,
+                                  fontWeight: !isRo ? FontWeight.bold : FontWeight.normal,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const Text('|', style: TextStyle(color: Colors.grey, fontSize: 12)),
+                          GestureDetector(
+                            onTap: () => ref.read(localeProvider.notifier).setLocale('ro'),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                              child: Text(
+                                'RO',
+                                style: TextStyle(
+                                  color: isRo ? const Color(0xFFFF7A5A) : Colors.grey,
+                                  fontWeight: isRo ? FontWeight.bold : FontWeight.normal,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
                 ),
               ],
             ),
@@ -330,10 +380,10 @@ class _HomeViewState extends ConsumerState<HomeView> {
           _buildBudgetCard(totalExpenses.abs()),
           const SizedBox(height: 16),
         ] else if (_section == ToshlSection.expenses) ...[
-          _buildSectionSummary('Total Expenses', totalExpenses.abs(), const Color(0xFFFF7A5A)),
+          _buildSectionSummary(AppLocalizations.of(context)!.totalExpenses, totalExpenses.abs(), const Color(0xFFFF7A5A)),
           const SizedBox(height: 16),
         ] else if (_section == ToshlSection.incomes) ...[
-          _buildSectionSummary('Total Income', totalIncome, const Color(0xFF10B981)),
+          _buildSectionSummary(AppLocalizations.of(context)!.totalIncome, totalIncome, const Color(0xFF10B981)),
           const SizedBox(height: 16),
         ] else if (_section == ToshlSection.budgets) ...[
           _buildBudgetCard(totalExpenses.abs()),
@@ -353,7 +403,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
               Padding(
                 padding: const EdgeInsets.only(left: 16, top: 16, bottom: 8),
                 child: Text(
-                  _formatDateHeader(date),
+                  _formatDateHeader(context, date),
                   style: const TextStyle(
                     color: Colors.grey,
                     fontSize: 14,
@@ -393,12 +443,12 @@ class _HomeViewState extends ConsumerState<HomeView> {
             }).toList();
 
             if (filtered.isEmpty) {
-              return const Center(
+              return Center(
                 child: Padding(
-                  padding: EdgeInsets.all(24.0),
+                  padding: const EdgeInsets.all(24.0),
                   child: Text(
-                    'No categories with transactions in this section.',
-                    style: TextStyle(color: Colors.grey),
+                    AppLocalizations.of(context)!.noCategoryTransactions,
+                    style: const TextStyle(color: Colors.grey),
                   ),
                 ),
               );
@@ -415,7 +465,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
                 return ListTile(
                   contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
                   title: Text(
-                    item.categoryName,
+                    CategoryLocalizer.getLocalizedName(context, item.categoryName),
                     style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
@@ -448,11 +498,11 @@ class _HomeViewState extends ConsumerState<HomeView> {
 
   Widget _buildMonthSelector() {
     final selectedMonth = ref.watch(selectedMonthProvider);
-    final monthNames = [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'
-    ];
-    final String monthText = "${monthNames[selectedMonth.month - 1]} ${selectedMonth.year}";
+    final currentLocale = Localizations.localeOf(context).languageCode;
+    final rawMonthText = DateFormat.yMMMM(currentLocale).format(selectedMonth);
+    final monthText = rawMonthText.isNotEmpty
+        ? rawMonthText[0].toUpperCase() + rawMonthText.substring(1)
+        : rawMonthText;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -488,9 +538,13 @@ class _HomeViewState extends ConsumerState<HomeView> {
 
   Widget _buildAdvisorWidget(BuildContext context) {
     final quote = ref.watch(insightsProvider);
-    final parts = quote.split(' Why it matters: ');
+    final isRo = quote.contains(' De ce contează: ');
+    final splitter = isRo ? ' De ce contează: ' : ' Why it matters: ';
+    final parts = quote.split(splitter);
     final primaryText = parts[0];
-    final whyItMattersText = parts.length > 1 ? 'Why it matters: ${parts[1]}' : '';
+    final whyItMattersText = parts.length > 1 
+        ? (isRo ? 'De ce contează: ${parts[1]}' : 'Why it matters: ${parts[1]}')
+        : '';
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -514,9 +568,9 @@ class _HomeViewState extends ConsumerState<HomeView> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'FINANCIAL INSIGHT',
-                    style: TextStyle(
+                  Text(
+                    AppLocalizations.of(context)!.financialInsight.toUpperCase(),
+                    style: const TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.bold,
                       color: Colors.grey,
@@ -567,9 +621,9 @@ class _HomeViewState extends ConsumerState<HomeView> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Total Balance',
-              style: TextStyle(
+            Text(
+              AppLocalizations.of(context)!.totalBalance,
+              style: const TextStyle(
                 color: Colors.grey,
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
@@ -593,13 +647,13 @@ class _HomeViewState extends ConsumerState<HomeView> {
                 _buildSummaryItem(
                   icon: Icons.arrow_downward,
                   color: const Color(0xFF10B981),
-                  label: 'Income',
+                  label: AppLocalizations.of(context)!.income,
                   amount: totalIncome,
                 ),
                 _buildSummaryItem(
                   icon: Icons.arrow_upward,
                   color: const Color(0xFFFF7A5A),
-                  label: 'Expenses',
+                  label: AppLocalizations.of(context)!.expenses,
                   amount: totalExpenses.abs(),
                 ),
               ],
@@ -707,9 +761,9 @@ class _HomeViewState extends ConsumerState<HomeView> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'Monthly Budget',
-                  style: TextStyle(
+                Text(
+                  AppLocalizations.of(context)!.monthlyBudget,
+                  style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 15,
                     color: Colors.white,
@@ -737,7 +791,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Spent: ${CurrencyFormatter.format(expenseAbs)} / ${CurrencyFormatter.format(budgetLimit)}',
+              '${AppLocalizations.of(context)!.spent}: ${CurrencyFormatter.format(expenseAbs)} / ${CurrencyFormatter.format(budgetLimit)}',
               style: const TextStyle(
                 color: Colors.grey,
                 fontSize: 13,
@@ -768,36 +822,36 @@ class _HomeViewState extends ConsumerState<HomeView> {
           size: 24,
         ),
       ),
-      confirmDismiss: (dir) async {
+      confirmDismiss: (direction) async {
         return await showDialog<bool>(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('Delete Transaction?'),
-            content: const Text(
-              'Are you sure you want to delete this transaction?',
+            title: Text(AppLocalizations.of(context)!.deleteTransactionTitle),
+            content: Text(
+              AppLocalizations.of(context)!.confirmDeleteTransaction,
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(false),
-                child: const Text('Cancel'),
+                child: Text(AppLocalizations.of(context)!.cancel),
               ),
               TextButton(
                 onPressed: () => Navigator.of(context).pop(true),
-                child: const Text(
-                  'Delete',
-                  style: TextStyle(color: Color(0xFFFF7A5A)),
+                child: Text(
+                  AppLocalizations.of(context)!.delete,
+                  style: const TextStyle(color: Color(0xFFFF7A5A)),
                 ),
               ),
             ],
           ),
         );
       },
-      onDismissed: (direction) {
+      onDismissed: (_) {
         ref.read(transactionListProvider.notifier).delete(tx.id);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Transaction deleted'),
-            backgroundColor: Color(0xFF1E293B),
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.transactionDeleted),
+            backgroundColor: const Color(0xFF1E293B),
           ),
         );
       },
@@ -806,7 +860,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
         child: Row(
           children: [
             Text(
-              cat.name,
+              CategoryLocalizer.getLocalizedName(context, cat.name),
               style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
@@ -857,12 +911,12 @@ class _HomeViewState extends ConsumerState<HomeView> {
           const SizedBox(height: 16),
           Text(
             _section == ToshlSection.overview
-                ? 'No transactions yet'
+                ? AppLocalizations.of(context)!.noTransactionsYet
                 : _section == ToshlSection.expenses
-                    ? 'No expenses yet'
+                    ? AppLocalizations.of(context)!.noExpensesYet
                     : _section == ToshlSection.incomes
-                        ? 'No incomes yet'
-                        : 'No transaction data yet',
+                        ? AppLocalizations.of(context)!.noIncomesYet
+                        : AppLocalizations.of(context)!.noTransactionDataYet,
             style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -870,9 +924,9 @@ class _HomeViewState extends ConsumerState<HomeView> {
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
-            "Tap the '+' button to record your first transaction.",
-            style: TextStyle(
+          Text(
+            AppLocalizations.of(context)!.tapToRecordFirstTransaction,
+            style: const TextStyle(
               fontSize: 14,
               color: Colors.grey,
             ),

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:balanza/l10n/app_localizations.dart';
 import '../../transactions/providers/transaction_provider.dart';
 import '../../transactions/presentation/categories_data.dart';
 import '../../../models/transaction.dart';
 import '../../../core/utils/currency_formatter.dart';
+import '../../../core/utils/category_localizer.dart';
 
 class ExpensePieChart extends ConsumerWidget {
   final List<Transaction>? customTransactions;
@@ -62,8 +64,8 @@ class ExpensePieChart extends ConsumerWidget {
           child: Center(
             child: Text(
               isIncome
-                  ? 'No income data to display yet.'
-                  : 'No expense data to display yet.',
+                  ? AppLocalizations.of(context)!.noIncomeData
+                  : AppLocalizations.of(context)!.noExpenseData,
               style: const TextStyle(color: Colors.grey, fontSize: 14),
             ),
           ),
@@ -86,7 +88,7 @@ class ExpensePieChart extends ConsumerWidget {
       sections.add(
         PieChartSectionData(
           value: sum,
-          title: showTitleText ? '${cat.name}\n${percentage.toStringAsFixed(1)}%' : '',
+          title: showTitleText ? '${CategoryLocalizer.getLocalizedName(context, cat.name)}\n${percentage.toStringAsFixed(1)}%' : '',
           color: color,
           radius: 65,
           titleStyle: const TextStyle(
@@ -120,7 +122,7 @@ class ExpensePieChart extends ConsumerWidget {
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
-                  cat.name,
+                  CategoryLocalizer.getLocalizedName(context, cat.name),
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
@@ -157,7 +159,7 @@ class ExpensePieChart extends ConsumerWidget {
           children: [
             Center(
               child: Text(
-                isIncome ? 'Income by Category' : 'Expenses by Category',
+                isIncome ? AppLocalizations.of(context)!.incomeByCategory : AppLocalizations.of(context)!.expensesByCategory,
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 16,

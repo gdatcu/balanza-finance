@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
+import 'package:balanza/l10n/app_localizations.dart';
 import '../providers/transaction_provider.dart';
 import '../../../models/transaction.dart';
+import '../../../core/utils/category_localizer.dart';
 import 'categories_data.dart';
 
 class TransactionInputSheet extends ConsumerStatefulWidget {
@@ -74,8 +76,8 @@ class _TransactionInputSheetState extends ConsumerState<TransactionInputSheet> {
       Navigator.of(context).pop();
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Transaction added successfully!'),
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.transactionAddedSuccessfully),
           backgroundColor: Colors.green,
         ),
       );
@@ -103,7 +105,7 @@ class _TransactionInputSheetState extends ConsumerState<TransactionInputSheet> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Add Transaction',
+                      AppLocalizations.of(context)!.addTransaction,
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
@@ -119,7 +121,9 @@ class _TransactionInputSheetState extends ConsumerState<TransactionInputSheet> {
                 // Toggle Switch for Income vs Expense
                 SwitchListTile(
                   title: Text(
-                    _isIncome ? 'Type: Income' : 'Type: Expense',
+                    _isIncome
+                        ? '${AppLocalizations.of(context)!.type}: ${AppLocalizations.of(context)!.typeIncome}'
+                        : '${AppLocalizations.of(context)!.type}: ${AppLocalizations.of(context)!.typeExpense}',
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   secondary: Icon(
@@ -144,7 +148,7 @@ class _TransactionInputSheetState extends ConsumerState<TransactionInputSheet> {
                   controller: _amountController,
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
                   decoration: InputDecoration(
-                    labelText: 'Amount (RON)',
+                    labelText: AppLocalizations.of(context)!.amountFieldLabel,
                     prefixIcon: Icon(Icons.wallet, color: _isIncome ? const Color(0xFF10B981) : const Color(0xFFFF7A5A)),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -159,11 +163,11 @@ class _TransactionInputSheetState extends ConsumerState<TransactionInputSheet> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter an amount';
+                      return AppLocalizations.of(context)!.pleaseEnterAmount;
                     }
                     final parsed = double.tryParse(value);
                     if (parsed == null || parsed <= 0) {
-                      return 'Please enter a valid positive number';
+                      return AppLocalizations.of(context)!.pleaseEnterValidPositiveNumber;
                     }
                     return null;
                   },
@@ -183,7 +187,7 @@ class _TransactionInputSheetState extends ConsumerState<TransactionInputSheet> {
 
                     return DropdownButtonFormField<String>(
                       decoration: InputDecoration(
-                        labelText: 'Category',
+                        labelText: AppLocalizations.of(context)!.category,
                         prefixIcon: Icon(Icons.category, color: _isIncome ? const Color(0xFF10B981) : const Color(0xFFFF7A5A)),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -210,7 +214,7 @@ class _TransactionInputSheetState extends ConsumerState<TransactionInputSheet> {
                                 child: Icon(icon, size: 16, color: color),
                               ),
                               const SizedBox(width: 12),
-                              Text(cat.name),
+                              Text(CategoryLocalizer.getLocalizedName(context, cat.name)),
                             ],
                           ),
                         );
@@ -222,7 +226,7 @@ class _TransactionInputSheetState extends ConsumerState<TransactionInputSheet> {
                       },
                       validator: (value) {
                         if (value == null) {
-                          return 'Please select a category';
+                          return AppLocalizations.of(context)!.pleaseSelectCategory;
                         }
                         return null;
                       },
@@ -247,7 +251,7 @@ class _TransactionInputSheetState extends ConsumerState<TransactionInputSheet> {
                   borderRadius: BorderRadius.circular(12),
                   child: InputDecorator(
                     decoration: InputDecoration(
-                      labelText: 'Date',
+                      labelText: AppLocalizations.of(context)!.date,
                       prefixIcon: Icon(Icons.calendar_today, color: _isIncome ? const Color(0xFF10B981) : const Color(0xFFFF7A5A)),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -272,7 +276,7 @@ class _TransactionInputSheetState extends ConsumerState<TransactionInputSheet> {
                 TextFormField(
                   controller: _noteController,
                   decoration: InputDecoration(
-                    labelText: 'Note (Optional)',
+                    labelText: AppLocalizations.of(context)!.noteOptional,
                     prefixIcon: Icon(Icons.description, color: _isIncome ? const Color(0xFF10B981) : const Color(0xFFFF7A5A)),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -298,9 +302,9 @@ class _TransactionInputSheetState extends ConsumerState<TransactionInputSheet> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: const Text(
-                    'Save Transaction',
-                    style: TextStyle(
+                  child: Text(
+                    AppLocalizations.of(context)!.saveTransaction,
+                    style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),

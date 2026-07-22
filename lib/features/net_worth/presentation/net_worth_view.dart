@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
+import 'package:balanza/l10n/app_localizations.dart';
 import '../../../../models/net_worth_item.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../providers/net_worth_provider.dart';
@@ -29,9 +30,9 @@ class NetWorthView extends ConsumerWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         foregroundColor: Colors.white,
-        title: const Text(
-          'Net Worth',
-          style: TextStyle(fontWeight: FontWeight.bold),
+        title: Text(
+          AppLocalizations.of(context)!.netWorth,
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
       body: Center(
@@ -49,7 +50,7 @@ class NetWorthView extends ConsumerWidget {
               return ListView(
                 padding: const EdgeInsets.only(top: 8, bottom: 80),
                 children: [
-                  _buildHeader(netWorthValue, totalAssets, totalLiabilities),
+                  _buildHeader(context, netWorthValue, totalAssets, totalLiabilities),
                   const SizedBox(height: 24),
                   
                   // Assets Section Header
@@ -58,9 +59,9 @@ class NetWorthView extends ConsumerWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
-                          'ASSETS',
-                          style: TextStyle(
+                        Text(
+                          AppLocalizations.of(context)!.assets.toUpperCase(),
+                          style: const TextStyle(
                             color: Color(0xFF10B981), // Sage Mint Green
                             fontWeight: FontWeight.bold,
                             fontSize: 15,
@@ -80,9 +81,12 @@ class NetWorthView extends ConsumerWidget {
                   ),
                   const Divider(color: Colors.white12, indent: 24, endIndent: 24),
                   if (assets.isEmpty)
-                    const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                      child: Text('No assets recorded', style: TextStyle(color: Colors.grey, fontSize: 14)),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                      child: Text(
+                        AppLocalizations.of(context)!.noAssetsRecorded,
+                        style: const TextStyle(color: Colors.grey, fontSize: 14),
+                      ),
                     )
                   else
                     ...assets.map((item) => _buildRow(context, ref, item)),
@@ -95,9 +99,9 @@ class NetWorthView extends ConsumerWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
-                          'LIABILITIES',
-                          style: TextStyle(
+                        Text(
+                          AppLocalizations.of(context)!.liabilities.toUpperCase(),
+                          style: const TextStyle(
                             color: Color(0xFFFF7A5A), // Coral Orange
                             fontWeight: FontWeight.bold,
                             fontSize: 15,
@@ -117,9 +121,12 @@ class NetWorthView extends ConsumerWidget {
                   ),
                   const Divider(color: Colors.white12, indent: 24, endIndent: 24),
                   if (liabilities.isEmpty)
-                    const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                      child: Text('No liabilities recorded', style: TextStyle(color: Colors.grey, fontSize: 14)),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                      child: Text(
+                        AppLocalizations.of(context)!.noLiabilitiesRecorded,
+                        style: const TextStyle(color: Colors.grey, fontSize: 14),
+                      ),
                     )
                   else
                     ...liabilities.map((item) => _buildRow(context, ref, item)),
@@ -138,7 +145,7 @@ class NetWorthView extends ConsumerWidget {
                   ElevatedButton(
                     onPressed: () => ref.invalidate(netWorthListProvider),
                     style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFF7A5A)),
-                    child: const Text('Retry'),
+                    child: Text(AppLocalizations.of(context)!.retry),
                   ),
                 ],
               ),
@@ -156,7 +163,7 @@ class NetWorthView extends ConsumerWidget {
     );
   }
 
-  Widget _buildHeader(double netWorth, double assets, double liabilities) {
+  Widget _buildHeader(BuildContext context, double netWorth, double assets, double liabilities) {
     final isPositive = netWorth >= 0;
     final accentColor = isPositive ? const Color(0xFF10B981) : const Color(0xFFFF7A5A);
 
@@ -171,9 +178,9 @@ class NetWorthView extends ConsumerWidget {
         padding: const EdgeInsets.all(24.0),
         child: Column(
           children: [
-            const Text(
-              'OVERALL NET WORTH',
-              style: TextStyle(
+            Text(
+              AppLocalizations.of(context)!.overallNetWorth.toUpperCase(),
+              style: const TextStyle(
                 color: Colors.grey,
                 fontWeight: FontWeight.bold,
                 fontSize: 13,
@@ -198,7 +205,7 @@ class NetWorthView extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      const Text('Total Assets', style: TextStyle(color: Colors.grey, fontSize: 11)),
+                      Text(AppLocalizations.of(context)!.totalAssets, style: const TextStyle(color: Colors.grey, fontSize: 11)),
                       const SizedBox(height: 4),
                       FittedBox(
                         fit: BoxFit.scaleDown,
@@ -222,7 +229,7 @@ class NetWorthView extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      const Text('Liabilities', style: TextStyle(color: Colors.grey, fontSize: 11)),
+                      Text(AppLocalizations.of(context)!.liabilities, style: const TextStyle(color: Colors.grey, fontSize: 11)),
                       const SizedBox(height: 4),
                       FittedBox(
                         fit: BoxFit.scaleDown,
@@ -246,7 +253,7 @@ class NetWorthView extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      const Text('Net Worth', style: TextStyle(color: Colors.grey, fontSize: 11)),
+                      Text(AppLocalizations.of(context)!.netWorth, style: const TextStyle(color: Colors.grey, fontSize: 11)),
                       const SizedBox(height: 4),
                       FittedBox(
                         fit: BoxFit.scaleDown,
@@ -290,18 +297,18 @@ class NetWorthView extends ConsumerWidget {
         return await showDialog<bool>(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('Delete Net Worth Item?'),
-            content: Text('Are you sure you want to delete "${item.name}"?'),
+            title: Text(AppLocalizations.of(context)!.deleteItem),
+            content: Text(AppLocalizations.of(context)!.confirmDelete),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(false),
-                child: const Text('Cancel'),
+                child: Text(AppLocalizations.of(context)!.cancel),
               ),
               TextButton(
                 onPressed: () => Navigator.of(context).pop(true),
-                child: const Text(
-                  'Delete',
-                  style: TextStyle(color: Color(0xFFFF7A5A)),
+                child: Text(
+                  AppLocalizations.of(context)!.delete,
+                  style: const TextStyle(color: Color(0xFFFF7A5A)),
                 ),
               ),
             ],
@@ -312,7 +319,7 @@ class NetWorthView extends ConsumerWidget {
         ref.read(netWorthListProvider.notifier).delete(item.id);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('"${item.name}" deleted'),
+            content: Text(AppLocalizations.of(context)!.itemDeleted),
             backgroundColor: const Color(0xFF1E293B),
           ),
         );
@@ -407,9 +414,9 @@ class _AddNetWorthItemSheetState extends ConsumerState<AddNetWorthItemSheet> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    'Add Net Worth Item',
-                    style: TextStyle(
+                  Text(
+                    AppLocalizations.of(context)!.addNetWorthItem,
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
@@ -426,7 +433,9 @@ class _AddNetWorthItemSheetState extends ConsumerState<AddNetWorthItemSheet> {
               // Switch Toggle
               SwitchListTile(
                 title: Text(
-                  _isAsset ? 'Type: Asset' : 'Type: Liability',
+                  _isAsset
+                      ? '${AppLocalizations.of(context)!.type}: ${AppLocalizations.of(context)!.typeAsset}'
+                      : '${AppLocalizations.of(context)!.type}: ${AppLocalizations.of(context)!.typeLiability}',
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 secondary: Icon(
@@ -449,7 +458,7 @@ class _AddNetWorthItemSheetState extends ConsumerState<AddNetWorthItemSheet> {
               TextFormField(
                 controller: _nameController,
                 decoration: InputDecoration(
-                  labelText: 'Name (e.g. Bank Account, Car loan)',
+                  labelText: AppLocalizations.of(context)!.nameFieldLabel,
                   prefixIcon: Icon(Icons.edit, color: activeColor),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -461,7 +470,7 @@ class _AddNetWorthItemSheetState extends ConsumerState<AddNetWorthItemSheet> {
                 ),
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
-                    return 'Please enter a name';
+                    return AppLocalizations.of(context)!.pleaseEnterName;
                   }
                   return null;
                 },
@@ -473,7 +482,7 @@ class _AddNetWorthItemSheetState extends ConsumerState<AddNetWorthItemSheet> {
                 controller: _amountController,
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 decoration: InputDecoration(
-                  labelText: 'Amount (RON)',
+                  labelText: AppLocalizations.of(context)!.amountFieldLabel,
                   prefixIcon: Icon(Icons.attach_money, color: activeColor),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -485,11 +494,11 @@ class _AddNetWorthItemSheetState extends ConsumerState<AddNetWorthItemSheet> {
                 ),
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
-                    return 'Please enter an amount';
+                    return AppLocalizations.of(context)!.pleaseEnterAmount;
                   }
                   final parsed = double.tryParse(value);
                   if (parsed == null || parsed <= 0) {
-                    return 'Please enter a valid positive number';
+                    return AppLocalizations.of(context)!.pleaseEnterValidPositiveNumber;
                   }
                   return null;
                 },
@@ -506,9 +515,9 @@ class _AddNetWorthItemSheetState extends ConsumerState<AddNetWorthItemSheet> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                child: const Text(
-                  'Add Item',
-                  style: TextStyle(
+                child: Text(
+                  AppLocalizations.of(context)!.addItem,
+                  style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),

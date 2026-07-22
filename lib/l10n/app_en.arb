@@ -1,0 +1,135 @@
+{
+  "@@locale": "en",
+  "appTitle": "Balanza Finance",
+  "appTagline": "Manage your personal ledger with ease",
+  "totalBalance": "Total Balance",
+  "income": "Income",
+  "expenses": "Expenses",
+  "netWorth": "Net Worth",
+  "addTransaction": "Add Transaction",
+  "monthlyBudget": "Monthly Budget",
+  "budgets": "Budgets",
+  "byDate": "By Date",
+  "byCategory": "By Category",
+  "overview": "Overview",
+  "advisor": "Advisor",
+  "settings": "Settings",
+  "configureBudget": "Configure Budget",
+  "configureBudgetHelp": "Set a monthly limit to keep your spending in check. Charts and warning indicators will adjust to this value.",
+  "enterBudgetAmount": "Enter budget amount",
+  "monthlyLimit": "Monthly Limit",
+  "saveBudget": "Save Budget",
+  "logOut": "Log Out",
+  "language": "Language",
+  "emailAddress": "Email Address",
+  "password": "Password",
+  "signIn": "Sign In",
+  "signUp": "Sign Up",
+  "assets": "Assets",
+  "liabilities": "Liabilities",
+  "overallNetWorth": "Overall Net Worth",
+  "totalAssets": "Total Assets",
+  "addNetWorthItem": "Add Net Worth Item",
+  "name": "Name",
+  "nameFieldLabel": "Name (e.g. Bank Account, Car loan)",
+  "pleaseEnterName": "Please enter a name",
+  "amount": "Amount",
+  "amountFieldLabel": "Amount (RON)",
+  "addItem": "Add Item",
+  "deleteItem": "Delete Item",
+  "confirmDelete": "Are you sure you want to delete this item?",
+  "cancel": "Cancel",
+  "delete": "Delete",
+  "itemDeleted": "Item deleted",
+  "noAssetsRecorded": "No assets recorded",
+  "noLiabilitiesRecorded": "No liabilities recorded",
+  "typeAsset": "Asset",
+  "typeLiability": "Liability",
+  "type": "Type",
+  "typeIncome": "Income",
+  "typeExpense": "Expense",
+  "saveTransaction": "Save Transaction",
+  "spent": "Spent",
+  "noteOptional": "Note (Optional)",
+  "date": "Date",
+  "category": "Category",
+  "pleaseEnterAmount": "Please enter an amount",
+  "pleaseSelectCategory": "Please select a category",
+  "pleaseEnterValidPositiveNumber": "Please enter a valid positive number",
+  "transactionAddedSuccessfully": "Transaction added successfully!",
+  "deleteTransactionTitle": "Delete Transaction?",
+  "confirmDeleteTransaction": "Are you sure you want to delete this transaction?",
+  "transactionDeleted": "Transaction deleted",
+  "retry": "Retry",
+  "noCategoryTransactions": "No categories with transactions in this section.",
+  "pleaseEnterBudgetAmount": "Please enter a budget amount",
+  "budgetUpdatedSuccessfully": "Budget updated successfully!",
+  "pleaseEnterEmail": "Please enter your email",
+  "pleaseEnterValidEmail": "Please enter a valid email address",
+  "pleaseEnterPassword": "Please enter your password",
+  "passwordTooShort": "Password must be at least 6 characters",
+  "unexpectedErrorSignIn": "An unexpected error occurred during sign in.",
+  "unexpectedErrorRegistration": "An unexpected error occurred during registration.",
+  "registrationSuccessful": "Registration successful! Check your email for validation or sign in.",
+  "registrationSubmitted": "Registration submitted successfully.",
+  "today": "Today",
+  "yesterday": "Yesterday",
+  "totalExpenses": "Total Expenses",
+  "totalIncome": "Total Income",
+  "financialInsight": "Financial Insight",
+  "categoryFood": "Food",
+  "categoryTransport": "Transport",
+  "categoryRent": "Rent",
+  "categoryUtilities": "Utilities",
+  "categoryEntertainment": "Entertainment",
+  "categoryShopping": "Shopping",
+  "categorySalary": "Salary",
+  "categoryInvestments": "Investments",
+  "categoryGifts": "Gifts",
+  "insightNetWorthGrew": "Excellent work. Your net worth grew by {amount} RON this month. Why it matters: This is the ultimate metric of financial momentum. Every positive increase means you are actively buying back your future time and building a permanent safety net.",
+  "@insightNetWorthGrew": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "insightHighSurplus": "Outstanding! You saved {percentage}% of your income this month. Why it matters: A high savings rate creates a compounding capital surplus, buying you control over your future time.",
+  "@insightHighSurplus": {
+    "placeholders": {
+      "percentage": {
+        "type": "String"
+      }
+    }
+  },
+  "insightHighExpenseWarning": "You have utilized {percentage}% of your budget. Why it matters: Small daily leaks sink great ships. Reeling in discretionary spending now prevents a deficit and keeps your wealth-building engine running.",
+  "@insightHighExpenseWarning": {
+    "placeholders": {
+      "percentage": {
+        "type": "String"
+      }
+    }
+  },
+  "insightOnTrackBudget": "You are at {percentage}% of your {budget} budget. On track for a strong surplus. Why it matters: Consistently beating your budget prevents lifestyle creep and builds the cash runway needed to take calculated risks.",
+  "@insightOnTrackBudget": {
+    "placeholders": {
+      "percentage": {
+        "type": "String"
+      },
+      "budget": {
+        "type": "String"
+      }
+    }
+  },
+  "insightDefault": "Keep tracking your transactions to gain control over your money. Why it matters: Consistent monitoring is the first step toward optimization and financial freedom.",
+  "insightLoading": "Analyzing your finances... Why it matters: Patience and continuous tracking are key to understanding your long-term wealth trajectory.",
+  "incomeByCategory": "Income by Category",
+  "expensesByCategory": "Expenses by Category",
+  "noIncomeData": "No income data to display yet.",
+  "noExpenseData": "No expense data to display yet.",
+  "noTransactionsYet": "No transactions yet",
+  "noExpensesYet": "No expenses yet",
+  "noIncomesYet": "No incomes yet",
+  "noTransactionDataYet": "No transaction data yet",
+  "tapToRecordFirstTransaction": "Tap the '+' button to record your first transaction."
+}

@@ -10,6 +10,7 @@ import '../../../core/utils/currency_formatter.dart';
 import '../../../models/net_worth_item.dart';
 import '../../net_worth/providers/net_worth_provider.dart';
 import '../../auth/providers/auth_provider.dart';
+import '../../settings/providers/locale_provider.dart';
 
 /// Provider for SharedPreferences instance. Must be overridden at app launch.
 final sharedPreferencesProvider = Provider<SharedPreferences>((ref) {
@@ -202,6 +203,8 @@ final insightsProvider = Provider<String>((ref) {
   final netWorthAsync = ref.watch(netWorthListProvider);
   final budget = ref.watch(monthlyBudgetProvider);
   final selectedMonth = ref.watch(selectedMonthProvider);
+  final locale = ref.watch(localeProvider);
+  final isRo = locale.languageCode == 'ro';
 
   final netWorthItems = netWorthAsync.value ?? const <NetWorthItem>[];
 
@@ -237,7 +240,11 @@ final insightsProvider = Provider<String>((ref) {
         if (currentNetWorth > previousNetWorth) {
           final diff = currentNetWorth - previousNetWorth;
           final diffStr = diff.toStringAsFixed(2);
-          return 'Excellent work. Your net worth grew by $diffStr RON this month. Why it matters: This is the ultimate metric of financial momentum. Every positive increase means you are actively buying back your future time and building a permanent safety net.';
+          if (isRo) {
+            return 'Excelentă treabă. Averea ta netă a crescut cu $diffStr RON în această lună. De ce contează: Aceasta este metrica supremă a impulsului financiar. Fiecare creștere pozitivă înseamnă că îți recumperi activ timpul viitor și construiești o plasă de siguranță permanentă.';
+          } else {
+            return 'Excellent work. Your net worth grew by $diffStr RON this month. Why it matters: This is the ultimate metric of financial momentum. Every positive increase means you are actively buying back your future time and building a permanent safety net.';
+          }
         }
       }
 
@@ -254,25 +261,47 @@ final insightsProvider = Provider<String>((ref) {
       // 2. High Surplus (Expenses < 20% of Income)
       if (totalIncome > 0 && totalExpenses.abs() < 0.20 * totalIncome) {
         final savingsPercentage = ((totalIncome - totalExpenses.abs()) / totalIncome * 100).toStringAsFixed(1);
-        return 'Outstanding! You saved $savingsPercentage% of your income this month. Why it matters: A high savings rate creates a compounding capital surplus, buying you control over your future time.';
+        if (isRo) {
+          return 'Remarcabil! Ai economisit $savingsPercentage% din veniturile tale în această lună. De ce contează: O rată ridicată de economisire creează un surplus de capital compus, oferindu-ți control asupra timpului tău viitor.';
+        } else {
+          return 'Outstanding! You saved $savingsPercentage% of your income this month. Why it matters: A high savings rate creates a compounding capital surplus, buying you control over your future time.';
+        }
       }
 
       // 3. High Expense Warning (Budget > 90%)
       if (budget > 0 && budgetSpentPercentage > 90) {
         final y = budgetSpentPercentage.toStringAsFixed(1);
-        return 'You have utilized $y% of your budget. Why it matters: Small daily leaks sink great ships. Reeling in discretionary spending now prevents a deficit and keeps your wealth-building engine running.';
+        if (isRo) {
+          return 'Ai utilizat $y% din bugetul tău. De ce contează: Scurgerile zilnice mici pot scufunda corăbii mari. Controlul cheltuielilor discreționare acum previne un deficit și îți menține motorul de acumulare a averii activ.';
+        } else {
+          return 'You have utilized $y% of your budget. Why it matters: Small daily leaks sink great ships. Reeling in discretionary spending now prevents a deficit and keeps your wealth-building engine running.';
+        }
       }
 
       // 4. On Track Budget (Budget < 50% mid-month)
       if (budget > 0 && budgetSpentPercentage < 50) {
         final y = budgetSpentPercentage.toStringAsFixed(1);
         final budgetAmount = CurrencyFormatter.format(budget);
-        return 'You are at $y% of your $budgetAmount budget. On track for a strong surplus. Why it matters: Consistently beating your budget prevents lifestyle creep and builds the cash runway needed to take calculated risks.';
+        if (isRo) {
+          return 'Ești la $y% din bugetul tău de $budgetAmount. Pe drumul cel bun pentru un surplus puternic. De ce contează: Depășirea constantă a bugetului previne creșterea stilului de viață și construiește rezerva de numerar necesară pentru a-ți asuma riscuri calculate.';
+        } else {
+          return 'You are at $y% of your $budgetAmount budget. On track for a strong surplus. Why it matters: Consistently beating your budget prevents lifestyle creep and builds the cash runway needed to take calculated risks.';
+        }
       }
 
       // Default/neutral insight if none of the above are met
-      return 'Keep tracking your transactions to gain control over your money. Why it matters: Consistent monitoring is the first step toward optimization and financial freedom.';
+      if (isRo) {
+        return 'Continuă să îți urmărești tranzacțiile pentru a câștiga control asupra banilor tăi. De ce contează: Monitorizarea constantă este primul pas către optimizare și libertate financiară.';
+      } else {
+        return 'Keep tracking your transactions to gain control over your money. Why it matters: Consistent monitoring is the first step toward optimization and financial freedom.';
+      }
     },
-    orElse: () => 'Analyzing your finances... Why it matters: Patience and continuous tracking are key to understanding your long-term wealth trajectory.',
+    orElse: () {
+      if (isRo) {
+        return 'Analizăm finanțele tale... De ce contează: Răbdarea și urmărirea continuă sunt cheia pentru a înțelege traiectoria pe termen lung a averii tale.';
+      } else {
+        return 'Analyzing your finances... Why it matters: Patience and continuous tracking are key to understanding your long-term wealth trajectory.';
+      }
+    },
   );
 });
