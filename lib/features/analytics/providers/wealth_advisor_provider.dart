@@ -80,7 +80,7 @@ final wealthAdvisorProvider = Provider<WealthAdvisorState?>((ref) {
 
   final List<WealthAdvisorState> candidates = [];
 
-  // 1. Evaluate universal category budget thresholds (Warning at 80% usage, Alert at 100%)
+  // 1. Evaluate universal category budget thresholds (Warning at 80% usage, Alert at 100%, Safe at <50%)
   final Map<String, double> categoryExpenses = {};
   for (final tx in transactions) {
     if (tx.amount < 0) {
@@ -142,10 +142,30 @@ final wealthAdvisorProvider = Provider<WealthAdvisorState?>((ref) {
           ),
         );
       }
+    } else if (pct < 50 && spentAmount > 0) {
+      final nudgeId = 'threshold_safe_$catId';
+      if (!dismissedIds.contains(nudgeId)) {
+        final en = 'Great pacing! You are well under your budget for $categoryName.';
+        final ro = 'Ritm excelent! Ești mult sub bugetul stabilit pentru $categoryName.';
+        candidates.add(
+          WealthAdvisorState(
+            id: nudgeId,
+            title: 'SAFE ZONE • ${categoryName.toUpperCase()}',
+            titleEn: 'SAFE ZONE • ${categoryName.toUpperCase()}',
+            titleRo: 'RITM EXCELENT • ${categoryName.toUpperCase()}',
+            message: en,
+            textEn: en,
+            textRo: ro,
+            icon: Icons.check_circle_outline,
+            type: AdvisorType.insight,
+            severity: NudgeSeverity.safe,
+          ),
+        );
+      }
     }
   });
 
-  // 2. Evaluate 'Transport' budget (Taxi vs. Public Transit) and behavioral nudges
+  // 2. Evaluate Multi-Category Behavioral Nudges based on recent transaction text / keywords
   final sortedTx = List<Transaction>.from(transactions)
     ..sort((a, b) => b.date.compareTo(a.date));
 
@@ -153,7 +173,7 @@ final wealthAdvisorProvider = Provider<WealthAdvisorState?>((ref) {
     if (tx.amount >= 0) continue;
     final text = (tx.description ?? '').toLowerCase();
 
-    // Transport (Taxi / Rideshare)
+    // A. Transport (Taxi / Rideshare)
     if ((text.contains('uber') && !text.contains('eats')) ||
         text.contains('bolt') ||
         text.contains('taxi') ||
@@ -179,7 +199,7 @@ final wealthAdvisorProvider = Provider<WealthAdvisorState?>((ref) {
       }
     }
 
-    // Transport (Public Transit)
+    // A. Transport (Public Transit)
     if (text.contains('stb') ||
         text.contains('metrorex') ||
         text.contains('bus') ||
@@ -206,10 +226,13 @@ final wealthAdvisorProvider = Provider<WealthAdvisorState?>((ref) {
       }
     }
 
-    // Food Delivery
+    // B. Food & Dining (Delivery / Restaurant)
     if (text.contains('uber eats') ||
         text.contains('glovo') ||
         text.contains('tazz') ||
+        text.contains('bolt food') ||
+        text.contains('mcdonalds') ||
+        text.contains('kfc') ||
         text.contains('restaurant')) {
       const nudgeId = 'nudge_food_delivery';
       if (!dismissedIds.contains(nudgeId)) {
@@ -227,6 +250,121 @@ final wealthAdvisorProvider = Provider<WealthAdvisorState?>((ref) {
             icon: Icons.restaurant,
             type: AdvisorType.nudge,
             severity: NudgeSeverity.info,
+          ),
+        );
+      }
+    }
+
+    // B. Food & Dining (Groceries)
+    if (text.contains('lidl') ||
+        text.contains('kaufland') ||
+        text.contains('mega image') ||
+        text.contains('carrefour') ||
+        text.contains('auchan') ||
+        text.contains('profi') ||
+        text.contains('groceries')) {
+      const nudgeId = 'nudge_food_groceries';
+      if (!dismissedIds.contains(nudgeId)) {
+        const en = 'Smart investment in home-cooked meals! High-value spending for your wellness and budget.';
+        const ro = 'Investiție inteligentă în mese gătite acasă! Cheltuială cu valoare mare pentru starea ta de bine și buget.';
+        candidates.add(
+          const WealthAdvisorState(
+            id: nudgeId,
+            title: 'SAVINGS INSIGHT • GROCERIES',
+            titleEn: 'SAVINGS INSIGHT • GROCERIES',
+            titleRo: 'INVESTIȚIE INTELIGENTĂ • CUMPĂRĂTURI',
+            message: en,
+            textEn: en,
+            textRo: ro,
+            icon: Icons.shopping_basket,
+            type: AdvisorType.insight,
+            severity: NudgeSeverity.safe,
+          ),
+        );
+      }
+    }
+
+    // C. Entertainment & Subscriptions (Streaming / Subscriptions)
+    if (text.contains('netflix') ||
+        text.contains('spotify') ||
+        text.contains('hbo') ||
+        text.contains('youtube') ||
+        text.contains('apple.com') ||
+        text.contains('subscription')) {
+      const nudgeId = 'nudge_entertainment_subscriptions';
+      if (!dismissedIds.contains(nudgeId)) {
+        const en = 'Review your active subscriptions periodically—canceling unused services is free compound interest!';
+        const ro = 'Revizuiește-ți abonamentele active periodic—anularea serviciilor nefolosite este dobândă compusă gratuită!';
+        candidates.add(
+          const WealthAdvisorState(
+            id: nudgeId,
+            title: 'BEHAVIORAL NUDGE • SUBSCRIPTIONS',
+            titleEn: 'BEHAVIORAL NUDGE • SUBSCRIPTIONS',
+            titleRo: 'RECOMANDARE COMPORTAMENTALĂ • ABONAMENTE',
+            message: en,
+            textEn: en,
+            textRo: ro,
+            icon: Icons.subscriptions,
+            type: AdvisorType.nudge,
+            severity: NudgeSeverity.info,
+          ),
+        );
+      }
+    }
+
+    // C. Entertainment & Subscriptions (Events / Leisure)
+    if (text.contains('cinema') ||
+        text.contains('concert') ||
+        text.contains('eventim') ||
+        text.contains('iabilet') ||
+        text.contains('event') ||
+        text.contains('leisure')) {
+      const nudgeId = 'nudge_entertainment_events';
+      if (!dismissedIds.contains(nudgeId)) {
+        const en = 'Investing in memorable experiences brings long-term joy. Just ensure it aligns with your monthly fun budget!';
+        const ro = 'Investiția în experiențe memorabile aduce bucurie pe termen lung. Doar asigură-te că se încadrează în bugetul tău de distracție!';
+        candidates.add(
+          const WealthAdvisorState(
+            id: nudgeId,
+            title: 'SAVINGS INSIGHT • LEISURE',
+            titleEn: 'SAVINGS INSIGHT • LEISURE',
+            titleRo: 'ANALIZĂ COMPORTAMENTALĂ • TIMP LIBER',
+            message: en,
+            textEn: en,
+            textRo: ro,
+            icon: Icons.confirmation_number,
+            type: AdvisorType.insight,
+            severity: NudgeSeverity.info,
+          ),
+        );
+      }
+    }
+
+    // D. Shopping & Lifestyle (Impulse / Non-Essential)
+    if (text.contains('zara') ||
+        text.contains('h&m') ||
+        text.contains('emag') ||
+        text.contains('about you') ||
+        text.contains('answear') ||
+        text.contains('amazon') ||
+        text.contains('shopping') ||
+        text.contains('impulse')) {
+      const nudgeId = 'nudge_shopping_lifestyle';
+      if (!dismissedIds.contains(nudgeId)) {
+        const en = 'Pause before the next purchase! Applying the 24-hour rule on non-essentials can save you hundreds each year.';
+        const ro = 'Fă o pauză înainte de următoarea cumpărătură! Aplicarea regulii de 24 de ore pentru lucrurile neesențiale îți poate economisi sute de lei/euro anual.';
+        candidates.add(
+          const WealthAdvisorState(
+            id: nudgeId,
+            title: 'BEHAVIORAL NUDGE • SHOPPING',
+            titleEn: 'BEHAVIORAL NUDGE • SHOPPING',
+            titleRo: 'RECOMANDARE COMPORTAMENTALĂ • CUMPĂRĂTURI',
+            message: en,
+            textEn: en,
+            textRo: ro,
+            icon: Icons.shopping_bag,
+            type: AdvisorType.nudge,
+            severity: NudgeSeverity.warning,
           ),
         );
       }
