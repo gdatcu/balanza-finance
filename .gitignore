@@ -1,0 +1,44 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.buildlog/
+.history
+.project
+.idea/
+.vscode/
+*.iml
+
+# Flutter/Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+/build/
+
+# Android
+.gradle/
+local.properties
+**/flutter_export_environment.sh
+**/AndroidManifest.xml.normal
+**/GeneratedPluginRegistrant.java
+
+# iOS/macOS
+xcode_backend.sh
+GeneratedPluginRegistrant.h
+GeneratedPluginRegistrant.m
+**/Runner.xcodeproj/project.xcworkspace
+**/Runner.xcworkspace
+**/Runner.xcodeproj/xcuserdata/
+**/Pods/
+**/Podfile.lock
+**/Xcode/
+**/DerivedData/
+
+# Web
+.shadow_build/
