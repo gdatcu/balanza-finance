@@ -9,6 +9,7 @@ import 'transaction_input_sheet.dart';
 import 'categories_data.dart';
 import '../../analytics/presentation/expense_pie_chart.dart';
 import '../../settings/presentation/settings_view.dart';
+import '../../net_worth/presentation/net_worth_view.dart';
 
 enum ToshlSection {
   overview,
@@ -216,6 +217,16 @@ class _HomeViewState extends ConsumerState<HomeView> {
                     Navigator.of(context).pop();
                   },
                 ),
+                ListTile(
+                  leading: const Icon(Icons.account_balance, color: Color(0xFFF59E0B)),
+                  title: const Text('Net Worth', style: TextStyle(color: Colors.white)),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => const NetWorthView()),
+                    );
+                  },
+                ),
                 const Divider(color: Colors.white12),
                 ListTile(
                   leading: const Icon(Icons.settings, color: Colors.grey),
@@ -312,6 +323,8 @@ class _HomeViewState extends ConsumerState<HomeView> {
         _buildMonthSelector(),
 
         if (_section == ToshlSection.overview) ...[
+          _buildAdvisorWidget(context),
+          const SizedBox(height: 16),
           _buildOverviewCard(totalBalance, totalIncome, totalExpenses),
           const SizedBox(height: 16),
           _buildBudgetCard(totalExpenses.abs()),
@@ -469,6 +482,71 @@ class _HomeViewState extends ConsumerState<HomeView> {
             },
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildAdvisorWidget(BuildContext context) {
+    final quote = ref.watch(insightsProvider);
+    final parts = quote.split(' Why it matters: ');
+    final primaryText = parts[0];
+    final whyItMattersText = parts.length > 1 ? 'Why it matters: ${parts[1]}' : '';
+
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      color: const Color(0xFF1E293B),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(color: Colors.white.withValues(alpha: 0.05), width: 1.5),
+      ),
+      elevation: 0,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
+          children: [
+            const Icon(
+              Icons.lightbulb_outline,
+              color: Color(0xFFF59E0B),
+              size: 28,
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'FINANCIAL INSIGHT',
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.grey,
+                      letterSpacing: 1.1,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    primaryText,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: Colors.white,
+                    ),
+                  ),
+                  if (whyItMattersText.isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      whyItMattersText,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: Colors.white70,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

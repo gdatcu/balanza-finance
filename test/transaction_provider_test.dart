@@ -1,6 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:balanza/features/auth/providers/auth_provider.dart';
 import 'package:balanza/models/transaction.dart';
 import 'package:balanza/features/transactions/repositories/transaction_repository.dart';
 import 'package:balanza/features/transactions/providers/transaction_provider.dart';
@@ -78,6 +80,7 @@ void main() {
         overrides: [
           sharedPreferencesProvider.overrideWithValue(prefs),
           transactionRepositoryProvider.overrideWithValue(mockRepository),
+          authProvider.overrideWith((ref) => Stream.value(AuthState(AuthChangeEvent.signedOut, null))),
         ],
       );
     });

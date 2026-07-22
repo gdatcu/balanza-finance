@@ -3,6 +3,7 @@ import 'package:balanza/models/account.dart';
 import 'package:balanza/models/category.dart';
 import 'package:balanza/models/transaction.dart';
 import 'package:balanza/models/category_summary.dart';
+import 'package:balanza/models/net_worth_item.dart';
 
 void main() {
   group('Account Model Tests', () {
@@ -199,6 +200,46 @@ void main() {
       expect(summary.categoryName, 'Food');
       expect(summary.totalAmount, -150.0);
       expect(summary.transactionType, TransactionType.expense);
+    });
+  });
+
+  group('NetWorthItem Model Tests', () {
+    test('initializes correctly with values', () {
+      final item = NetWorthItem(
+        id: 'nw-1',
+        userId: 'u-1',
+        name: 'House',
+        balance: 250000.0,
+        type: NetWorthType.asset,
+        createdAt: DateTime.parse('2026-07-22T10:00:00Z'),
+      );
+
+      expect(item.id, 'nw-1');
+      expect(item.userId, 'u-1');
+      expect(item.name, 'House');
+      expect(item.balance, 250000.0);
+      expect(item.type, NetWorthType.asset);
+      expect(item.createdAt, DateTime.parse('2026-07-22T10:00:00Z'));
+    });
+
+    test('fromJson and toJson map correctly', () {
+      final json = {
+        'id': 'nw-2',
+        'user_id': 'u-2',
+        'name': 'Car Loan',
+        'balance': 15000.0,
+        'type': 'liability',
+        'created_at': '2026-07-22T11:00:00.000Z',
+      };
+
+      final item = NetWorthItem.fromJson(json);
+      expect(item.name, 'Car Loan');
+      expect(item.type, NetWorthType.liability);
+      expect(item.balance, 15000.0);
+
+      final outJson = item.toJson();
+      expect(outJson['id'], 'nw-2');
+      expect(outJson['type'], 'liability');
     });
   });
 }
