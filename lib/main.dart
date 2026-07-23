@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:balanza/l10n/app_localizations.dart';
@@ -9,9 +10,16 @@ import 'features/transactions/presentation/home_view.dart';
 import 'features/transactions/providers/transaction_provider.dart';
 import 'features/settings/providers/locale_provider.dart';
 import 'features/auth/presentation/biometric_lock_wrapper.dart';
+import 'features/notifications/providers/push_notification_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  try {
+    await Firebase.initializeApp();
+  } catch (e) {
+    debugPrint('Firebase.initializeApp warning: $e');
+  }
 
   final prefs = await SharedPreferences.getInstance();
 
@@ -35,6 +43,9 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Initialize FCM notification service listener
+    ref.watch(pushNotificationServiceProvider);
+
     final authStateAsync = ref.watch(authProvider);
     final locale = ref.watch(localeProvider);
 

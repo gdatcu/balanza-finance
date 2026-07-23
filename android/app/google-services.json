@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1001434571675",
+    "project_id": "balanza-finance",
+    "storage_bucket": "balanza-finance.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1001434571675:android:fb94ba5607135909eb773e",
+        "android_client_info": {
+          "package_name": "com.example.balanza"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCIHT96IyjkZGyPiOwfv7YMJ1mcr0v7OyA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
