@@ -10,9 +10,9 @@ void main() {
     test('Over-budget alert threshold trigger (>= 100%)', () async {
       final container = ProviderContainer(
         overrides: [
-          monthlyBudgetProvider.overrideWith(() => _MockBudgetNotifier(300.0)),
+          monthlyBudgetProvider.overrideWith((ref) => Stream.value(300.0)),
           transactionListProvider.overrideWith(
-            () => _MockTransactionNotifier([
+            (ref) => Stream.value([
               Transaction(
                 id: 'tx-1',
                 userId: 'user-1',
@@ -28,7 +28,9 @@ void main() {
         ],
       );
 
-      await container.read(transactionListProvider.future);
+      container.listen(transactionListProvider, (prev, next) {});
+      container.listen(monthlyBudgetProvider, (prev, next) {});
+      await pumpEventQueue();
 
       final nudge = container.read(wealthAdvisorProvider);
       expect(nudge, isNotNull);
@@ -40,9 +42,9 @@ void main() {
     test('Warning zone threshold trigger (80% - 99%)', () async {
       final container = ProviderContainer(
         overrides: [
-          monthlyBudgetProvider.overrideWith(() => _MockBudgetNotifier(300.0)),
+          monthlyBudgetProvider.overrideWith((ref) => Stream.value(300.0)),
           transactionListProvider.overrideWith(
-            () => _MockTransactionNotifier([
+            (ref) => Stream.value([
               Transaction(
                 id: 'tx-1',
                 userId: 'user-1',
@@ -58,7 +60,9 @@ void main() {
         ],
       );
 
-      await container.read(transactionListProvider.future);
+      container.listen(transactionListProvider, (prev, next) {});
+      container.listen(monthlyBudgetProvider, (prev, next) {});
+      await pumpEventQueue();
 
       final nudge = container.read(wealthAdvisorProvider);
       expect(nudge, isNotNull);
@@ -70,9 +74,9 @@ void main() {
     test('Behavioral Nudge: Transport Taxi / Rideshare trigger', () async {
       final container = ProviderContainer(
         overrides: [
-          monthlyBudgetProvider.overrideWith(() => _MockBudgetNotifier(1000.0)),
+          monthlyBudgetProvider.overrideWith((ref) => Stream.value(1000.0)),
           transactionListProvider.overrideWith(
-            () => _MockTransactionNotifier([
+            (ref) => Stream.value([
               Transaction(
                 id: 'tx-1',
                 userId: 'user-1',
@@ -88,7 +92,9 @@ void main() {
         ],
       );
 
-      await container.read(transactionListProvider.future);
+      container.listen(transactionListProvider, (prev, next) {});
+      container.listen(monthlyBudgetProvider, (prev, next) {});
+      await pumpEventQueue();
 
       final nudge = container.read(wealthAdvisorProvider);
       expect(nudge, isNotNull);
@@ -99,9 +105,9 @@ void main() {
     test('Behavioral Nudge: Food Delivery trigger', () async {
       final container = ProviderContainer(
         overrides: [
-          monthlyBudgetProvider.overrideWith(() => _MockBudgetNotifier(1000.0)),
+          monthlyBudgetProvider.overrideWith((ref) => Stream.value(1000.0)),
           transactionListProvider.overrideWith(
-            () => _MockTransactionNotifier([
+            (ref) => Stream.value([
               Transaction(
                 id: 'tx-1',
                 userId: 'user-1',
@@ -117,7 +123,9 @@ void main() {
         ],
       );
 
-      await container.read(transactionListProvider.future);
+      container.listen(transactionListProvider, (prev, next) {});
+      container.listen(monthlyBudgetProvider, (prev, next) {});
+      await pumpEventQueue();
 
       final nudge = container.read(wealthAdvisorProvider);
       expect(nudge, isNotNull);
@@ -128,9 +136,9 @@ void main() {
     test('Dismissing a nudge hides it from provider', () async {
       final container = ProviderContainer(
         overrides: [
-          monthlyBudgetProvider.overrideWith(() => _MockBudgetNotifier(1000.0)),
+          monthlyBudgetProvider.overrideWith((ref) => Stream.value(1000.0)),
           transactionListProvider.overrideWith(
-            () => _MockTransactionNotifier([
+            (ref) => Stream.value([
               Transaction(
                 id: 'tx-1',
                 userId: 'user-1',
@@ -146,7 +154,9 @@ void main() {
         ],
       );
 
-      await container.read(transactionListProvider.future);
+      container.listen(transactionListProvider, (prev, next) {});
+      container.listen(monthlyBudgetProvider, (prev, next) {});
+      await pumpEventQueue();
 
       var nudge = container.read(wealthAdvisorProvider);
       expect(nudge, isNotNull);
@@ -157,20 +167,4 @@ void main() {
       expect(updatedNudge?.id, isNot(equals(nudge.id)));
     });
   });
-}
-
-class _MockTransactionNotifier extends TransactionListNotifier {
-  final List<Transaction> _mockTransactions;
-  _MockTransactionNotifier(this._mockTransactions);
-
-  @override
-  Future<List<Transaction>> build() async => _mockTransactions;
-}
-
-class _MockBudgetNotifier extends MonthlyBudgetNotifier {
-  final double _initialBudget;
-  _MockBudgetNotifier(this._initialBudget);
-
-  @override
-  double build() => _initialBudget;
 }

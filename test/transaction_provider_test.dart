@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -9,8 +10,34 @@ import 'package:balanza/features/transactions/providers/transaction_provider.dar
 
 class MockTransactionRepository implements TransactionRepository {
   final List<Transaction> transactions;
+  final StreamController<List<Transaction>> _controller = StreamController<List<Transaction>>.broadcast();
 
   MockTransactionRepository(this.transactions);
+
+  void dispose() {
+    _controller.close();
+  }
+
+  void _notify(DateTime month) async {
+    if (!_controller.isClosed) {
+      _controller.add(await getTransactions(month));
+    }
+  }
+
+  @override
+  Stream<List<Transaction>> getTransactionsStream(DateTime month) {
+    return Stream.multi((multiController) async {
+      multiController.add(await getTransactions(month));
+      final sub = _controller.stream.listen((data) {
+        if (!multiController.isClosed) {
+          multiController.add(data);
+        }
+      });
+      multiController.onCancel = () {
+        sub.cancel();
+      };
+    });
+  }
 
   @override
   Future<List<Transaction>> getTransactions(DateTime month) async {
@@ -26,6 +53,7 @@ class MockTransactionRepository implements TransactionRepository {
   @override
   Future<Transaction> addTransaction(Transaction transaction) async {
     transactions.add(transaction);
+    _notify(transaction.date);
     return transaction;
   }
 
@@ -35,17 +63,21 @@ class MockTransactionRepository implements TransactionRepository {
     if (idx != -1) {
       transactions[idx] = transaction;
     }
+    _notify(transaction.date);
     return transaction;
   }
 
   @override
   Future<void> deleteTransaction(String id) async {
+    final txList = transactions.where((t) => t.id == id).toList();
+    final date = txList.isNotEmpty ? txList.first.date : DateTime.now();
     transactions.removeWhere((tx) => tx.id == id);
+    _notify(date);
   }
 }
 
 void main() {
-  group('Transaction Provider and Notifier Tests', () {
+  group('Transaction Provider and Stream Tests', () {
     late List<Transaction> initialData;
     late MockTransactionRepository mockRepository;
     late ProviderContainer container;
@@ -83,25 +115,25 @@ void main() {
           authProvider.overrideWith((ref) => Stream.value(AuthState(AuthChangeEvent.signedOut, null))),
         ],
       );
+      container.listen(transactionListProvider, (prev, next) {});
     });
 
     tearDown(() {
+      mockRepository.dispose();
       container.dispose();
     });
 
     test('Loads transactions initially in descending date order', () async {
-      // First read triggers the build method of TransactionListNotifier
-      final list = await container.read(transactionListProvider.future);
+      await pumpEventQueue();
+      final list = container.read(transactionListProvider).value!;
 
-      // Verify that list returns the initialData sorted descending by date
       expect(list.length, 2);
       expect(list[0].id, 't2'); // t2 is 11:00, t1 is 10:00
       expect(list[1].id, 't1');
     });
 
     test('Add transaction inserts and updates provider state', () async {
-      // Initialize provider state
-      await container.read(transactionListProvider.future);
+      await pumpEventQueue();
 
       final newTx = Transaction(
         id: 't3',
@@ -113,11 +145,12 @@ void main() {
         createdAt: DateTime.parse('2026-07-21T12:00:00Z'),
       );
 
-      await container.read(transactionListProvider.notifier).add(newTx);
+      await mockRepository.addTransaction(newTx);
+      await pumpEventQueue();
 
       final currentState = container.read(transactionListProvider);
       expect(currentState.hasValue, true);
-      
+
       final list = currentState.value!;
       expect(list.length, 3);
       expect(list[0].id, 't3'); // t3 is 12:00, so it's first
@@ -126,20 +159,20 @@ void main() {
     });
 
     test('Update transaction modifies local provider state', () async {
-      // Initialize provider state
-      await container.read(transactionListProvider.future);
+      await pumpEventQueue();
 
       final updatedTx = Transaction(
         id: 't1',
         userId: 'u1',
         accountId: 'a1',
-        amount: -80.0, // Modified amount
-        description: 'Updated Tx 1', // Modified description
+        amount: -80.0,
+        description: 'Updated Tx 1',
         date: DateTime.parse('2026-07-21T10:00:00Z'),
         createdAt: DateTime.parse('2026-07-21T10:00:00Z'),
       );
 
-      await container.read(transactionListProvider.notifier).updateTx(updatedTx);
+      await mockRepository.updateTransaction(updatedTx);
+      await pumpEventQueue();
 
       final currentState = container.read(transactionListProvider);
       expect(currentState.hasValue, true);
@@ -151,10 +184,10 @@ void main() {
     });
 
     test('Delete transaction removes it from provider state', () async {
-      // Initialize provider state
-      await container.read(transactionListProvider.future);
+      await pumpEventQueue();
 
-      await container.read(transactionListProvider.notifier).delete('t1');
+      await mockRepository.deleteTransaction('t1');
+      await pumpEventQueue();
 
       final currentState = container.read(transactionListProvider);
       expect(currentState.hasValue, true);

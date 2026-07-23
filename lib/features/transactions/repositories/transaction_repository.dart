@@ -7,6 +7,20 @@ class TransactionRepository {
   TransactionRepository([SupabaseClient? client])
       : _client = client ?? Supabase.instance.client;
 
+  Stream<List<Transaction>> getTransactionsStream(DateTime month) {
+    final start = DateTime(month.year, month.month, 1);
+    final end = DateTime(month.year, month.month + 1, 0, 23, 59, 59, 999);
+
+    return _client
+        .from('transactions')
+        .stream(primaryKey: ['id'])
+        .order('date', ascending: false)
+        .map((response) => response
+            .map((json) => Transaction.fromJson(json))
+            .where((tx) => !tx.date.isBefore(start) && !tx.date.isAfter(end))
+            .toList());
+  }
+
   Future<List<Transaction>> getTransactions(DateTime month) async {
     final start = DateTime(month.year, month.month, 1);
     final end = DateTime(month.year, month.month + 1, 0, 23, 59, 59, 999);

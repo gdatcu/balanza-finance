@@ -11,7 +11,6 @@ import '../../../core/utils/category_localizer.dart';
 import 'transaction_input_sheet.dart';
 import 'categories_data.dart';
 import '../../analytics/presentation/expense_pie_chart.dart';
-import '../../analytics/presentation/wealth_advisor_banner.dart';
 import '../../analytics/presentation/wealth_advisor_card.dart';
 import '../../analytics/providers/wealth_advisor_provider.dart';
 import '../../settings/presentation/settings_view.dart';
@@ -42,6 +41,14 @@ class _HomeViewState extends ConsumerState<HomeView> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(updaterProvider).checkForUpdates(context);
     });
+  }
+
+  Future<void> _handleRefresh() async {
+    ref.invalidate(transactionListProvider);
+    ref.invalidate(monthlyBudgetProvider);
+    try {
+      await ref.read(transactionListProvider.future);
+    } catch (_) {}
   }
 
   void _showAddTransaction(BuildContext context) {
@@ -380,55 +387,61 @@ class _HomeViewState extends ConsumerState<HomeView> {
 
     final grouped = _groupTransactionsByDate(filtered);
 
-    return ListView(
-      padding: const EdgeInsets.only(top: 8, bottom: 80),
-      children: [
-        _buildMonthSelector(),
+    return RefreshIndicator(
+      onRefresh: _handleRefresh,
+      color: const Color(0xFFFF7A5A),
+      backgroundColor: const Color(0xFF1E293B),
+      child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.only(top: 8, bottom: 80),
+        children: [
+          _buildMonthSelector(),
 
-        if (_section == ToshlSection.overview) ...[
-          if (advisorState != null) WealthAdvisorCard(state: advisorState),
-          _buildAdvisorWidget(context),
-          const SizedBox(height: 16),
-          _buildOverviewCard(totalBalance, totalIncome, totalExpenses),
-          const SizedBox(height: 16),
-          _buildBudgetCard(totalExpenses.abs()),
-          const SizedBox(height: 16),
-        ] else if (_section == ToshlSection.expenses) ...[
-          _buildSectionSummary(AppLocalizations.of(context)!.totalExpenses, totalExpenses.abs(), const Color(0xFFFF7A5A)),
-          const SizedBox(height: 16),
-        ] else if (_section == ToshlSection.incomes) ...[
-          _buildSectionSummary(AppLocalizations.of(context)!.totalIncome, totalIncome, const Color(0xFF10B981)),
-          const SizedBox(height: 16),
-        ] else if (_section == ToshlSection.budgets) ...[
-          _buildBudgetCard(totalExpenses.abs()),
-          const SizedBox(height: 16),
-        ],
+          if (_section == ToshlSection.overview) ...[
+            if (advisorState != null) WealthAdvisorCard(state: advisorState),
+            _buildAdvisorWidget(context),
+            const SizedBox(height: 16),
+            _buildOverviewCard(totalBalance, totalIncome, totalExpenses),
+            const SizedBox(height: 16),
+            _buildBudgetCard(totalExpenses.abs()),
+            const SizedBox(height: 16),
+          ] else if (_section == ToshlSection.expenses) ...[
+            _buildSectionSummary(AppLocalizations.of(context)!.totalExpenses, totalExpenses.abs(), const Color(0xFFFF7A5A)),
+            const SizedBox(height: 16),
+          ] else if (_section == ToshlSection.incomes) ...[
+            _buildSectionSummary(AppLocalizations.of(context)!.totalIncome, totalIncome, const Color(0xFF10B981)),
+            const SizedBox(height: 16),
+          ] else if (_section == ToshlSection.budgets) ...[
+            _buildBudgetCard(totalExpenses.abs()),
+            const SizedBox(height: 16),
+          ],
 
-        if (filtered.isEmpty)
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 40.0),
-            child: _buildEmptyState(),
-          )
-        else
-          ...grouped.entries.expand((entry) {
-            final date = entry.key;
-            final txList = entry.value;
-            return [
-              Padding(
-                padding: const EdgeInsets.only(left: 16, top: 16, bottom: 8),
-                child: Text(
-                  _formatDateHeader(context, date),
-                  style: const TextStyle(
-                    color: Colors.grey,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
+          if (filtered.isEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 40.0),
+              child: _buildEmptyState(),
+            )
+          else
+            ...grouped.entries.expand((entry) {
+              final date = entry.key;
+              final txList = entry.value;
+              return [
+                Padding(
+                  padding: const EdgeInsets.only(left: 16, top: 16, bottom: 8),
+                  child: Text(
+                    _formatDateHeader(context, date),
+                    style: const TextStyle(
+                      color: Colors.grey,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
-              ),
-              ...txList.map((tx) => _buildTransactionRow(tx)),
-            ];
-          }),
-      ],
+                ...txList.map((tx) => _buildTransactionRow(tx)),
+              ];
+            }),
+        ],
+      ),
     );
   }
 
@@ -436,77 +449,83 @@ class _HomeViewState extends ConsumerState<HomeView> {
     final isIncomeView = _section == ToshlSection.incomes;
     final summariesAsync = ref.watch(categorySummaryProvider);
 
-    return ListView(
-      padding: const EdgeInsets.only(top: 8, bottom: 80),
-      children: [
-        _buildMonthSelector(),
-        const SizedBox(height: 8),
-        ExpensePieChart(
-          customTransactions: transactions,
-          isIncome: isIncomeView,
-        ),
-        const SizedBox(height: 16),
-        summariesAsync.when(
-          data: (summaries) {
-            final filtered = summaries.where((s) {
-              if (isIncomeView) {
-                return s.transactionType == TransactionType.income;
-              } else {
-                return s.transactionType == TransactionType.expense;
-              }
-            }).toList();
+    return RefreshIndicator(
+      onRefresh: _handleRefresh,
+      color: const Color(0xFFFF7A5A),
+      backgroundColor: const Color(0xFF1E293B),
+      child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.only(top: 8, bottom: 80),
+        children: [
+          _buildMonthSelector(),
+          const SizedBox(height: 8),
+          ExpensePieChart(
+            customTransactions: transactions,
+            isIncome: isIncomeView,
+          ),
+          const SizedBox(height: 16),
+          summariesAsync.when(
+            data: (summaries) {
+              final filtered = summaries.where((s) {
+                if (isIncomeView) {
+                  return s.transactionType == TransactionType.income;
+                } else {
+                  return s.transactionType == TransactionType.expense;
+                }
+              }).toList();
 
-            if (filtered.isEmpty) {
-              return Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(24.0),
-                  child: Text(
-                    AppLocalizations.of(context)!.noCategoryTransactions,
-                    style: const TextStyle(color: Colors.grey),
-                  ),
-                ),
-              );
-            }
-
-            return ListView.separated(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: filtered.length,
-              separatorBuilder: (context, index) => const Divider(color: Colors.white12, height: 1),
-              itemBuilder: (context, index) {
-                final item = filtered[index];
-                final color = isIncomeView ? const Color(0xFF10B981) : const Color(0xFFFF7A5A);
-                return ListTile(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
-                  title: Text(
-                    CategoryLocalizer.getLocalizedName(context, item.categoryName),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                  ),
-                  trailing: Text(
-                    item.totalAmount > 0
-                        ? '+${CurrencyFormatter.format(item.totalAmount)}'
-                        : CurrencyFormatter.format(item.totalAmount),
-                    style: TextStyle(
-                      color: color,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
+              if (filtered.isEmpty) {
+                return Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: Text(
+                      AppLocalizations.of(context)!.noCategoryTransactions,
+                      style: const TextStyle(color: Colors.grey),
                     ),
                   ),
                 );
-              },
-            );
-          },
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (err, __) => Text(
-            'Error: $err',
-            style: const TextStyle(color: Color(0xFFFF7A5A)),
+              }
+
+              return ListView.separated(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: filtered.length,
+                separatorBuilder: (context, index) => const Divider(color: Colors.white12, height: 1),
+                itemBuilder: (context, index) {
+                  final item = filtered[index];
+                  final color = isIncomeView ? const Color(0xFF10B981) : const Color(0xFFFF7A5A);
+                  return ListTile(
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
+                    title: Text(
+                      CategoryLocalizer.getLocalizedName(context, item.categoryName),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                    trailing: Text(
+                      item.totalAmount > 0
+                          ? '+${CurrencyFormatter.format(item.totalAmount)}'
+                          : CurrencyFormatter.format(item.totalAmount),
+                      style: TextStyle(
+                        color: color,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (err, __) => Text(
+              'Error: $err',
+              style: const TextStyle(color: Color(0xFFFF7A5A)),
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -746,7 +765,9 @@ class _HomeViewState extends ConsumerState<HomeView> {
   }
 
   Widget _buildBudgetCard(double expenseAbs) {
-    final budgetLimit = ref.watch(monthlyBudgetProvider);
+    final budgetLimit = ref.watch(monthlyBudgetProvider).value ??
+        ref.watch(sharedPreferencesProvider).getDouble('monthly_budget_limit') ??
+        1000.0;
     final budgetRatio = budgetLimit > 0 ? expenseAbs / budgetLimit : 0.0;
     final progressVal = budgetRatio.clamp(0.0, 1.0);
 
@@ -861,7 +882,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
         );
       },
       onDismissed: (_) {
-        ref.read(transactionListProvider.notifier).delete(tx.id);
+        ref.read(transactionRepositoryProvider).deleteTransaction(tx.id);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(AppLocalizations.of(context)!.transactionDeleted),

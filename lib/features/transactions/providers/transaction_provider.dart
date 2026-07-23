@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -38,121 +39,64 @@ final selectedMonthProvider = NotifierProvider<SelectedMonthNotifier, DateTime>(
   return SelectedMonthNotifier();
 });
 
-class MonthlyBudgetNotifier extends Notifier<double> {
-  static const _key = 'monthly_budget_limit';
+Future<bool> updateMonthlyBudget(dynamic ref, double value) async {
+  final prefs = ref.read(sharedPreferencesProvider);
+  final success = await prefs.setDouble('monthly_budget_limit', value);
 
-  @override
-  double build() {
-    // Rebuild the budget whenever the user's authentication state changes
-    ref.watch(authProvider);
-
-    final prefs = ref.watch(sharedPreferencesProvider);
-    final localBudget = prefs.getDouble(_key) ?? 1000.0;
-
-    try {
-      final client = Supabase.instance.client;
-      final currentUserId = client.auth.currentUser?.id;
-      if (currentUserId != null) {
-        _loadFromSupabase(client, currentUserId, localBudget);
-      }
-    } catch (_) {
-      // Gracefully handle uninitialized Supabase (e.g. in tests)
+  try {
+    final client = Supabase.instance.client;
+    final currentUserId = client.auth.currentUser?.id;
+    if (currentUserId != null) {
+      await client.from('budgets').upsert({
+        'user_id': currentUserId,
+        'limit_amount': value,
+      }, onConflict: 'user_id');
     }
+  } catch (_) {}
 
-    return localBudget;
-  }
-
-  Future<void> _loadFromSupabase(SupabaseClient client, String userId, double localBudget) async {
-    try {
-      final response = await client
-          .from('budgets')
-          .select('limit_amount')
-          .eq('user_id', userId)
-          .maybeSingle();
-
-      if (response != null && response['limit_amount'] != null) {
-        state = (response['limit_amount'] as num).toDouble();
-      } else {
-        // If no budget row exists in Supabase, sync the local budget to Supabase
-        await client.from('budgets').upsert({
-          'user_id': userId,
-          'limit_amount': localBudget,
-        }, onConflict: 'user_id');
-      }
-    } catch (_) {
-      // Gracefully catch database missing table errors before user runs SQL console script
-    }
-  }
-
-  Future<bool> update(double value) async {
-    final prefs = ref.read(sharedPreferencesProvider);
-    final success = await prefs.setDouble(_key, value);
-    state = value;
-
-    try {
-      final client = Supabase.instance.client;
-      final currentUserId = client.auth.currentUser?.id;
-      if (currentUserId != null) {
-        await client.from('budgets').upsert({
-          'user_id': currentUserId,
-          'limit_amount': value,
-        }, onConflict: 'user_id');
-      }
-    } catch (_) {}
-
-    return success;
-  }
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    ref.invalidate(monthlyBudgetProvider);
+  });
+  return success;
 }
 
-final monthlyBudgetProvider = NotifierProvider<MonthlyBudgetNotifier, double>(() {
-  return MonthlyBudgetNotifier();
+/// StreamProvider responsible for fetching live realtime budget updates from Supabase.
+final monthlyBudgetProvider = StreamProvider<double>((ref) {
+  // Re-subscribe when auth state changes
+  ref.watch(authProvider);
+
+  final prefs = ref.watch(sharedPreferencesProvider);
+  final localBudget = prefs.getDouble('monthly_budget_limit') ?? 1000.0;
+
+  try {
+    final client = Supabase.instance.client;
+    final currentUserId = client.auth.currentUser?.id;
+    if (currentUserId != null) {
+      return client
+          .from('budgets')
+          .stream(primaryKey: ['id'])
+          .eq('user_id', currentUserId)
+          .map((data) {
+            if (data.isNotEmpty && data.first['limit_amount'] != null) {
+              final val = (data.first['limit_amount'] as num).toDouble();
+              prefs.setDouble('monthly_budget_limit', val);
+              return val;
+            }
+            return localBudget;
+          });
+    }
+  } catch (_) {
+    // Gracefully handle uninitialized Supabase (e.g. in tests)
+  }
+
+  return Stream.value(localBudget);
 });
 
-/// AsyncNotifier to manage state, loading/error states, and updates to the transactions list.
-class TransactionListNotifier extends AsyncNotifier<List<Transaction>> {
-  TransactionRepository get _repository => ref.read(transactionRepositoryProvider);
-
-  @override
-  Future<List<Transaction>> build() async {
-    final selectedMonth = ref.watch(selectedMonthProvider);
-    return ref.watch(transactionRepositoryProvider).getTransactions(selectedMonth);
-  }
-
-  /// Adds a new transaction and updates the state by refetching the active month's data.
-  Future<void> add(Transaction transaction) async {
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      await _repository.addTransaction(transaction);
-      final selectedMonth = ref.read(selectedMonthProvider);
-      return _repository.getTransactions(selectedMonth);
-    });
-  }
-
-  /// Updates an existing transaction in the database and refetches the active month's data.
-  Future<void> updateTx(Transaction transaction) async {
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      await _repository.updateTransaction(transaction);
-      final selectedMonth = ref.read(selectedMonthProvider);
-      return _repository.getTransactions(selectedMonth);
-    });
-  }
-
-  /// Deletes a transaction and refetches the active month's data.
-  Future<void> delete(String id) async {
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      await _repository.deleteTransaction(id);
-      final selectedMonth = ref.read(selectedMonthProvider);
-      return _repository.getTransactions(selectedMonth);
-    });
-  }
-}
-
-/// Provider for the TransactionListNotifier.
-final transactionListProvider =
-    AsyncNotifierProvider<TransactionListNotifier, List<Transaction>>(() {
-  return TransactionListNotifier();
+/// StreamProvider responsible for fetching live realtime transaction updates from Supabase.
+final transactionListProvider = StreamProvider<List<Transaction>>((ref) {
+  final selectedMonth = ref.watch(selectedMonthProvider);
+  final repository = ref.watch(transactionRepositoryProvider);
+  return repository.getTransactionsStream(selectedMonth);
 });
 
 /// Provider to fetch categories dynamically from Supabase.
@@ -201,7 +145,7 @@ final categorySummaryProvider = Provider<AsyncValue<List<CategorySummary>>>((ref
 final insightsProvider = Provider<String>((ref) {
   final transactionsAsync = ref.watch(transactionListProvider);
   final netWorthAsync = ref.watch(netWorthListProvider);
-  final budget = ref.watch(monthlyBudgetProvider);
+  final budget = ref.watch(monthlyBudgetProvider).value ?? 1000.0;
   final selectedMonth = ref.watch(selectedMonthProvider);
   final locale = ref.watch(localeProvider);
   final isRo = locale.languageCode == 'ro';

@@ -145,7 +145,7 @@ class _TransactionInputSheetState extends ConsumerState<TransactionInputSheet> {
         originalAmount: originalAmount,
       );
 
-      ref.read(transactionListProvider.notifier).add(transaction);
+      ref.read(transactionRepositoryProvider).addTransaction(transaction);
       Navigator.of(context).pop();
 
       ScaffoldMessenger.of(context).showSnackBar(

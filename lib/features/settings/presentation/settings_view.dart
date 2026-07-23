@@ -18,7 +18,7 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
   @override
   void initState() {
     super.initState();
-    final currentBudget = ref.read(monthlyBudgetProvider);
+    final currentBudget = ref.read(monthlyBudgetProvider).value ?? 1000.0;
     _budgetController = TextEditingController(text: currentBudget.toStringAsFixed(2));
   }
 
@@ -31,16 +31,14 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
   Future<void> _saveBudget() async {
     if (_formKey.currentState!.validate()) {
       final newBudget = double.parse(_budgetController.text);
-      await ref.read(monthlyBudgetProvider.notifier).update(newBudget);
-      if (mounted) {
-        Navigator.of(context).pop();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(AppLocalizations.of(context)!.budgetUpdatedSuccessfully),
-            backgroundColor: Colors.green,
-          ),
-        );
-      }
+      Navigator.of(context).pop();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.budgetUpdatedSuccessfully),
+          backgroundColor: Colors.green,
+        ),
+      );
+      await updateMonthlyBudget(ref, newBudget);
     }
   }
 

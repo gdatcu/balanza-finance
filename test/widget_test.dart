@@ -15,6 +15,21 @@ import 'package:balanza/models/category.dart';
 
 class MockTransactionRepository implements TransactionRepository {
   @override
+  Stream<List<Transaction>> getTransactionsStream(DateTime month) {
+    return Stream.value([
+      Transaction(
+        id: 't1',
+        userId: 'u1',
+        accountId: 'a1',
+        amount: -50.0,
+        description: 'Groceries Spend',
+        date: DateTime.parse('2026-07-21T10:00:00Z'),
+        createdAt: DateTime.parse('2026-07-21T10:00:00Z'),
+      ),
+    ]);
+  }
+
+  @override
   Future<List<Transaction>> getTransactions(DateTime month) async {
     return [
       Transaction(
@@ -160,7 +175,6 @@ void main() {
     expect(saveBtn, findsOneWidget);
     await tester.tap(saveBtn);
     await tester.pumpAndSettle();
-
     expect(find.text('Balanza Finance'), findsOneWidget);
     expect(find.text('Spent: RON 50.00 / RON 1500.00'), findsOneWidget);
   });

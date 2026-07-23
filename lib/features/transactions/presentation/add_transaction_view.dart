@@ -119,7 +119,7 @@ class _AddTransactionViewState extends ConsumerState<AddTransactionView> {
         createdAt: DateTime.now(),
       );
 
-      await ref.read(transactionListProvider.notifier).add(transaction);
+      await ref.read(transactionRepositoryProvider).addTransaction(transaction);
 
       if (mounted) {
         Navigator.of(context).pop();

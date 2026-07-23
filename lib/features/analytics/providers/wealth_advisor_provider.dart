@@ -72,7 +72,7 @@ final dismissedNudgesProvider =
 /// Riverpod provider computing current Wealth Advisor state based on transactions and budgets.
 final wealthAdvisorProvider = Provider<WealthAdvisorState?>((ref) {
   final transactionsAsync = ref.watch(transactionListProvider);
-  final monthlyBudget = ref.watch(monthlyBudgetProvider);
+  final monthlyBudget = ref.watch(monthlyBudgetProvider).value ?? 1000.0;
   final dismissedIds = ref.watch(dismissedNudgesProvider);
 
   final transactions = transactionsAsync.value ?? <Transaction>[];
