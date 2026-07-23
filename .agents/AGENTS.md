@@ -42,36 +42,32 @@ This document outlines the zero-cost technology stack and architecture decisions
 > 5. **Data Visualization:** Integrate  
 >    fl_chart to build interactive visual reports.
 
-## 6. Release Process (In-App Auto-Updater)
+## 6. Release Process (Automated CI/CD & In-App Updater)
 
-The app uses `github_release_apk_updater` (local path dep in `packages/`) to check for and install updates via GitHub Releases. Follow these steps exactly for every new release:
+The app uses `github_release_apk_updater` (embedded in `packages/`) to check for and install updates via GitHub Releases. Follow these steps exactly for every new release:
 
-### Step 1 — Bump the version
+### Step 1 — Collect release details and update RELEASE_NOTES.md
+Before creating any new release:
+1. Collect the exact list of user-facing features, bug fixes, UI polish, and backend/architectural changes implemented since the previous release.
+2. Adapt and update `RELEASE_NOTES.md` in the repository root with these details. The GitHub Actions release workflow reads `RELEASE_NOTES.md` and populates the release notes on GitHub automatically.
+
+### Step 2 — Bump the version
 In `pubspec.yaml`, increment the `version` field:
 ```yaml
-version: 1.2.0+3  # format: semver+buildNumber
+version: 1.3.1+5  # format: semver+buildNumber
 ```
-The `versionName` (e.g. `1.2.0`) is what the updater compares against GitHub release tags.
+The `versionName` (e.g. `1.3.1`) is what the updater compares against GitHub release tags.
 
-### Step 2 — Build the signed release APK
-```powershell
-flutter build apk --release --obfuscate --split-debug-info=build/app/outputs/symbols
-```
-Output: `build\app\outputs\flutter-apk\app-release.apk`
-
-### Step 3 — Commit and push
+### Step 3 — Commit, Tag, and Push
 ```powershell
 git add .
-git commit -m "chore(release): bump version to 1.2.0"
-git push
+git commit -m "chore(release): bump version to 1.3.1 and update release notes"
+git tag v1.3.1
+git push origin main --tags
 ```
 
-### Step 4 — Create a GitHub Release
-1. Go to `https://github.com/gdatcu/balanza-finance/releases/new`
-2. Set the **tag** to match the version exactly: `v1.2.0`
-3. Set the **release title** to `Balanza Finance v1.2.0`
-4. Upload `app-release.apk` as a release **asset**
-5. Publish the release
+### Step 4 — Automated GitHub Actions Build & Release
+- GitHub Actions automatically picks up the tag push (`v1.3.1`), runs `flutter analyze` and `flutter test`, builds the release APK signed with `KEYSTORE_BASE64`, attaches `app-release.apk`, and uses `RELEASE_NOTES.md` as the release body.
 
 ### How users receive the update
 - On next app launch, `UpdaterService` (in `lib/features/settings/providers/updater_provider.dart`) fetches the latest GitHub release tag.
@@ -79,6 +75,6 @@ git push
 - The user taps **Actualizează** → APK downloads with a progress bar → native Android installer opens.
 
 ### Important Notes
-- The `packages/github_release_apk_updater` directory is a **git submodule** (embedded repo). Its `build.gradle.kts` has been patched to work with the project's Kotlin/Gradle versions — do not re-clone it without re-applying the patches.
+- The `packages/github_release_apk_updater` directory is an embedded sub-package in `packages/`.
 - `minSdk` is fixed at **24** (Android 7.0+) due to the updater plugin requirement.
 - `compileSdk` is fixed at **36** and `ndkVersion` at **27.0.12077973**.

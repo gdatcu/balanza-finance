@@ -1,22 +1,24 @@
-# Balanza Finance v1.3.0 Release Notes
+# Balanza Finance v1.3.1 Release Notes
 
-## ⚡ What's New
+## 🛠️ Critical Fixes & Improvements
 
-### 🔄 Realtime Automatic Database Sync
-- Transactions and monthly budget limits now stream live updates directly from Supabase PostgreSQL in real-time.
-- Visual charts and summaries refresh instantly across devices without needing to reopen the app.
+### 🔐 Google Sign-In Authentication Fix
+- Fixed `PlatformException(sign_in_failed, 10)` authentication error on release builds by configuring a dedicated release keystore (`upload-keystore.jks`) and adding ProGuard preservation rules for Google Play Services (`com.google.android.gms`).
+- Migrated keystore signing binary and credentials to encrypted **GitHub Repository Secrets** (`KEYSTORE_BASE64`, `KEYSTORE_PASSWORD`, `KEY_ALIAS`, `KEY_PASSWORD`) for secure CI/CD builds.
 
-### 📱 Manual Pull-to-Refresh Gesture
-- Added smooth Pull-to-Refresh support to the main financial dashboard.
-- Swipe down on any transaction list to manually re-sync your financial data on demand.
-
-### 🤖 CI/CD Release Automation
-- Fully automated build and release deployment via GitHub Actions.
-- Automated static analysis and test validation on every pull request and release build.
+### 🎨 UI & Framework Compatibility
+- **ListTile / Material Wrapper**: Fixed Flutter 3.33+ ListTile background container assertion by wrapping navigation drawer contents in a `Material` widget.
+- **Lints & Deprecations**: Resolved code deprecation warnings across view components for clean static analysis execution.
 
 ---
 
-## 🛠️ Enhancements & Performance Fixes
-- **Wealth Advisor**: Improved budget threshold evaluation and reactivity for over-budget and category warnings.
-- **State Management**: Upgraded Riverpod `StreamProvider` architecture for seamless data updates.
-- **In-App Updater**: Patched plugin SDK dependencies for reliable background and manual app updates on Android 7.0+ (API 24-36).
+## ⚡ Features (Introduced in 1.3.x Series)
+
+### 🔄 Realtime Automatic Database Sync
+- Live Supabase PostgreSQL database streams for transactions and budget limits. Changes automatically sync across devices in real-time.
+
+### 📱 Dashboard Pull-to-Refresh Gesture
+- Added responsive pull-to-refresh on dashboard list views to manually force-sync transaction data on demand.
+
+### 🤖 Automated GitHub Actions CI/CD
+- Automated testing (`flutter test`), static analysis (`flutter analyze`), and release APK packaging (`app-release.apk`) on tag pushes (`v*`).
