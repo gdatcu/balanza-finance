@@ -8,8 +8,10 @@ enum CategoryType {
   shopping,
   investments,
   gifts,
+  // ignore: constant_identifier_names
   coffee_tea,
   restaurants,
+  // ignore: constant_identifier_names
   pet_care,
   subscriptions,
   other,

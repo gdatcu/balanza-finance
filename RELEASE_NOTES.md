@@ -1,4 +1,4 @@
-# Balanza Finance v1.5.0 Release Notes
+# Balanza Finance v1.5.1 Release Notes
 
 ## ⚡ New Features
 
