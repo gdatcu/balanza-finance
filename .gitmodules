@@ -1,0 +1,3 @@
+[submodule "packages/github_release_apk_updater"]
+	path = packages/github_release_apk_updater
+	url = https://github.com/dozmaz/github_release_apk_updater.git
