@@ -148,7 +148,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
           ),
         ),
         drawer: Drawer(
-          child: Container(
+          child: Material(
             color: const Color(0xFF0F172A),
             child: ListView(
               padding: EdgeInsets.zero,
