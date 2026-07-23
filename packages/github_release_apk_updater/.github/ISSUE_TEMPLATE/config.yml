@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 General Discussion
+    url: https://github.com/dozmaz/github_release_apk_updater/discussions
+    about: For general questions or ideas that are not bugs or feature requests, use GitHub Discussions.
+  - name: 🔒 Security Vulnerability
+    url: https://github.com/dozmaz/github_release_apk_updater/security/advisories/new
+    about: Please report security vulnerabilities privately via GitHub Security Advisories, never as a public issue.
+  - name: 📦 pub.dev Package Page
+    url: https://pub.dev/packages/github_release_apk_updater
+    about: For general package info, version history, and API documentation.
