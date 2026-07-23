@@ -1,5 +1,6 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../models/transaction.dart';
+import '../presentation/categories_data.dart';
 
 class TransactionRepository {
   final SupabaseClient _client;
@@ -42,6 +43,21 @@ class TransactionRepository {
     final updatedTx = currentUserId != null
         ? transaction.copyWith(userId: currentUserId)
         : transaction;
+
+    if (updatedTx.categoryId != null) {
+      try {
+        final cat = defaultCategories.firstWhere(
+          (c) => c.id == updatedTx.categoryId,
+        );
+        await _client.from('categories').upsert({
+          'id': cat.id,
+          'name': cat.name,
+          'icon': cat.icon,
+          'color': cat.color,
+          'created_at': cat.createdAt.toIso8601String(),
+        }, onConflict: 'id');
+      } catch (_) {}
+    }
 
     final response = await _client
         .from('transactions')

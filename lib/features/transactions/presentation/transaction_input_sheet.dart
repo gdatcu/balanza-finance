@@ -119,7 +119,7 @@ class _TransactionInputSheetState extends ConsumerState<TransactionInputSheet> {
     }
   }
 
-  void _submit() {
+  Future<void> _submit() async {
     if (_formKey.currentState!.validate()) {
       final double amt = double.parse(_amountController.text);
       
@@ -149,15 +149,27 @@ class _TransactionInputSheetState extends ConsumerState<TransactionInputSheet> {
         originalAmount: originalAmount,
       );
 
-      ref.read(transactionRepositoryProvider).addTransaction(transaction);
-      Navigator.of(context).pop();
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(AppLocalizations.of(context)!.transactionAddedSuccessfully),
-          backgroundColor: Colors.green,
-        ),
-      );
+      try {
+        await ref.read(transactionRepositoryProvider).addTransaction(transaction);
+        if (mounted) {
+          Navigator.of(context).pop();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(AppLocalizations.of(context)!.transactionAddedSuccessfully),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Failed to save transaction: $e'),
+              backgroundColor: const Color(0xFFFF7A5A),
+            ),
+          );
+        }
+      }
     }
   }
 
