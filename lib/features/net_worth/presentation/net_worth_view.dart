@@ -443,7 +443,7 @@ class _AddNetWorthItemSheetState extends ConsumerState<AddNetWorthItemSheet> {
                   color: activeColor,
                 ),
                 value: _isAsset,
-                activeColor: const Color(0xFF10B981),
+                activeThumbColor: const Color(0xFF10B981),
                 inactiveThumbColor: const Color(0xFFFF7A5A),
                 inactiveTrackColor: const Color(0xFFFF7A5A).withValues(alpha: 0.2),
                 onChanged: (val) {
