@@ -64,6 +64,7 @@ jobs:
         with:
           tag_name: ${{ steps.tag.outputs.tag_name }}
           name: Balanza Finance ${{ steps.tag.outputs.tag_name }}
+          body_path: RELEASE_NOTES.md
           files: build/app/outputs/flutter-apk/app-release.apk
           draft: false
           prerelease: false
