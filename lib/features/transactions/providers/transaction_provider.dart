@@ -99,13 +99,27 @@ final transactionListProvider = StreamProvider<List<Transaction>>((ref) {
   return repository.getTransactionsStream(selectedMonth);
 });
 
-/// Provider to fetch categories dynamically from Supabase.
+/// Provider to fetch categories dynamically from Supabase, merged with defaultCategories.
 final supabaseCategoriesProvider = FutureProvider<List<Category>>((ref) async {
-  final client = Supabase.instance.client;
-  final response = await client.from('categories').select();
-  return (response as List)
-      .map((json) => Category.fromJson(json as Map<String, dynamic>))
-      .toList();
+  List<Category> remote = [];
+  try {
+    final client = Supabase.instance.client;
+    final response = await client.from('categories').select();
+    remote = (response as List)
+        .map((json) => Category.fromJson(json as Map<String, dynamic>))
+        .toList();
+  } catch (_) {
+    return defaultCategories;
+  }
+
+  final Map<String, Category> categoryMap = {};
+  for (final cat in defaultCategories) {
+    categoryMap[cat.id] = cat;
+  }
+  for (final cat in remote) {
+    categoryMap[cat.id] = cat;
+  }
+  return categoryMap.values.toList();
 });
 
 /// Provider for Category Summaries, aggregating transactions by category for the current month.
