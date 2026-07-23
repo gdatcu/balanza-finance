@@ -54,29 +54,78 @@ class TransactionRepository {
           'name': cat.name,
           'icon': cat.icon,
           'color': cat.color,
+          if (currentUserId != null) 'user_id': currentUserId,
           'created_at': cat.createdAt.toIso8601String(),
         }, onConflict: 'id');
       } catch (_) {}
     }
 
-    final response = await _client
-        .from('transactions')
-        .insert(updatedTx.toJson())
-        .select()
-        .single();
+    try {
+      final response = await _client
+          .from('transactions')
+          .insert(updatedTx.toJson())
+          .select()
+          .single();
 
-    return Transaction.fromJson(response);
+      return Transaction.fromJson(response);
+    } on PostgrestException catch (e) {
+      if (e.code == '23503' && updatedTx.categoryId != null) {
+        final fallbackTx = updatedTx.copyWith(categoryId: null);
+        final response = await _client
+            .from('transactions')
+            .insert(fallbackTx.toJson())
+            .select()
+            .single();
+        return Transaction.fromJson(response);
+      }
+      rethrow;
+    }
   }
 
   Future<Transaction> updateTransaction(Transaction transaction) async {
-    final response = await _client
-        .from('transactions')
-        .update(transaction.toJson())
-        .eq('id', transaction.id)
-        .select()
-        .single();
+    final currentUserId = _client.auth.currentUser?.id;
+    final updatedTx = currentUserId != null
+        ? transaction.copyWith(userId: currentUserId)
+        : transaction;
 
-    return Transaction.fromJson(response);
+    if (updatedTx.categoryId != null) {
+      try {
+        final cat = defaultCategories.firstWhere(
+          (c) => c.id == updatedTx.categoryId,
+        );
+        await _client.from('categories').upsert({
+          'id': cat.id,
+          'name': cat.name,
+          'icon': cat.icon,
+          'color': cat.color,
+          if (currentUserId != null) 'user_id': currentUserId,
+          'created_at': cat.createdAt.toIso8601String(),
+        }, onConflict: 'id');
+      } catch (_) {}
+    }
+
+    try {
+      final response = await _client
+          .from('transactions')
+          .update(updatedTx.toJson())
+          .eq('id', updatedTx.id)
+          .select()
+          .single();
+
+      return Transaction.fromJson(response);
+    } on PostgrestException catch (e) {
+      if (e.code == '23503' && updatedTx.categoryId != null) {
+        final fallbackTx = updatedTx.copyWith(categoryId: null);
+        final response = await _client
+            .from('transactions')
+            .update(fallbackTx.toJson())
+            .eq('id', fallbackTx.id)
+            .select()
+            .single();
+        return Transaction.fromJson(response);
+      }
+      rethrow;
+    }
   }
 
   Future<void> deleteTransaction(String id) async {
