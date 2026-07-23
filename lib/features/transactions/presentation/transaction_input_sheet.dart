@@ -204,7 +204,8 @@ class _TransactionInputSheetState extends ConsumerState<TransactionInputSheet> {
                     color: _isIncome ? const Color(0xFF10B981) : const Color(0xFFFF7A5A),
                   ),
                   value: _isIncome,
-                  activeThumbColor: const Color(0xFF10B981),
+                  // ignore: deprecated_member_use
+                  activeColor: const Color(0xFF10B981),
                   inactiveThumbColor: const Color(0xFFFF7A5A),
                   inactiveTrackColor: const Color(0xFFFF7A5A).withValues(alpha: 0.2),
                   onChanged: (val) {
@@ -345,7 +346,8 @@ class _TransactionInputSheetState extends ConsumerState<TransactionInputSheet> {
                           ),
                         ),
                       ),
-                      initialValue: _selectedCategoryId,
+                      // ignore: deprecated_member_use
+                      value: _selectedCategoryId,
                       items: filtered.map((cat) {
                         final color = getCategoryColor(cat.color);
                         final icon = getCategoryIcon(cat.icon);

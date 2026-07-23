@@ -218,7 +218,8 @@ class _AddTransactionViewState extends ConsumerState<AddTransactionView> {
 
               // Account Selector Dropdown
               DropdownButtonFormField<Account>(
-                initialValue: _selectedAccount,
+                // ignore: deprecated_member_use
+                value: _selectedAccount,
                 decoration: InputDecoration(
                   labelText: 'Account *',
                   prefixIcon: const Icon(Icons.account_balance),
@@ -247,7 +248,8 @@ class _AddTransactionViewState extends ConsumerState<AddTransactionView> {
 
               // Category Selector Dropdown (Dynamically Filtered)
               DropdownButtonFormField<Category>(
-                initialValue: _selectedCategory,
+                // ignore: deprecated_member_use
+                value: _selectedCategory,
                 decoration: InputDecoration(
                   labelText: 'Category *',
                   border: OutlineInputBorder(
