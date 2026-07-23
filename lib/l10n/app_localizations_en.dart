@@ -361,4 +361,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String autoTaggedMessage(String category) {
     return 'Auto-tagged as $category based on remote rules.';
   }
+
+  @override
+  String get categoryCoffeeTea => 'Coffee & Tea';
+
+  @override
+  String get categoryRestaurants => 'Restaurants & Dining';
+
+  @override
+  String get categoryPetCare => 'Pet Care';
+
+  @override
+  String get categorySubscriptions => 'Subscriptions';
+
+  @override
+  String get categoryOther => 'Other';
 }

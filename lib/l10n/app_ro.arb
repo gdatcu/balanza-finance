@@ -154,5 +154,10 @@
         "type": "String"
       }
     }
-  }
+  },
+  "categoryCoffeeTea": "Cafea & Ceai",
+  "categoryRestaurants": "Restaurante & Localuri",
+  "categoryPetCare": "Îngrijire Animale",
+  "categorySubscriptions": "Abonamente & Servicii",
+  "categoryOther": "Altele"
 }

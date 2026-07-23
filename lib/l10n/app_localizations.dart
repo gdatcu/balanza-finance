@@ -757,6 +757,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Auto-tagged as {category} based on remote rules.'**
   String autoTaggedMessage(String category);
+
+  /// No description provided for @categoryCoffeeTea.
+  ///
+  /// In en, this message translates to:
+  /// **'Coffee & Tea'**
+  String get categoryCoffeeTea;
+
+  /// No description provided for @categoryRestaurants.
+  ///
+  /// In en, this message translates to:
+  /// **'Restaurants & Dining'**
+  String get categoryRestaurants;
+
+  /// No description provided for @categoryPetCare.
+  ///
+  /// In en, this message translates to:
+  /// **'Pet Care'**
+  String get categoryPetCare;
+
+  /// No description provided for @categorySubscriptions.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscriptions'**
+  String get categorySubscriptions;
+
+  /// No description provided for @categoryOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get categoryOther;
 }
 
 class _AppLocalizationsDelegate

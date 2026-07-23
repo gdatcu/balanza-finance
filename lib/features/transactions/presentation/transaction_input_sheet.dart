@@ -47,8 +47,7 @@ class _TransactionInputSheetState extends ConsumerState<TransactionInputSheet> {
     final rules = ref.read(taggingRulesProvider).value;
     if (rules == null || rules.isEmpty) return;
 
-    final categories = ref.read(supabaseCategoriesProvider).value;
-    if (categories == null || categories.isEmpty) return;
+    final categories = ref.read(supabaseCategoriesProvider).value ?? defaultCategories;
 
     final result = TransactionParser.parseText(_noteController.text, rules);
     if (result != null && result.matchedRule.id != _lastAutoTaggedRuleId) {
@@ -75,7 +74,7 @@ class _TransactionInputSheetState extends ConsumerState<TransactionInputSheet> {
           ScaffoldMessenger.of(context).hideCurrentSnackBar();
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Auto-tagged as $localizedCategoryName based on remote rules.'),
+              content: Text(AppLocalizations.of(context)!.autoTaggedMessage(localizedCategoryName)),
               backgroundColor: const Color(0xFF10B981),
               duration: const Duration(seconds: 3),
             ),
@@ -92,6 +91,11 @@ class _TransactionInputSheetState extends ConsumerState<TransactionInputSheet> {
     '00000000-0000-0000-0000-0000000000c4', // Utilities
     '00000000-0000-0000-0000-0000000000c6', // Entertainment
     '00000000-0000-0000-0000-0000000000c7', // Shopping
+    '00000000-0000-0000-0000-000000000c10', // Coffee & Tea
+    '00000000-0000-0000-0000-000000000c11', // Restaurants
+    '00000000-0000-0000-0000-000000000c12', // Pet Care
+    '00000000-0000-0000-0000-000000000c13', // Subscriptions
+    '00000000-0000-0000-0000-000000000c14', // Other
   };
 
   @override

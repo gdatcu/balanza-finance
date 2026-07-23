@@ -1,3 +1,20 @@
+enum CategoryType {
+  food,
+  transport,
+  rent,
+  utilities,
+  salary,
+  entertainment,
+  shopping,
+  investments,
+  gifts,
+  coffee_tea,
+  restaurants,
+  pet_care,
+  subscriptions,
+  other,
+}
+
 class Category {
   final String id;
   final String name;

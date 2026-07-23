@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../models/transaction.dart';
+import '../../../models/category.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../transactions/providers/transaction_provider.dart';
 import '../../transactions/presentation/categories_data.dart';
@@ -165,7 +166,157 @@ final wealthAdvisorProvider = Provider<WealthAdvisorState?>((ref) {
     }
   });
 
-  // 2. Evaluate Multi-Category Behavioral Nudges based on recent transaction text / keywords
+  // 2. Evaluate Category Aggregates for Specific Behavioral Nudges
+  int coffeeTeaCount = 0;
+  double restaurantSpending = 0.0;
+  int subscriptionCount = 0;
+  double otherSpending = 0.0;
+  double totalExpenseSum = 0.0;
+
+  for (final tx in transactions) {
+    if (tx.amount < 0) {
+      final amt = tx.amount.abs();
+      totalExpenseSum += amt;
+
+      final cat = defaultCategories.firstWhere(
+        (c) => c.id == tx.categoryId,
+        orElse: () => Category(
+          id: tx.categoryId ?? 'uncategorized',
+          name: tx.categoryId == null ? 'other' : 'uncategorized',
+          createdAt: DateTime.now(),
+        ),
+      );
+
+      final desc = (tx.description ?? '').toLowerCase();
+      final catName = cat.name.toLowerCase();
+
+      // Check coffee_tea
+      if (tx.categoryId == '00000000-0000-0000-0000-000000000c10' ||
+          catName == 'coffee_tea' ||
+          catName == 'coffee & tea' ||
+          desc.contains('starbucks') ||
+          desc.contains('5togo') ||
+          desc.contains('latte')) {
+        coffeeTeaCount++;
+      }
+
+      // Check restaurants
+      if (tx.categoryId == '00000000-0000-0000-0000-000000000c11' ||
+          catName == 'restaurants' ||
+          catName == 'restaurant') {
+        restaurantSpending += amt;
+      }
+
+      // Check subscriptions
+      if (tx.categoryId == '00000000-0000-0000-0000-000000000c13' ||
+          catName == 'subscriptions' ||
+          catName == 'subscription') {
+        subscriptionCount++;
+      }
+
+      // Check other / uncategorized
+      if (tx.categoryId == null ||
+          tx.categoryId == '00000000-0000-0000-0000-000000000c14' ||
+          catName == 'other' ||
+          catName == 'uncategorized') {
+        otherSpending += amt;
+      }
+    }
+  }
+
+  // A. coffee_tea trigger (> 15 transactions/month) -> "Latte Factor"
+  if (coffeeTeaCount > 15) {
+    const nudgeId = 'nudge_coffee_tea_frequency';
+    if (!dismissedIds.contains(nudgeId)) {
+      const en = 'You have made over 15 coffee & tea purchases this month! Small daily cafe visits add up fast ("Latte Factor")—brewing at home can unlock significant annual savings.';
+      const ro = 'Ai făcut peste 15 achiziții de cafea & ceai în această lună! Vizitele zilnice la cafenea se adună rapid ("Factorul Latte")—prepararea acasă poate debloca economii anuale semnificative.';
+      candidates.add(
+        const WealthAdvisorState(
+          id: nudgeId,
+          title: 'BEHAVIORAL NUDGE • LATTE FACTOR',
+          titleEn: 'BEHAVIORAL NUDGE • LATTE FACTOR',
+          titleRo: 'RECOMANDARE COMPORTAMENTALĂ • FACTORUL LATTE',
+          message: en,
+          textEn: en,
+          textRo: ro,
+          icon: Icons.local_cafe,
+          type: AdvisorType.nudge,
+          severity: NudgeSeverity.warning,
+        ),
+      );
+    }
+  }
+
+  // B. restaurants trigger (Ratio > 15% of total spending) -> Meal-prep vs delivery balance
+  if (totalExpenseSum > 0 && (restaurantSpending / totalExpenseSum) > 0.15) {
+    const nudgeId = 'nudge_restaurants_ratio';
+    if (!dismissedIds.contains(nudgeId)) {
+      const en = 'Restaurants & Dining account for over 15% of your total spending. Balancing dining out with meal-prepping at home helps preserve your savings surplus.';
+      const ro = 'Restaurantele și mesele în oraș reprezintă peste 15% din cheltuielile tale totale. Balansarea meselor în oraș cu gătitul acasă ajută la menținerea surplusului.';
+      candidates.add(
+        const WealthAdvisorState(
+          id: nudgeId,
+          title: 'BEHAVIORAL NUDGE • RESTAURANT SPENDING',
+          titleEn: 'BEHAVIORAL NUDGE • RESTAURANT SPENDING',
+          titleRo: 'RECOMANDARE COMPORTAMENTALĂ • CHELTUIELI RESTAURANTE',
+          message: en,
+          textEn: en,
+          textRo: ro,
+          icon: Icons.restaurant,
+          type: AdvisorType.nudge,
+          severity: NudgeSeverity.warning,
+        ),
+      );
+    }
+  }
+
+  // C. subscriptions trigger (> 5 recurring items in 30 days) -> Unused service pruning
+  if (subscriptionCount > 5) {
+    const nudgeId = 'nudge_subscriptions_pruning';
+    if (!dismissedIds.contains(nudgeId)) {
+      const en = 'You have over 5 recurring subscription charges in the last 30 days. Pruning unused services and memberships is an instant way to eliminate waste.';
+      const ro = 'Ai peste 5 taxe de abonament recurente în ultimele 30 de zile. Curățarea serviciilor și abonamentelor nefolosite este o cale rapidă de a elimina risipa.';
+      candidates.add(
+        const WealthAdvisorState(
+          id: nudgeId,
+          title: 'BEHAVIORAL NUDGE • SUBSCRIPTION PRUNING',
+          titleEn: 'BEHAVIORAL NUDGE • SUBSCRIPTION PRUNING',
+          titleRo: 'RECOMANDARE COMPORTAMENTALĂ • AUDIT ABONAMENTE',
+          message: en,
+          textEn: en,
+          textRo: ro,
+          icon: Icons.subscriptions,
+          type: AdvisorType.nudge,
+          severity: NudgeSeverity.info,
+        ),
+      );
+    }
+  }
+
+  // D. other trigger (> 20% spending uncategorized / other) -> Eliminate budget blind spots
+  if (totalExpenseSum > 0 && (otherSpending / totalExpenseSum) > 0.20) {
+    const nudgeId = 'nudge_other_uncategorized';
+    if (!dismissedIds.contains(nudgeId)) {
+      const en = 'Over 20% of your total spending is uncategorized or marked as Other. Tagging transactions eliminates budget blind spots and keeps your tracking accurate.';
+      const ro = 'Peste 20% din cheltuielile tale sunt necategorisite sau marcate ca Altele. Etichetarea tranzacțiilor elimină punctele oarbe financiare și îți menține bugetul precis.';
+      candidates.add(
+        const WealthAdvisorState(
+          id: nudgeId,
+          title: 'BEHAVIORAL NUDGE • BUDGET BLIND SPOTS',
+          titleEn: 'BEHAVIORAL NUDGE • BUDGET BLIND SPOTS',
+          titleRo: 'RECOMANDARE COMPORTAMENTALĂ • PUNCTE OARBE BUGET',
+          message: en,
+          textEn: en,
+          textRo: ro,
+          icon: Icons.inventory_2,
+          type: AdvisorType.nudge,
+          severity: NudgeSeverity.warning,
+        ),
+      );
+    }
+  }
+
+  // 3. Evaluate Multi-Category Behavioral Nudges based on recent transaction text / keywords
   final sortedTx = List<Transaction>.from(transactions)
     ..sort((a, b) => b.date.compareTo(a.date));
 

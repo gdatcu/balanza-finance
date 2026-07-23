@@ -34,6 +34,7 @@ class HomeView extends ConsumerStatefulWidget {
 
 class _HomeViewState extends ConsumerState<HomeView> {
   ToshlSection _section = ToshlSection.overview;
+  String? _selectedCategoryFilterId;
 
   @override
   void initState() {
@@ -41,6 +42,56 @@ class _HomeViewState extends ConsumerState<HomeView> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(updaterProvider).checkForUpdates(context);
     });
+  }
+
+  Widget _buildCategoryFilterChips() {
+    final categories = expenseCategories;
+    return Container(
+      height: 44,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: categories.length + 1,
+        separatorBuilder: (_, __) => const SizedBox(width: 8),
+        itemBuilder: (context, index) {
+          if (index == 0) {
+            final isSelected = _selectedCategoryFilterId == null;
+            return ChoiceChip(
+              label: const Text('All', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+              selected: isSelected,
+              selectedColor: const Color(0xFFFF7A5A),
+              backgroundColor: const Color(0xFF1E293B),
+              labelStyle: TextStyle(color: isSelected ? Colors.white : Colors.grey),
+              onSelected: (_) {
+                setState(() {
+                  _selectedCategoryFilterId = null;
+                });
+              },
+            );
+          }
+
+          final cat = categories[index - 1];
+          final isSelected = _selectedCategoryFilterId == cat.id;
+          final color = getCategoryColor(cat.color);
+          final icon = getCategoryIcon(cat.icon);
+          final name = CategoryLocalizer.getLocalizedName(context, cat.name);
+
+          return ChoiceChip(
+            avatar: Icon(icon, size: 16, color: isSelected ? Colors.white : color),
+            label: Text(name, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+            selected: isSelected,
+            selectedColor: color,
+            backgroundColor: const Color(0xFF1E293B),
+            labelStyle: TextStyle(color: isSelected ? Colors.white : Colors.grey),
+            onSelected: (_) {
+              setState(() {
+                _selectedCategoryFilterId = isSelected ? null : cat.id;
+              });
+            },
+          );
+        },
+      ),
+    );
   }
 
   Future<void> _handleRefresh() async {
@@ -362,6 +413,9 @@ class _HomeViewState extends ConsumerState<HomeView> {
   Widget _buildByDateTab(List<Transaction> transactions) {
     final advisorState = ref.watch(wealthAdvisorProvider);
     final filtered = transactions.where((tx) {
+      if (_selectedCategoryFilterId != null && tx.categoryId != _selectedCategoryFilterId) {
+        return false;
+      }
       switch (_section) {
         case ToshlSection.overview:
           return true;
@@ -396,6 +450,8 @@ class _HomeViewState extends ConsumerState<HomeView> {
         padding: const EdgeInsets.only(top: 8, bottom: 80),
         children: [
           _buildMonthSelector(),
+          _buildCategoryFilterChips(),
+          const SizedBox(height: 8),
 
           if (_section == ToshlSection.overview) ...[
             if (advisorState != null) WealthAdvisorCard(state: advisorState),
@@ -447,6 +503,9 @@ class _HomeViewState extends ConsumerState<HomeView> {
 
   Widget _buildByCategoryTab(List<Transaction> transactions) {
     final isIncomeView = _section == ToshlSection.incomes;
+    final filteredTransactions = _selectedCategoryFilterId == null
+        ? transactions
+        : transactions.where((tx) => tx.categoryId == _selectedCategoryFilterId).toList();
     final summariesAsync = ref.watch(categorySummaryProvider);
 
     return RefreshIndicator(
@@ -458,15 +517,23 @@ class _HomeViewState extends ConsumerState<HomeView> {
         padding: const EdgeInsets.only(top: 8, bottom: 80),
         children: [
           _buildMonthSelector(),
+          _buildCategoryFilterChips(),
           const SizedBox(height: 8),
           ExpensePieChart(
-            customTransactions: transactions,
+            customTransactions: filteredTransactions,
             isIncome: isIncomeView,
           ),
           const SizedBox(height: 16),
           summariesAsync.when(
             data: (summaries) {
               final filtered = summaries.where((s) {
+                if (_selectedCategoryFilterId != null) {
+                  final cat = defaultCategories.firstWhere(
+                    (c) => c.id == _selectedCategoryFilterId,
+                    orElse: () => defaultCategories.first,
+                  );
+                  if (s.categoryName.toLowerCase() != cat.name.toLowerCase()) return false;
+                }
                 if (isIncomeView) {
                   return s.transactionType == TransactionType.income;
                 } else {
@@ -493,9 +560,21 @@ class _HomeViewState extends ConsumerState<HomeView> {
                 separatorBuilder: (context, index) => const Divider(color: Colors.white12, height: 1),
                 itemBuilder: (context, index) {
                   final item = filtered[index];
-                  final color = isIncomeView ? const Color(0xFF10B981) : const Color(0xFFFF7A5A);
+                  final catObj = defaultCategories.firstWhere(
+                    (c) => c.name.toLowerCase() == item.categoryName.toLowerCase(),
+                    orElse: () => defaultCategories.first,
+                  );
+                  final catColor = getCategoryColor(catObj.color);
+                  final catIcon = getCategoryIcon(catObj.icon);
+                  final textColor = isIncomeView ? const Color(0xFF10B981) : const Color(0xFFFF7A5A);
+
                   return ListTile(
                     contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
+                    leading: CircleAvatar(
+                      radius: 16,
+                      backgroundColor: catColor.withValues(alpha: 0.2),
+                      child: Icon(catIcon, size: 18, color: catColor),
+                    ),
                     title: Text(
                       CategoryLocalizer.getLocalizedName(context, item.categoryName),
                       style: const TextStyle(
@@ -509,7 +588,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
                           ? '+${CurrencyFormatter.format(item.totalAmount)}'
                           : CurrencyFormatter.format(item.totalAmount),
                       style: TextStyle(
-                        color: color,
+                        color: textColor,
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
                       ),
@@ -894,6 +973,12 @@ class _HomeViewState extends ConsumerState<HomeView> {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
           children: [
+            CircleAvatar(
+              radius: 16,
+              backgroundColor: getCategoryColor(cat.color).withValues(alpha: 0.2),
+              child: Icon(getCategoryIcon(cat.icon), size: 18, color: getCategoryColor(cat.color)),
+            ),
+            const SizedBox(width: 12),
             Text(
               CategoryLocalizer.getLocalizedName(context, cat.name),
               style: const TextStyle(

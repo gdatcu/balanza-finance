@@ -363,4 +363,19 @@ class AppLocalizationsRo extends AppLocalizations {
   String autoTaggedMessage(String category) {
     return 'Etichetat automat ca $category pe baza regulilor la distanță.';
   }
+
+  @override
+  String get categoryCoffeeTea => 'Cafea & Ceai';
+
+  @override
+  String get categoryRestaurants => 'Restaurante & Localuri';
+
+  @override
+  String get categoryPetCare => 'Îngrijire Animale';
+
+  @override
+  String get categorySubscriptions => 'Abonamente & Servicii';
+
+  @override
+  String get categoryOther => 'Altele';
 }

@@ -133,6 +133,156 @@ void main() {
       expect(nudge.textRo, contains('Să mănănci în oraș'));
     });
 
+    test('Behavioral Nudge: coffee_tea high frequency trigger (>15 tx)', () async {
+      final transactions = List.generate(
+        16,
+        (index) => Transaction(
+          id: 'tx-coffee-$index',
+          userId: 'user-1',
+          accountId: 'acc-1',
+          categoryId: '00000000-0000-0000-0000-000000000c10', // coffee_tea
+          amount: -12.0,
+          description: 'Espresso #$index',
+          date: DateTime.now(),
+          createdAt: DateTime.now(),
+        ),
+      );
+
+      final container = ProviderContainer(
+        overrides: [
+          monthlyBudgetProvider.overrideWith((ref) => Stream.value(10000.0)),
+          transactionListProvider.overrideWith((ref) => Stream.value(transactions)),
+        ],
+      );
+
+      container.listen(transactionListProvider, (prev, next) {});
+      container.listen(monthlyBudgetProvider, (prev, next) {});
+      await pumpEventQueue();
+
+      final nudge = container.read(wealthAdvisorProvider);
+      expect(nudge, isNotNull);
+      expect(nudge!.id, equals('nudge_coffee_tea_frequency'));
+      expect(nudge.textEn, contains('Latte Factor'));
+      expect(nudge.textRo, contains('Factorul Latte'));
+    });
+
+    test('Behavioral Nudge: restaurants spending ratio trigger (>15%)', () async {
+      final container = ProviderContainer(
+        overrides: [
+          monthlyBudgetProvider.overrideWith((ref) => Stream.value(10000.0)),
+          transactionListProvider.overrideWith(
+            (ref) => Stream.value([
+              Transaction(
+                id: 'tx-rest-1',
+                userId: 'user-1',
+                accountId: 'acc-1',
+                categoryId: '00000000-0000-0000-0000-000000000c11', // restaurants
+                amount: -250.0, // 250 out of 1000 total spending = 25% (> 15%)
+                description: 'Fancy Steakhouse',
+                date: DateTime.now(),
+                createdAt: DateTime.now(),
+              ),
+              Transaction(
+                id: 'tx-other-1',
+                userId: 'user-1',
+                accountId: 'acc-1',
+                categoryId: '00000000-0000-0000-0000-0000000000c3', // Rent
+                amount: -750.0,
+                description: 'Monthly rent',
+                date: DateTime.now(),
+                createdAt: DateTime.now(),
+              ),
+            ]),
+          ),
+        ],
+      );
+
+      container.listen(transactionListProvider, (prev, next) {});
+      container.listen(monthlyBudgetProvider, (prev, next) {});
+      await pumpEventQueue();
+
+      final nudge = container.read(wealthAdvisorProvider);
+      expect(nudge, isNotNull);
+      expect(nudge!.id, equals('nudge_restaurants_ratio'));
+      expect(nudge.textEn, contains('15% of your total spending'));
+      expect(nudge.textRo, contains('15% din cheltuielile tale'));
+    });
+
+    test('Behavioral Nudge: subscriptions item count trigger (>5 items)', () async {
+      final transactions = List.generate(
+        6,
+        (index) => Transaction(
+          id: 'tx-sub-$index',
+          userId: 'user-1',
+          accountId: 'acc-1',
+          categoryId: '00000000-0000-0000-0000-000000000c13', // subscriptions
+          amount: -20.0,
+          description: 'Subscription #$index',
+          date: DateTime.now(),
+          createdAt: DateTime.now(),
+        ),
+      );
+
+      final container = ProviderContainer(
+        overrides: [
+          monthlyBudgetProvider.overrideWith((ref) => Stream.value(10000.0)),
+          transactionListProvider.overrideWith((ref) => Stream.value(transactions)),
+        ],
+      );
+
+      container.listen(transactionListProvider, (prev, next) {});
+      container.listen(monthlyBudgetProvider, (prev, next) {});
+      await pumpEventQueue();
+
+      final nudge = container.read(wealthAdvisorProvider);
+      expect(nudge, isNotNull);
+      expect(nudge!.id, equals('nudge_subscriptions_pruning'));
+      expect(nudge.textEn, contains('5 recurring subscription charges'));
+      expect(nudge.textRo, contains('5 taxe de abonament'));
+    });
+
+    test('Behavioral Nudge: uncategorized / other spending trigger (>20%)', () async {
+      final container = ProviderContainer(
+        overrides: [
+          monthlyBudgetProvider.overrideWith((ref) => Stream.value(10000.0)),
+          transactionListProvider.overrideWith(
+            (ref) => Stream.value([
+              Transaction(
+                id: 'tx-other-1',
+                userId: 'user-1',
+                accountId: 'acc-1',
+                categoryId: '00000000-0000-0000-0000-000000000c14', // other
+                amount: -300.0, // 300 out of 1000 = 30% (> 20%)
+                description: 'Misc expense',
+                date: DateTime.now(),
+                createdAt: DateTime.now(),
+              ),
+              Transaction(
+                id: 'tx-rent-1',
+                userId: 'user-1',
+                accountId: 'acc-1',
+                categoryId: '00000000-0000-0000-0000-0000000000c3', // Rent
+                amount: -700.0,
+                description: 'Monthly rent',
+                date: DateTime.now(),
+                createdAt: DateTime.now(),
+              ),
+            ]),
+          ),
+        ],
+      );
+
+      container.listen(transactionListProvider, (prev, next) {});
+      container.listen(monthlyBudgetProvider, (prev, next) {});
+      await pumpEventQueue();
+
+      final nudge = container.read(wealthAdvisorProvider);
+      expect(nudge, isNotNull);
+      expect(nudge!.id, equals('nudge_other_uncategorized'));
+      expect(nudge.textEn, contains('20% of your total spending'));
+      expect(nudge.textRo, contains('20% din cheltuielile tale'));
+    });
+
     test('Dismissing a nudge hides it from provider', () async {
       final container = ProviderContainer(
         overrides: [

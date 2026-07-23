@@ -154,5 +154,10 @@
         "type": "String"
       }
     }
-  }
+  },
+  "categoryCoffeeTea": "Coffee & Tea",
+  "categoryRestaurants": "Restaurants & Dining",
+  "categoryPetCare": "Pet Care",
+  "categorySubscriptions": "Subscriptions",
+  "categoryOther": "Other"
 }
