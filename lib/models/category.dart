@@ -44,13 +44,29 @@ class Category {
   });
 
   factory Category.fromJson(Map<String, dynamic> json) {
+    final id = json['id'] as String;
+    final name = (json['name'] as String).toLowerCase();
+    final isIncomeJson = json['is_income'] as bool?;
+
+    final isKnownIncome = isIncomeJson == true ||
+        id == '00000000-0000-0000-0000-0000000000c5' || // Salary
+        id == '00000000-0000-0000-0000-0000000000c8' || // Investments
+        id == '00000000-0000-0000-0000-0000000000c9' || // Gifts
+        id == '00000000-0000-0000-0000-000000000c17' || // Meal Tickets
+        id == '00000000-0000-0000-0000-000000000c18' || // Side Hustle
+        name == 'salary' ||
+        name == 'investments' ||
+        name == 'gifts' ||
+        name == 'meal_tickets' ||
+        name == 'side_hustle';
+
     return Category(
-      id: json['id'] as String,
+      id: id,
       name: json['name'] as String,
       icon: json['icon'] as String?,
       color: json['color'] as String?,
       userId: json['user_id'] as String?,
-      isIncome: json['is_income'] as bool? ?? false,
+      isIncome: isKnownIncome,
       createdAt: DateTime.parse(json['created_at'] as String),
     );
   }

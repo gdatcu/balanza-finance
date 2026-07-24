@@ -117,7 +117,13 @@ final supabaseCategoriesProvider = FutureProvider<List<Category>>((ref) async {
     categoryMap[cat.id] = cat;
   }
   for (final cat in remote) {
-    categoryMap[cat.id] = cat;
+    final defaultCat = defaultCategories.firstWhere(
+      (c) => c.id == cat.id,
+      orElse: () => cat,
+    );
+    categoryMap[cat.id] = cat.copyWith(
+      isIncome: cat.isIncome || defaultCat.isIncome,
+    );
   }
   return categoryMap.values.toList();
 });
