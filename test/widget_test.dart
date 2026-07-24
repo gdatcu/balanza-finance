@@ -101,7 +101,7 @@ void main() {
     expect(find.text('Total Balance'), findsOneWidget);
 
     expect(find.text('Groceries Spend'), findsOneWidget);
-    expect(find.text('-RON 50.00'), findsNWidgets(2));
+    expect(find.text('-RON 50.00'), findsNWidgets(3));
 
     final fab = find.byType(FloatingActionButton);
     expect(fab, findsOneWidget);

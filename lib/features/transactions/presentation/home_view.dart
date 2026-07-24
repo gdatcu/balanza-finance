@@ -148,6 +148,52 @@ class _HomeViewState extends ConsumerState<HomeView> {
     }
   }
 
+  Widget _buildDateGroupHeader(BuildContext context, DateTime date, List<Transaction> txList) {
+    final dailyTotal = txList.fold<double>(0.0, (sum, tx) => sum + tx.amount);
+    final isPositive = dailyTotal > 0;
+    final isNegative = dailyTotal < 0;
+
+    final totalColor = isPositive
+        ? const Color(0xFF10B981)
+        : (isNegative ? const Color(0xFFFF7A5A) : Colors.grey);
+
+    final formattedTotal = isPositive
+        ? '+${CurrencyFormatter.format(dailyTotal)}'
+        : CurrencyFormatter.format(dailyTotal);
+
+    return Container(
+      margin: const EdgeInsets.only(top: 16, bottom: 4, left: 16, right: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1E293B),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            _formatDateHeader(context, date),
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 0.3,
+            ),
+          ),
+          Text(
+            formattedTotal,
+            style: TextStyle(
+              color: totalColor,
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final transactionsAsync = ref.watch(transactionListProvider);
@@ -483,17 +529,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
               final date = entry.key;
               final txList = entry.value;
               return [
-                Padding(
-                  padding: const EdgeInsets.only(left: 16, top: 16, bottom: 8),
-                  child: Text(
-                    _formatDateHeader(context, date),
-                    style: const TextStyle(
-                      color: Colors.grey,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
+                _buildDateGroupHeader(context, date, txList),
                 ...txList.map((tx) => _buildTransactionRow(tx)),
               ];
             }),
