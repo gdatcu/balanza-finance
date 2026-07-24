@@ -65,21 +65,16 @@ class _TransactionInputSheetState extends ConsumerState<TransactionInputSheet> {
 
     final result = TransactionParser.parseText(_noteController.text, rules);
     if (result != null && result.matchedRule.id != _lastAutoTaggedRuleId) {
-      final matchedCat = categories.firstWhere(
-        (c) =>
-            (result.categoryId != null && c.id == result.categoryId) ||
-            c.name.toLowerCase() == result.category.toLowerCase() ||
-            c.id == result.category,
-        orElse: () => categories.firstWhere(
-          (c) => c.name.toLowerCase().contains(result.category.toLowerCase()),
-          orElse: () => categories.first,
-        ),
+      final matchedCat = CategoryMatcher.findMatchingCategory(
+        result: result,
+        categories: categories,
       );
 
       _lastAutoTaggedRuleId = result.matchedRule.id;
 
-      if (_selectedCategoryId != matchedCat.id) {
+      if (_selectedCategoryId != matchedCat.id || _isIncome != matchedCat.isIncome) {
         setState(() {
+          _isIncome = matchedCat.isIncome;
           _selectedCategoryId = matchedCat.id;
         });
 

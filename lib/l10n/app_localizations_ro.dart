@@ -401,7 +401,8 @@ class AppLocalizationsRo extends AppLocalizations {
   String get editTransaction => 'Editează Tranzacția';
 
   @override
-  String get transactionUpdatedSuccessfully => 'Tranzacție actualizată cu succes!';
+  String get transactionUpdatedSuccessfully =>
+      'Tranzacție actualizată cu succes!';
 
   @override
   String get noNote => 'Fără notă';

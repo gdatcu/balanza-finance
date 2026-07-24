@@ -812,18 +812,33 @@ abstract class AppLocalizations {
   /// **'Side Hustle / Extra'**
   String get categorySideHustle;
 
+  /// No description provided for @transactionDetails.
+  ///
+  /// In en, this message translates to:
   /// **'Transaction Details'**
   String get transactionDetails;
 
+  /// No description provided for @edit.
+  ///
+  /// In en, this message translates to:
   /// **'Edit'**
   String get edit;
 
+  /// No description provided for @editTransaction.
+  ///
+  /// In en, this message translates to:
   /// **'Edit Transaction'**
   String get editTransaction;
 
+  /// No description provided for @transactionUpdatedSuccessfully.
+  ///
+  /// In en, this message translates to:
   /// **'Transaction updated successfully!'**
   String get transactionUpdatedSuccessfully;
 
+  /// No description provided for @noNote.
+  ///
+  /// In en, this message translates to:
   /// **'No note provided'**
   String get noNote;
 }

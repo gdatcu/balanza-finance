@@ -6,6 +6,7 @@ class TaggingRule {
   final String? tag;
   final bool isActive;
   final String? categoryId;
+  final int priority;
 
   const TaggingRule({
     required this.id,
@@ -15,17 +16,23 @@ class TaggingRule {
     this.tag,
     this.isActive = true,
     this.categoryId,
+    this.priority = 5,
   });
 
   factory TaggingRule.fromJson(Map<String, dynamic> json) {
+    final rawCat = json['category'] as String? ?? json['category_name'] as String? ?? '';
+    final rawSub = json['sub_category'] as String? ?? json['subcategory'] as String?;
+    final rawTag = json['tag'] as String?;
+
     return TaggingRule(
       id: json['id']?.toString() ?? '',
-      keyword: json['keyword'] as String? ?? '',
-      category: json['category'] as String? ?? json['category_name'] as String? ?? '',
-      subCategory: json['sub_category'] as String? ?? json['subcategory'] as String?,
-      tag: json['tag'] as String?,
+      keyword: (json['keyword'] as String? ?? '').trim(),
+      category: rawCat.trim(),
+      subCategory: rawSub?.trim(),
+      tag: rawTag?.trim(),
       isActive: json['is_active'] as bool? ?? true,
       categoryId: json['category_id'] as String?,
+      priority: (json['priority'] as num?)?.toInt() ?? 5,
     );
   }
 
@@ -38,6 +45,7 @@ class TaggingRule {
       'tag': tag,
       'is_active': isActive,
       'category_id': categoryId,
+      'priority': priority,
     };
   }
 }

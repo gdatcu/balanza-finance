@@ -399,7 +399,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get editTransaction => 'Edit Transaction';
 
   @override
-  String get transactionUpdatedSuccessfully => 'Transaction updated successfully!';
+  String get transactionUpdatedSuccessfully =>
+      'Transaction updated successfully!';
 
   @override
   String get noNote => 'No note provided';
