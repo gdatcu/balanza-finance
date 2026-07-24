@@ -390,4 +390,19 @@ class AppLocalizationsRo extends AppLocalizations {
 
   @override
   String get categorySideHustle => 'Proiecte Extra';
+
+  @override
+  String get transactionDetails => 'Detalii Tranzacție';
+
+  @override
+  String get edit => 'Editează';
+
+  @override
+  String get editTransaction => 'Editează Tranzacția';
+
+  @override
+  String get transactionUpdatedSuccessfully => 'Tranzacție actualizată cu succes!';
+
+  @override
+  String get noNote => 'Fără notă';
 }

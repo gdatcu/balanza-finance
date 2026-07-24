@@ -1,10 +1,19 @@
-# Balanza Finance v1.6.2 Release Notes
+# Balanza Finance v1.7.0 Release Notes
 
-## 🛠️ Fixes & Enhancements
+## ⚡ New Features
 
-### 🌐 Human-Readable Bilingual Category Localizations in Wealth Advisor Nudges
-- Fixed raw enum/category keys (e.g. `COFFEE_TEA` / `coffee_tea`) appearing in Wealth Advisor banner titles and card messages.
-- Updated `CategoryLocalizer` with static `getCategoryNameEn` and `getCategoryNameRo` helpers to ensure category names are rendered as human-readable, properly formatted strings across both languages:
-  - ☕ EN: **`Coffee & Tea`** / **`COFFEE & TEA`** | RO: **`Cafea & Ceai`** / **`CAFEA & CEAI`**
-  - 🛒 EN: **`Shopping`** / **`SHOPPING`** | RO: **`Cumpărături`** / **`CUMPĂRĂTURI`**
-  - 🏦 EN: **`Credit & Loans`** / **`CREDIT & LOANS`** | RO: **`Rate & Credite`** / **`RATE & CREDITE`**
+### 📄 Interactive Transaction Details Screen (`TransactionDetailsScreen`)
+- Added a dedicated, read-only transaction detail view showing Amount, Category Badge/Name, Date, Type (Income vs. Expense), Account, and Notes.
+- Integrated currency conversion display when transactions are recorded in foreign currencies (e.g. `EUR`).
+
+### ✏️ Edit Transaction Functionality
+- Upgraded `TransactionInputSheet` to accept an existing transaction for pre-filling controllers and state variables.
+- Added **Edit** action in AppBar of `TransactionDetailsScreen` to edit transactions in real time.
+- Integrated `updateTransaction` in `TransactionRepository` and `TransactionNotifier` for live Supabase database sync.
+
+### 🗑️ Delete Transaction Functionality with Confirmation Dialog
+- Added **Delete** action in AppBar of `TransactionDetailsScreen` with an interactive localized confirmation dialog.
+- Executes `deleteTransaction` in Supabase and returns cleanly to the Dashboard with feedback snackbars.
+
+### 🌐 Complete EN / RO Localization Setup
+- Added localization dictionary strings for `transactionDetails`, `edit`, `delete`, `editTransaction`, `transactionUpdatedSuccessfully`, and `noNote` across English and Romanian.

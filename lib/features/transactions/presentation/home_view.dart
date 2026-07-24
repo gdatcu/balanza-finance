@@ -9,6 +9,7 @@ import '../../../models/category_summary.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/category_localizer.dart';
 import 'transaction_input_sheet.dart';
+import 'transaction_details_screen.dart';
 import 'categories_data.dart';
 import '../../analytics/presentation/expense_pie_chart.dart';
 import '../../analytics/presentation/wealth_advisor_card.dart';
@@ -969,69 +970,78 @@ class _HomeViewState extends ConsumerState<HomeView> {
           ),
         );
       },
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        child: Row(
-          children: [
-            CircleAvatar(
-              radius: 16,
-              backgroundColor: getCategoryColor(cat.color).withValues(alpha: 0.2),
-              child: Icon(getCategoryIcon(cat.icon), size: 18, color: getCategoryColor(cat.color)),
+      child: InkWell(
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => TransactionDetailsScreen(transaction: tx),
             ),
-            const SizedBox(width: 12),
-            Text(
-              CategoryLocalizer.getLocalizedName(context, cat.name),
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-                fontSize: 16,
+          );
+        },
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Row(
+            children: [
+              CircleAvatar(
+                radius: 16,
+                backgroundColor: getCategoryColor(cat.color).withValues(alpha: 0.2),
+                child: Icon(getCategoryIcon(cat.icon), size: 18, color: getCategoryColor(cat.color)),
               ),
-            ),
-            if (tx.description != null && tx.description!.trim().isNotEmpty) ...[
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  tx.description!,
-                  style: const TextStyle(
-                    color: Colors.grey,
-                    fontSize: 14,
-                  ),
-                  overflow: TextOverflow.ellipsis,
+              const SizedBox(width: 12),
+              Text(
+                CategoryLocalizer.getLocalizedName(context, cat.name),
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  fontSize: 16,
                 ),
               ),
-            ] else ...[
-              const Spacer(),
-            ],
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  tx.amount > 0
-                      ? '+${CurrencyFormatter.format(tx.amount)}'
-                      : CurrencyFormatter.format(tx.amount),
-                  style: TextStyle(
-                    color: tx.amount > 0 ? const Color(0xFF10B981) : const Color(0xFFFF7A5A),
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-                if (tx.originalCurrency == 'EUR' && tx.originalAmount != null) ...[
-                  const SizedBox(height: 2),
-                  Text(
-                    tx.originalAmount! > 0
-                        ? '+€${tx.originalAmount!.toStringAsFixed(2)}'
-                        : '-€${tx.originalAmount!.abs().toStringAsFixed(2)}',
+              if (tx.description != null && tx.description!.trim().isNotEmpty) ...[
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    tx.description!,
                     style: const TextStyle(
                       color: Colors.grey,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
+                      fontSize: 14,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ] else ...[
+                const Spacer(),
+              ],
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    tx.amount > 0
+                        ? '+${CurrencyFormatter.format(tx.amount)}'
+                        : CurrencyFormatter.format(tx.amount),
+                    style: TextStyle(
+                      color: tx.amount > 0 ? const Color(0xFF10B981) : const Color(0xFFFF7A5A),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
                     ),
                   ),
+                  if (tx.originalCurrency == 'EUR' && tx.originalAmount != null) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      tx.originalAmount! > 0
+                          ? '+€${tx.originalAmount!.toStringAsFixed(2)}'
+                          : '-€${tx.originalAmount!.abs().toStringAsFixed(2)}',
+                      style: const TextStyle(
+                        color: Colors.grey,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
                 ],
-              ],
-            ),
-          ],
+              ),
+            ],
+          ),
         ),
       ),
     );

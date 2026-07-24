@@ -811,6 +811,21 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Side Hustle / Extra'**
   String get categorySideHustle;
+
+  /// **'Transaction Details'**
+  String get transactionDetails;
+
+  /// **'Edit'**
+  String get edit;
+
+  /// **'Edit Transaction'**
+  String get editTransaction;
+
+  /// **'Transaction updated successfully!'**
+  String get transactionUpdatedSuccessfully;
+
+  /// **'No note provided'**
+  String get noNote;
 }
 
 class _AppLocalizationsDelegate

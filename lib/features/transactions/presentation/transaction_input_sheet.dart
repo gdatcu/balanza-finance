@@ -12,7 +12,9 @@ import '../providers/tagging_rules_provider.dart';
 import '../utils/transaction_parser.dart';
 
 class TransactionInputSheet extends ConsumerStatefulWidget {
-  const TransactionInputSheet({super.key});
+  final Transaction? transactionToEdit;
+
+  const TransactionInputSheet({super.key, this.transactionToEdit});
 
   @override
   ConsumerState<TransactionInputSheet> createState() => _TransactionInputSheetState();
@@ -35,6 +37,18 @@ class _TransactionInputSheetState extends ConsumerState<TransactionInputSheet> {
   @override
   void initState() {
     super.initState();
+    if (widget.transactionToEdit != null) {
+      final tx = widget.transactionToEdit!;
+      _isIncome = tx.amount > 0;
+      _selectedCategoryId = tx.categoryId;
+      _selectedDate = tx.date;
+      _selectedCurrency = tx.originalCurrency;
+      final absAmt = tx.originalAmount != null
+          ? tx.originalAmount!.abs()
+          : tx.amount.abs();
+      _amountController.text = absAmt.toString();
+      _noteController.text = tx.description ?? '';
+    }
     _amountController.addListener(_onAmountChanged);
     _noteController.addListener(_onNoteChanged);
   }
@@ -124,6 +138,44 @@ class _TransactionInputSheetState extends ConsumerState<TransactionInputSheet> {
       final double finalAmount = _isIncome ? finalAmountVal : -finalAmountVal;
       final double originalAmount = _isIncome ? amt : -amt;
 
+      if (widget.transactionToEdit != null) {
+        final updatedTx = Transaction(
+          id: widget.transactionToEdit!.id,
+          userId: widget.transactionToEdit!.userId,
+          accountId: _selectedAccountId,
+          categoryId: _selectedCategoryId,
+          amount: finalAmount,
+          description: _noteController.text.trim().isEmpty ? null : _noteController.text.trim(),
+          date: _selectedDate,
+          createdAt: widget.transactionToEdit!.createdAt,
+          originalCurrency: originalCurrencyVal,
+          originalAmount: originalAmount,
+        );
+
+        try {
+          await ref.read(transactionRepositoryProvider).updateTransaction(updatedTx);
+          if (mounted) {
+            Navigator.of(context).pop(true);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(AppLocalizations.of(context)!.transactionUpdatedSuccessfully),
+                backgroundColor: const Color(0xFF10B981),
+              ),
+            );
+          }
+        } catch (e) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Failed to update transaction: $e'),
+                backgroundColor: const Color(0xFFFF7A5A),
+              ),
+            );
+          }
+        }
+        return;
+      }
+
       final transaction = Transaction(
         id: const Uuid().v4(),
         userId: '00000000-0000-0000-0000-000000000000', // Default mock user id
@@ -140,7 +192,7 @@ class _TransactionInputSheetState extends ConsumerState<TransactionInputSheet> {
       try {
         await ref.read(transactionRepositoryProvider).addTransaction(transaction);
         if (mounted) {
-          Navigator.of(context).pop();
+          Navigator.of(context).pop(true);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(AppLocalizations.of(context)!.transactionAddedSuccessfully),
@@ -182,7 +234,9 @@ class _TransactionInputSheetState extends ConsumerState<TransactionInputSheet> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      AppLocalizations.of(context)!.addTransaction,
+                      widget.transactionToEdit != null
+                          ? AppLocalizations.of(context)!.editTransaction
+                          : AppLocalizations.of(context)!.addTransaction,
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
@@ -455,7 +509,9 @@ class _TransactionInputSheetState extends ConsumerState<TransactionInputSheet> {
                     ),
                   ),
                   child: Text(
-                    AppLocalizations.of(context)!.saveTransaction,
+                    widget.transactionToEdit != null
+                        ? AppLocalizations.of(context)!.edit
+                        : AppLocalizations.of(context)!.saveTransaction,
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,

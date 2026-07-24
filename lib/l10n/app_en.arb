@@ -163,5 +163,10 @@
   "categoryCreditInstallments": "Credit & Loans",
   "categoryGroceries": "Groceries",
   "categoryMealTickets": "Meal Tickets",
-  "categorySideHustle": "Side Hustle / Extra"
+  "categorySideHustle": "Side Hustle / Extra",
+  "transactionDetails": "Transaction Details",
+  "edit": "Edit",
+  "editTransaction": "Edit Transaction",
+  "transactionUpdatedSuccessfully": "Transaction updated successfully!",
+  "noNote": "No note provided"
 }

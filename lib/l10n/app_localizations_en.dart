@@ -388,4 +388,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get categorySideHustle => 'Side Hustle / Extra';
+
+  @override
+  String get transactionDetails => 'Transaction Details';
+
+  @override
+  String get edit => 'Edit';
+
+  @override
+  String get editTransaction => 'Edit Transaction';
+
+  @override
+  String get transactionUpdatedSuccessfully => 'Transaction updated successfully!';
+
+  @override
+  String get noNote => 'No note provided';
 }

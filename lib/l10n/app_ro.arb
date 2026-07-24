@@ -163,5 +163,10 @@
   "categoryCreditInstallments": "Rate & Credite",
   "categoryGroceries": "Cumpărături Casnice",
   "categoryMealTickets": "Bonuri de Masă",
-  "categorySideHustle": "Proiecte Extra"
+  "categorySideHustle": "Proiecte Extra",
+  "transactionDetails": "Detalii Tranzacție",
+  "edit": "Editează",
+  "editTransaction": "Editează Tranzacția",
+  "transactionUpdatedSuccessfully": "Tranzacție actualizată cu succes!",
+  "noNote": "Fără notă"
 }
