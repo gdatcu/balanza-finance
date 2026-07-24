@@ -52,6 +52,7 @@ class _CategoryBudgetInputSheetState extends ConsumerState<CategoryBudgetInputSh
             _selectedCategory,
             amount,
           );
+      ref.invalidate(categoryBudgetsStreamProvider);
 
       if (mounted) {
         Navigator.of(context).pop();
@@ -239,6 +240,7 @@ class _CategoryBudgetInputSheetState extends ConsumerState<CategoryBudgetInputSh
                             await ref
                                 .read(categoryBudgetRepositoryProvider)
                                 .deleteCategoryBudget(widget.budgetToEdit!.id);
+                            ref.invalidate(categoryBudgetsStreamProvider);
                             if (mounted) {
                               nav.pop();
                             }

@@ -428,5 +428,5 @@ class AppLocalizationsRo extends AppLocalizations {
       'Ești sigur că vrei să elimini această limită de buget pentru categorie?';
 
   @override
-  String get addCategoryBudget => '+ Adaugă Buget pe Categorie';
+  String get addCategoryBudget => 'Adaugă Buget pe Categorie';
 }

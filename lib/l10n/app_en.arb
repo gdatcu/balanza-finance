@@ -175,5 +175,5 @@
   "noCategoryBudgetsYet": "No category budgets configured yet. Set a budget to track spending pacing!",
   "deleteBudgetTitle": "Delete Budget?",
   "confirmDeleteBudget": "Are you sure you want to remove this category budget limit?",
-  "addCategoryBudget": "+ Add Category Budget"
+  "addCategoryBudget": "Add Category Budget"
 }

@@ -1,9 +1,13 @@
-# Balanza Finance v1.10.1 Release Notes
+# Balanza Finance v1.10.2 Release Notes
 
-## 🛠️ Fixes & Enhancements
+## 🐛 Bug Fixes & UX Polish
 
-### 🧹 Static Analysis & CI Fix
-- Added `// ignore: deprecated_member_use` annotation to `category_budget_input_sheet.dart` form field properties to ensure compatibility across older and newer Flutter SDKs during GitHub Actions automated CI builds.
+### 🎨 Fixed Duplicate "+" Icon Bug
+- Removed redundant `"+ "` prefix from `addCategoryBudget` localization strings (`EN` / `RO`) so `TextButton.icon` displays a single `+` icon cleanly without rendering `+ + Adaugă Buget pe Categorie`.
+
+### ⚡ Real-Time Category Budget Reflection
+- Added `ref.invalidate(categoryBudgetsStreamProvider);` immediately following budget `upsert` and `delete` operations in `CategoryBudgetInputSheet`.
+- Newly added, edited, or deleted category budgets now update on the Dashboard in real time without requiring a manual page refresh.
 
 ### 🎨 Visual Progress Bars & Bottom Sheet Budget Editor
 - Upgraded the **Budgets** section (`ToshlSection.budgets`) on the Dashboard with visual progress bars:

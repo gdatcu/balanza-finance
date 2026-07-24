@@ -426,5 +426,5 @@ class AppLocalizationsEn extends AppLocalizations {
       'Are you sure you want to remove this category budget limit?';
 
   @override
-  String get addCategoryBudget => '+ Add Category Budget';
+  String get addCategoryBudget => 'Add Category Budget';
 }
