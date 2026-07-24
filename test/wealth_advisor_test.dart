@@ -1,9 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:balanza/models/transaction.dart';
+import 'package:balanza/models/category_budget.dart';
 import 'package:balanza/features/analytics/models/advisor_nudge.dart';
 import 'package:balanza/features/analytics/providers/wealth_advisor_provider.dart';
 import 'package:balanza/features/transactions/providers/transaction_provider.dart';
+import 'package:balanza/features/budgets/repositories/category_budget_repository.dart';
 
 void main() {
   group('Phase 21: Universal Wealth Advisor Behavioral Nudges Tests', () {
@@ -11,6 +13,14 @@ void main() {
       final container = ProviderContainer(
         overrides: [
           monthlyBudgetProvider.overrideWith((ref) => Stream.value(300.0)),
+          categoryBudgetsStreamProvider.overrideWithValue(AsyncData([
+            CategoryBudget(
+              id: 'budget-food',
+              userId: 'user-1',
+              category: '00000000-0000-0000-0000-0000000000c1',
+              amountLimit: 100.0,
+            ),
+          ])),
           transactionListProvider.overrideWith(
             (ref) => Stream.value([
               Transaction(
@@ -43,6 +53,14 @@ void main() {
       final container = ProviderContainer(
         overrides: [
           monthlyBudgetProvider.overrideWith((ref) => Stream.value(300.0)),
+          categoryBudgetsStreamProvider.overrideWithValue(AsyncData([
+            CategoryBudget(
+              id: 'budget-food',
+              userId: 'user-1',
+              category: '00000000-0000-0000-0000-0000000000c1',
+              amountLimit: 100.0,
+            ),
+          ])),
           transactionListProvider.overrideWith(
             (ref) => Stream.value([
               Transaction(

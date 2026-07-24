@@ -884,11 +884,40 @@ abstract class AppLocalizations {
   /// **'Add Category Budget'**
   String get addCategoryBudget;
 
+  /// No description provided for @categoryClothing.
+  ///
+  /// In en, this message translates to:
+  /// **'Clothing & Fashion'**
   String get categoryClothing;
+
+  /// No description provided for @categoryHealthcare.
+  ///
+  /// In en, this message translates to:
+  /// **'Health & Medical'**
   String get categoryHealthcare;
+
+  /// No description provided for @categoryGadgets.
+  ///
+  /// In en, this message translates to:
+  /// **'Gadgets & Tech'**
   String get categoryGadgets;
+
+  /// No description provided for @categoryTravel.
+  ///
+  /// In en, this message translates to:
+  /// **'Travel & Holidays'**
   String get categoryTravel;
+
+  /// No description provided for @categoryPersonalCare.
+  ///
+  /// In en, this message translates to:
+  /// **'Personal Care'**
   String get categoryPersonalCare;
+
+  /// No description provided for @categoryEducation.
+  ///
+  /// In en, this message translates to:
+  /// **'Education'**
   String get categoryEducation;
 }
 

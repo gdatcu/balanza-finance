@@ -98,20 +98,23 @@ final wealthAdvisorProvider = Provider<WealthAdvisorState?>((ref) {
     }
   }
 
-  final double fallbackLimit = monthlyBudget > 0 ? (monthlyBudget / 3.0) : 300.0;
 
   categoryExpenses.forEach((catId, spentAmount) {
     final catObj = defaultCategories.firstWhere(
       (c) => c.id == catId,
       orElse: () => defaultCategories.first,
     );
+
+    // Only evaluate budget thresholds for categories with a user-set budget.
+    // Skip categories that have no explicit budget limit configured.
+    final double? categoryBudgetLimit = customCategoryLimits[catObj.id] ??
+        customCategoryLimits[catObj.name] ??
+        customCategoryLimits[catId];
+
+    if (categoryBudgetLimit == null || categoryBudgetLimit <= 0) return;
+
     final categoryNameEn = CategoryLocalizer.getCategoryNameEn(catObj.name);
     final categoryNameRo = CategoryLocalizer.getCategoryNameRo(catObj.name);
-
-    final double categoryBudgetLimit = customCategoryLimits[catObj.id] ??
-        customCategoryLimits[catObj.name] ??
-        customCategoryLimits[catId] ??
-        fallbackLimit;
 
     final pct = (spentAmount / categoryBudgetLimit) * 100;
 
@@ -120,7 +123,7 @@ final wealthAdvisorProvider = Provider<WealthAdvisorState?>((ref) {
       final excessStr = CurrencyFormatter.format(excess);
       final nudgeId = 'threshold_alert_$catId';
       if (!dismissedIds.contains(nudgeId)) {
-        final en = 'Budget Alert: You have exceeded your $categoryNameEn limit by $excessStr. Let’s adjust other categories to stay on track!';
+        final en = 'Budget Alert: You have exceeded your $categoryNameEn limit by $excessStr. Let\'s adjust other categories to stay on track!';
         final ro = 'Alertă de Buget: Ai depășit limita pentru $categoryNameRo cu $excessStr. Să ajustăm celelalte categorii pentru a rămâne pe cale!';
         candidates.add(
           WealthAdvisorState(
