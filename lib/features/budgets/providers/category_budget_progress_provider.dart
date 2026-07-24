@@ -35,7 +35,7 @@ final categoryBudgetProgressProvider = Provider<List<CategoryBudgetProgress>>((r
 
   if (budgets.isEmpty) return <CategoryBudgetProgress>[];
 
-  // Sum monthly expenses (amount < 0) per category ID and category name
+  // Sum monthly expenses (amount < 0) per canonical category ID (no double counting)
   final Map<String, double> categorySpent = {};
   for (final tx in transactions) {
     if (tx.amount < 0) {
@@ -45,8 +45,6 @@ final categoryBudgetProgressProvider = Provider<List<CategoryBudgetProgress>>((r
         orElse: () => Category(id: rawCatId, name: rawCatId, createdAt: DateTime.now()),
       );
       categorySpent[catObj.id] = (categorySpent[catObj.id] ?? 0.0) + tx.amount.abs();
-      categorySpent[catObj.name.toLowerCase()] = (categorySpent[catObj.name.toLowerCase()] ?? 0.0) + tx.amount.abs();
-      categorySpent[rawCatId] = (categorySpent[rawCatId] ?? 0.0) + tx.amount.abs();
     }
   }
 
@@ -63,7 +61,7 @@ final categoryBudgetProgressProvider = Provider<List<CategoryBudgetProgress>>((r
       ),
     );
 
-    final spent = categorySpent[catObj.id] ?? categorySpent[budget.category] ?? 0.0;
+    final spent = categorySpent[catObj.id] ?? 0.0;
     final pct = budget.amountLimit > 0 ? (spent / budget.amountLimit) * 100 : 0.0;
 
     result.add(

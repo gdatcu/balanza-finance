@@ -1,9 +1,10 @@
-# Balanza Finance v1.10.2 Release Notes
+# Balanza Finance v1.10.3 Release Notes
 
-## 🐛 Bug Fixes & UX Polish
+## 🐛 Bug Fixes
 
-### 🎨 Fixed Duplicate "+" Icon Bug
-- Removed redundant `"+ "` prefix from `addCategoryBudget` localization strings (`EN` / `RO`) so `TextButton.icon` displays a single `+` icon cleanly without rendering `+ + Adaugă Buget pe Categorie`.
+### 🎯 Fixed Double-Counting Bug in Category Spending Calculation
+- Resolved a critical issue in `categoryBudgetProgressProvider` where transaction amounts were double-counted across multiple map keys (`catObj.id`, `rawCatId`), causing a single 1000 RON transaction to display as 2000 RON spent in the Category Budget progress card.
+- Standardized category spending accumulation strictly by canonical category ID (`catObj.id`).
 
 ### ⚡ Real-Time Category Budget Reflection
 - Added `ref.invalidate(categoryBudgetsStreamProvider);` immediately following budget `upsert` and `delete` operations in `CategoryBudgetInputSheet`.

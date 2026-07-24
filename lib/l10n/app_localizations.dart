@@ -881,7 +881,7 @@ abstract class AppLocalizations {
   /// No description provided for @addCategoryBudget.
   ///
   /// In en, this message translates to:
-  /// **'+ Add Category Budget'**
+  /// **'Add Category Budget'**
   String get addCategoryBudget;
 }
 
