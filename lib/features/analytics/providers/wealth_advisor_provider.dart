@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../models/transaction.dart';
 import '../../../models/category.dart';
 import '../../../core/utils/currency_formatter.dart';
+import '../../../core/utils/category_localizer.dart';
 import '../../transactions/providers/transaction_provider.dart';
 import '../../transactions/presentation/categories_data.dart';
 import '../models/advisor_nudge.dart';
@@ -97,7 +98,8 @@ final wealthAdvisorProvider = Provider<WealthAdvisorState?>((ref) {
       (c) => c.id == catId,
       orElse: () => defaultCategories.first,
     );
-    final categoryName = catObj.name;
+    final categoryNameEn = CategoryLocalizer.getCategoryNameEn(catObj.name);
+    final categoryNameRo = CategoryLocalizer.getCategoryNameRo(catObj.name);
     final pct = (spentAmount / categoryBudgetLimit) * 100;
 
     if (pct >= 100) {
@@ -105,14 +107,14 @@ final wealthAdvisorProvider = Provider<WealthAdvisorState?>((ref) {
       final excessStr = CurrencyFormatter.format(excess);
       final nudgeId = 'threshold_alert_$catId';
       if (!dismissedIds.contains(nudgeId)) {
-        final en = 'Budget Alert: You have exceeded your $categoryName limit by $excessStr. Let’s adjust other categories to stay on track!';
-        final ro = 'Alertă de Buget: Ai depășit limita pentru $categoryName cu $excessStr. Să ajustăm celelalte categorii pentru a rămâne pe cale!';
+        final en = 'Budget Alert: You have exceeded your $categoryNameEn limit by $excessStr. Let’s adjust other categories to stay on track!';
+        final ro = 'Alertă de Buget: Ai depășit limita pentru $categoryNameRo cu $excessStr. Să ajustăm celelalte categorii pentru a rămâne pe cale!';
         candidates.add(
           WealthAdvisorState(
             id: nudgeId,
-            title: 'BUDGET ALERT • ${categoryName.toUpperCase()}',
-            titleEn: 'BUDGET ALERT • ${categoryName.toUpperCase()}',
-            titleRo: 'ALERTĂ DE BUGET • ${categoryName.toUpperCase()}',
+            title: 'BUDGET ALERT • ${categoryNameEn.toUpperCase()}',
+            titleEn: 'BUDGET ALERT • ${categoryNameEn.toUpperCase()}',
+            titleRo: 'ALERTĂ DE BUGET • ${categoryNameRo.toUpperCase()}',
             message: en,
             textEn: en,
             textRo: ro,
@@ -126,14 +128,14 @@ final wealthAdvisorProvider = Provider<WealthAdvisorState?>((ref) {
       final pctStr = pct.toStringAsFixed(0);
       final nudgeId = 'threshold_warning_$catId';
       if (!dismissedIds.contains(nudgeId)) {
-        final en = 'Notice: You have used $pctStr% of your $categoryName budget. Consider slowing down expenses here for the rest of the month.';
-        final ro = 'Atenție: Ai consumat $pctStr% din bugetul pentru $categoryName. Ia în calcul să încetinești cheltuielile aici până la sfârșitul lunii.';
+        final en = 'Notice: You have used $pctStr% of your $categoryNameEn budget. Consider slowing down expenses here for the rest of the month.';
+        final ro = 'Atenție: Ai consumat $pctStr% din bugetul pentru $categoryNameRo. Ia în calcul să încetinești cheltuielile aici până la sfârșitul lunii.';
         candidates.add(
           WealthAdvisorState(
             id: nudgeId,
-            title: 'WARNING • ${categoryName.toUpperCase()} ($pctStr%)',
-            titleEn: 'WARNING • ${categoryName.toUpperCase()} ($pctStr%)',
-            titleRo: 'ATENȚIE • ${categoryName.toUpperCase()} ($pctStr%)',
+            title: 'WARNING • ${categoryNameEn.toUpperCase()} ($pctStr%)',
+            titleEn: 'WARNING • ${categoryNameEn.toUpperCase()} ($pctStr%)',
+            titleRo: 'ATENȚIE • ${categoryNameRo.toUpperCase()} ($pctStr%)',
             message: en,
             textEn: en,
             textRo: ro,
@@ -146,14 +148,14 @@ final wealthAdvisorProvider = Provider<WealthAdvisorState?>((ref) {
     } else if (pct < 50 && spentAmount > 0) {
       final nudgeId = 'threshold_safe_$catId';
       if (!dismissedIds.contains(nudgeId)) {
-        final en = 'Great pacing! You are well under your budget for $categoryName.';
-        final ro = 'Ritm excelent! Ești mult sub bugetul stabilit pentru $categoryName.';
+        final en = 'Great pacing! You are well under your budget for $categoryNameEn.';
+        final ro = 'Ritm excelent! Ești mult sub bugetul stabilit pentru $categoryNameRo.';
         candidates.add(
           WealthAdvisorState(
             id: nudgeId,
-            title: 'SAFE ZONE • ${categoryName.toUpperCase()}',
-            titleEn: 'SAFE ZONE • ${categoryName.toUpperCase()}',
-            titleRo: 'RITM EXCELENT • ${categoryName.toUpperCase()}',
+            title: 'SAFE ZONE • ${categoryNameEn.toUpperCase()}',
+            titleEn: 'SAFE ZONE • ${categoryNameEn.toUpperCase()}',
+            titleRo: 'RITM EXCELENT • ${categoryNameRo.toUpperCase()}',
             message: en,
             textEn: en,
             textRo: ro,
