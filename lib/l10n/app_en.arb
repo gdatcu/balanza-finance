@@ -159,5 +159,9 @@
   "categoryRestaurants": "Restaurants & Dining",
   "categoryPetCare": "Pet Care",
   "categorySubscriptions": "Subscriptions",
-  "categoryOther": "Other"
+  "categoryOther": "Other",
+  "categoryCreditInstallments": "Credit & Loans",
+  "categoryGroceries": "Groceries",
+  "categoryMealTickets": "Meal Tickets",
+  "categorySideHustle": "Side Hustle / Extra"
 }

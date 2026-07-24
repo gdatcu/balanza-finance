@@ -40,6 +40,25 @@ class CategoryLocalizer {
         return localizations.categorySubscriptions;
       case 'other':
         return localizations.categoryOther;
+      case 'credit_installments':
+      case 'credit & loans':
+      case 'credit':
+      case 'rate & credite':
+        return localizations.categoryCreditInstallments;
+      case 'groceries':
+      case 'cumpărături casnice':
+      case 'cumparaturi casnice':
+        return localizations.categoryGroceries;
+      case 'meal_tickets':
+      case 'meal tickets':
+      case 'bonuri de masă':
+      case 'bonuri de masa':
+        return localizations.categoryMealTickets;
+      case 'side_hustle':
+      case 'side hustle':
+      case 'side hustle / extra':
+      case 'proiecte extra':
+        return localizations.categorySideHustle;
       default:
         return name;
     }

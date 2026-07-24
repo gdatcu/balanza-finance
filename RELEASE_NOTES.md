@@ -1,33 +1,34 @@
-# Balanza Finance v1.5.1 Release Notes
+# Balanza Finance v1.6.0 Release Notes
 
 ## ⚡ New Features
 
-### ☕ Category Schema Expansion
-- Introduced 5 new spending categories across Balanza Finance: `coffee_tea` (☕ Coffee & Tea), `restaurants` (🍽️ Restaurants & Dining), `pet_care` (🐾 Pet Care), `subscriptions` (🔄 Subscriptions), and `other` (📦 Other).
-- Integrated curated theme colors and Material icons for all new spending categories.
+### 💰 Income vs. Expense Category Schema & Direction (`isIncome`)
+- Explicit cash flow direction classification added to `Category` model (`isIncome` boolean flag).
+- Expanded category schema with new vital categories:
+  - 🏦 **`credit_installments`** (Rate & Credite | Expense)
+  - 🛒 **`groceries`** (Cumpărături Casnice | Expense)
+  - 💡 **`utilities`** (Utilități & Facturi | Expense)
+  - 🎫 **`meal_tickets`** (Bonuri de Masă | Income)
+  - 💰 **`salary`** (Salariu | Income)
+  - 🚀 **`side_hustle`** (Proiecte Extra | Income)
 
-### 🌐 Complete EN / RO Localization Setup
-- Full bilingual dictionary updates (English / Romanian) across all category labels, transaction forms, notifications, and analytics views.
-- Updated `CategoryLocalizer` for seamless localized category string formatting.
+### 🧠 Advanced Wealth Advisor Cross-Category Rules
+- Integrated 3 new behavioral nudges:
+  - 🏦 **Debt-to-Income Rule** (`nudge_debt_to_income`): Triggers when credit & loan installments exceed 30% of primary income (`salary` + `side_hustle`).
+  - 🍽️ **Food Ratio Rule** (`nudge_food_ratio`): Triggers when restaurant spending exceeds 50% of home grocery purchases.
+  - 🎫 **Ticket Allocation Rule** (`nudge_ticket_allocation`): Advises users logging meal tickets to restrict ticket usage strictly to groceries to preserve liquid cash.
 
-### 🧠 Riverpod Wealth Advisor Behavioral Nudges
-- Added 4 data-driven behavioral nudges to the Wealth Advisor engine:
-  - **`coffee_tea` Frequency Trigger** (>15 tx/month): Highlights the "Latte Factor" to boost annual savings.
-  - **`restaurants` Ratio Trigger** (>15% total spending): Encourages meal-prep vs. delivery balance.
-  - **`subscriptions` Pruning Trigger** (>5 recurring items in 30 days): Prompts audit and cancellation of unused subscriptions.
-  - **`other` Uncategorized Trigger** (>20% total spending): Prompts tagging transactions to eliminate budget blind spots.
+### 🌐 Complete Bilingual Localization (EN / RO)
+- Added localizations for all new categories across English and Romanian dictionaries (`CategoryLocalizer`).
 
-### 🏷️ Auto-Tagging Engine Integration
-- Enhanced client-side transaction description parsing against local fallback and remote Supabase `tagging_rules`.
-- Smart auto-tagging feedback snackbars with localized category names.
-
-### 🎨 Dashboard & Interactive UI Upgrades
-- Added interactive category filter chips on the Dashboard for real-time transaction and category breakdown filtering.
-- Enhanced transaction rows and category pie chart breakdown lists with custom category icon badges and theme colors.
+### 🎨 Smart UI Dropdowns & Dynamic Dashboard Filtering
+- Transaction input modal dynamically switches dropdown categories based on Income vs. Expense selection.
+- Dashboard filter chips updated with income and expense category tags.
 
 ---
 
 ## 🛠️ Critical Fixes & Improvements
 
-### 🧪 Automated Testing
-- Expanded test suite with unit tests in `wealth_advisor_test.dart` for all 4 new behavioral nudges (`36/36 tests passed`).
+### 🧪 Automated Testing & Code Quality
+- Expanded automated unit test suite (`39/39 tests passed`).
+- Static analysis clean (`0 issues found`).

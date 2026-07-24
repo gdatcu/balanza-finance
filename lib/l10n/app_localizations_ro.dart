@@ -378,4 +378,16 @@ class AppLocalizationsRo extends AppLocalizations {
 
   @override
   String get categoryOther => 'Altele';
+
+  @override
+  String get categoryCreditInstallments => 'Rate & Credite';
+
+  @override
+  String get categoryGroceries => 'Cumpărături Casnice';
+
+  @override
+  String get categoryMealTickets => 'Bonuri de Masă';
+
+  @override
+  String get categorySideHustle => 'Proiecte Extra';
 }

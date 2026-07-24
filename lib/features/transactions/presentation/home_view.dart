@@ -45,7 +45,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
   }
 
   Widget _buildCategoryFilterChips() {
-    final categories = expenseCategories;
+    final categories = defaultCategories;
     return Container(
       height: 44,
       padding: const EdgeInsets.symmetric(horizontal: 16),

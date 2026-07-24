@@ -69,6 +69,7 @@ void main() {
       'icon': 'fastfood',
       'color': '#FF5733',
       'user_id': 'u1111111-2222-3333-4444-555555555555',
+      'is_income': true,
       'created_at': '2026-07-21T12:05:00.000Z',
     };
 
@@ -80,6 +81,7 @@ void main() {
       expect(category.icon, 'fastfood');
       expect(category.color, '#FF5733');
       expect(category.userId, 'u1111111-2222-3333-4444-555555555555');
+      expect(category.isIncome, true);
       expect(category.createdAt, DateTime.parse('2026-07-21T12:05:00.000Z'));
     });
 
@@ -90,6 +92,7 @@ void main() {
         icon: 'fastfood',
         color: '#FF5733',
         userId: 'u1111111-2222-3333-4444-555555555555',
+        isIncome: true,
         createdAt: DateTime.parse('2026-07-21T12:05:00.000Z'),
       );
 
@@ -100,6 +103,7 @@ void main() {
       expect(json['icon'], 'fastfood');
       expect(json['color'], '#FF5733');
       expect(json['user_id'], 'u1111111-2222-3333-4444-555555555555');
+      expect(json['is_income'], true);
       expect(json['created_at'], '2026-07-21T12:05:00.000Z');
     });
 

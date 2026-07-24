@@ -787,6 +787,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Other'**
   String get categoryOther;
+
+  /// No description provided for @categoryCreditInstallments.
+  ///
+  /// In en, this message translates to:
+  /// **'Credit & Loans'**
+  String get categoryCreditInstallments;
+
+  /// No description provided for @categoryGroceries.
+  ///
+  /// In en, this message translates to:
+  /// **'Groceries'**
+  String get categoryGroceries;
+
+  /// No description provided for @categoryMealTickets.
+  ///
+  /// In en, this message translates to:
+  /// **'Meal Tickets'**
+  String get categoryMealTickets;
+
+  /// No description provided for @categorySideHustle.
+  ///
+  /// In en, this message translates to:
+  /// **'Side Hustle / Extra'**
+  String get categorySideHustle;
 }
 
 class _AppLocalizationsDelegate

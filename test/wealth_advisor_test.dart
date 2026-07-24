@@ -283,6 +283,132 @@ void main() {
       expect(nudge.textRo, contains('20% din cheltuielile tale'));
     });
 
+    test('Behavioral Nudge: Debt-to-Income ratio trigger (>30%)', () async {
+      final container = ProviderContainer(
+        overrides: [
+          monthlyBudgetProvider.overrideWith((ref) => Stream.value(5000.0)),
+          transactionListProvider.overrideWith(
+            (ref) => Stream.value([
+              Transaction(
+                id: 'tx-1',
+                userId: 'user-1',
+                accountId: 'acc-1',
+                categoryId: '00000000-0000-0000-0000-0000000000c5', // Salary
+                amount: 3000.0,
+                description: 'Monthly Salary',
+                date: DateTime.now(),
+                createdAt: DateTime.now(),
+              ),
+              Transaction(
+                id: 'tx-2',
+                userId: 'user-1',
+                accountId: 'acc-1',
+                categoryId: '00000000-0000-0000-0000-000000000c15', // Credit Installments
+                amount: -1200.0, // 40% of salary (> 30%)
+                description: 'Bank credit installment',
+                date: DateTime.now(),
+                createdAt: DateTime.now(),
+              ),
+            ]),
+          ),
+        ],
+      );
+
+      container.listen(transactionListProvider, (prev, next) {});
+      container.listen(monthlyBudgetProvider, (prev, next) {});
+      await pumpEventQueue();
+
+      final nudge = container.read(wealthAdvisorProvider);
+      expect(nudge, isNotNull);
+      expect(nudge!.id, equals('nudge_debt_to_income'));
+      expect(nudge.textEn, contains('exceed 30% of your income'));
+      expect(nudge.textRo, contains('depășesc 30% din venituri'));
+    });
+
+    test('Behavioral Nudge: Food Ratio trigger (restaurants > 50% groceries)', () async {
+      final container = ProviderContainer(
+        overrides: [
+          monthlyBudgetProvider.overrideWith((ref) => Stream.value(5000.0)),
+          transactionListProvider.overrideWith(
+            (ref) => Stream.value([
+              Transaction(
+                id: 'tx-1',
+                userId: 'user-1',
+                accountId: 'acc-1',
+                categoryId: '00000000-0000-0000-0000-0000000000c3', // Rent
+                amount: -1000.0,
+                description: 'Apartment Rent',
+                date: DateTime.now(),
+                createdAt: DateTime.now(),
+              ),
+              Transaction(
+                id: 'tx-2',
+                userId: 'user-1',
+                accountId: 'acc-1',
+                categoryId: '00000000-0000-0000-0000-000000000c16', // Groceries
+                amount: -200.0,
+                description: 'Supermarket Lidl',
+                date: DateTime.now(),
+                createdAt: DateTime.now(),
+              ),
+              Transaction(
+                id: 'tx-3',
+                userId: 'user-1',
+                accountId: 'acc-1',
+                categoryId: '00000000-0000-0000-0000-000000000c11', // Restaurants
+                amount: -150.0, // 150 > 50% of 200 (75%)
+                description: 'Fancy Dinner Out',
+                date: DateTime.now(),
+                createdAt: DateTime.now(),
+              ),
+            ]),
+          ),
+        ],
+      );
+
+      container.listen(transactionListProvider, (prev, next) {});
+      container.listen(monthlyBudgetProvider, (prev, next) {});
+      await pumpEventQueue();
+
+      final nudge = container.read(wealthAdvisorProvider);
+      expect(nudge, isNotNull);
+      expect(nudge!.id, equals('nudge_food_ratio'));
+      expect(nudge.textEn, contains('exceeds 50% of your grocery budget'));
+      expect(nudge.textRo, contains('depășesc 50% din cumpărăturile casnice'));
+    });
+
+    test('Behavioral Nudge: Ticket Allocation trigger (meal_tickets logged)', () async {
+      final container = ProviderContainer(
+        overrides: [
+          monthlyBudgetProvider.overrideWith((ref) => Stream.value(5000.0)),
+          transactionListProvider.overrideWith(
+            (ref) => Stream.value([
+              Transaction(
+                id: 'tx-1',
+                userId: 'user-1',
+                accountId: 'acc-1',
+                categoryId: '00000000-0000-0000-0000-000000000c17', // Meal Tickets
+                amount: 600.0,
+                description: 'Edenred Meal Tickets',
+                date: DateTime.now(),
+                createdAt: DateTime.now(),
+              ),
+            ]),
+          ),
+        ],
+      );
+
+      container.listen(transactionListProvider, (prev, next) {});
+      container.listen(monthlyBudgetProvider, (prev, next) {});
+      await pumpEventQueue();
+
+      final nudge = container.read(wealthAdvisorProvider);
+      expect(nudge, isNotNull);
+      expect(nudge!.id, equals('nudge_ticket_allocation'));
+      expect(nudge.textEn, contains('You logged meal tickets this month'));
+      expect(nudge.textRo, contains('Ai înregistrat bonuri de masă'));
+    });
+
     test('Dismissing a nudge hides it from provider', () async {
       final container = ProviderContainer(
         overrides: [

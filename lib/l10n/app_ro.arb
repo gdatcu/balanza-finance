@@ -159,5 +159,9 @@
   "categoryRestaurants": "Restaurante & Localuri",
   "categoryPetCare": "Îngrijire Animale",
   "categorySubscriptions": "Abonamente & Servicii",
-  "categoryOther": "Altele"
+  "categoryOther": "Altele",
+  "categoryCreditInstallments": "Rate & Credite",
+  "categoryGroceries": "Cumpărături Casnice",
+  "categoryMealTickets": "Bonuri de Masă",
+  "categorySideHustle": "Proiecte Extra"
 }

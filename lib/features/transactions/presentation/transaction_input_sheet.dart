@@ -84,19 +84,7 @@ class _TransactionInputSheetState extends ConsumerState<TransactionInputSheet> {
     }
   }
 
-  final Set<String> _expenseCategoryIds = {
-    '00000000-0000-0000-0000-0000000000c1', // Food
-    '00000000-0000-0000-0000-0000000000c2', // Transport
-    '00000000-0000-0000-0000-0000000000c3', // Rent
-    '00000000-0000-0000-0000-0000000000c4', // Utilities
-    '00000000-0000-0000-0000-0000000000c6', // Entertainment
-    '00000000-0000-0000-0000-0000000000c7', // Shopping
-    '00000000-0000-0000-0000-000000000c10', // Coffee & Tea
-    '00000000-0000-0000-0000-000000000c11', // Restaurants
-    '00000000-0000-0000-0000-000000000c12', // Pet Care
-    '00000000-0000-0000-0000-000000000c13', // Subscriptions
-    '00000000-0000-0000-0000-000000000c14', // Other
-  };
+
 
   @override
   void dispose() {
@@ -340,12 +328,13 @@ class _TransactionInputSheetState extends ConsumerState<TransactionInputSheet> {
                 categoriesAsync.when(
                   data: (categories) {
                     final filtered = categories.where((c) {
-                      if (_isIncome) {
-                        return !_expenseCategoryIds.contains(c.id);
-                      } else {
-                        return _expenseCategoryIds.contains(c.id);
-                      }
+                      return _isIncome ? c.isIncome : !c.isIncome;
                     }).toList();
+
+                    if (_selectedCategoryId == null ||
+                        !filtered.any((c) => c.id == _selectedCategoryId)) {
+                      _selectedCategoryId = filtered.isNotEmpty ? filtered.first.id : null;
+                    }
 
                     return DropdownButtonFormField<String>(
                       decoration: InputDecoration(

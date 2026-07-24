@@ -173,22 +173,27 @@ final wealthAdvisorProvider = Provider<WealthAdvisorState?>((ref) {
   double otherSpending = 0.0;
   double totalExpenseSum = 0.0;
 
+  double creditInstallmentsSpending = 0.0;
+  double groceriesSpending = 0.0;
+  double salaryIncome = 0.0;
+  double sideHustleIncome = 0.0;
+  double mealTicketsIncome = 0.0;
+
   for (final tx in transactions) {
+    final cat = defaultCategories.firstWhere(
+      (c) => c.id == tx.categoryId,
+      orElse: () => Category(
+        id: tx.categoryId ?? 'uncategorized',
+        name: tx.categoryId == null ? 'other' : 'uncategorized',
+        createdAt: DateTime.now(),
+      ),
+    );
+    final desc = (tx.description ?? '').toLowerCase();
+    final catName = cat.name.toLowerCase();
+
     if (tx.amount < 0) {
       final amt = tx.amount.abs();
       totalExpenseSum += amt;
-
-      final cat = defaultCategories.firstWhere(
-        (c) => c.id == tx.categoryId,
-        orElse: () => Category(
-          id: tx.categoryId ?? 'uncategorized',
-          name: tx.categoryId == null ? 'other' : 'uncategorized',
-          createdAt: DateTime.now(),
-        ),
-      );
-
-      final desc = (tx.description ?? '').toLowerCase();
-      final catName = cat.name.toLowerCase();
 
       // Check coffee_tea
       if (tx.categoryId == '00000000-0000-0000-0000-000000000c10' ||
@@ -220,6 +225,46 @@ final wealthAdvisorProvider = Provider<WealthAdvisorState?>((ref) {
           catName == 'other' ||
           catName == 'uncategorized') {
         otherSpending += amt;
+      }
+
+      // Check credit_installments
+      if (tx.categoryId == '00000000-0000-0000-0000-000000000c15' ||
+          catName == 'credit_installments' ||
+          catName == 'credit & loans' ||
+          catName == 'rate & credite') {
+        creditInstallmentsSpending += amt;
+      }
+
+      // Check groceries
+      if (tx.categoryId == '00000000-0000-0000-0000-000000000c16' ||
+          catName == 'groceries' ||
+          catName == 'cumpărături casnice' ||
+          catName == 'cumparaturi casnice') {
+        groceriesSpending += amt;
+      }
+    } else if (tx.amount > 0) {
+      // Check salary
+      if (tx.categoryId == '00000000-0000-0000-0000-0000000000c5' ||
+          catName == 'salary' ||
+          catName == 'salariu') {
+        salaryIncome += tx.amount;
+      }
+
+      // Check side_hustle
+      if (tx.categoryId == '00000000-0000-0000-0000-000000000c18' ||
+          catName == 'side_hustle' ||
+          catName == 'side hustle' ||
+          catName == 'proiecte extra') {
+        sideHustleIncome += tx.amount;
+      }
+
+      // Check meal_tickets
+      if (tx.categoryId == '00000000-0000-0000-0000-000000000c17' ||
+          catName == 'meal_tickets' ||
+          catName == 'meal tickets' ||
+          catName == 'bonuri de masă' ||
+          catName == 'bonuri de masa') {
+        mealTicketsIncome += tx.amount;
       }
     }
   }
@@ -311,6 +356,84 @@ final wealthAdvisorProvider = Provider<WealthAdvisorState?>((ref) {
           icon: Icons.inventory_2,
           type: AdvisorType.nudge,
           severity: NudgeSeverity.warning,
+        ),
+      );
+    }
+  }
+
+  // E. Debt-to-Income Rule (credit_installments > 30% of (salary + side_hustle))
+  final double totalPrimaryIncome = salaryIncome + sideHustleIncome;
+  if (totalPrimaryIncome > 0 &&
+      (creditInstallmentsSpending / totalPrimaryIncome) > 0.30) {
+    const nudgeId = 'nudge_debt_to_income';
+    if (!dismissedIds.contains(nudgeId)) {
+      const en =
+          'Your loan & credit installments exceed 30% of your income. Consider allocating extra cash flow toward early principal paydown.';
+      const ro =
+          'Ratele și creditele depășesc 30% din venituri. Se recomandă rambursarea anticipată a principalului.';
+      candidates.add(
+        const WealthAdvisorState(
+          id: nudgeId,
+          title: 'BEHAVIORAL NUDGE • DEBT-TO-INCOME RATIO',
+          titleEn: 'BEHAVIORAL NUDGE • DEBT-TO-INCOME RATIO',
+          titleRo: 'RECOMANDARE COMPORTAMENTALĂ • GRAD ÎNDATORARE',
+          message: en,
+          textEn: en,
+          textRo: ro,
+          icon: Icons.account_balance,
+          type: AdvisorType.nudge,
+          severity: NudgeSeverity.warning,
+        ),
+      );
+    }
+  }
+
+  // F. Food Ratio Rule (restaurants > 50% of groceries total)
+  if (groceriesSpending > 0 &&
+      (restaurantSpending / groceriesSpending) > 0.50) {
+    const nudgeId = 'nudge_food_ratio';
+    if (!dismissedIds.contains(nudgeId)) {
+      const en =
+          'Your restaurant spending exceeds 50% of your grocery budget. Shifting towards home-cooked meals could save significant capital.';
+      const ro =
+          'Cheltuielile la restaurante depășesc 50% din cumpărăturile casnice. Pregătirea meselor acasă poate aduce economii considerabile.';
+      candidates.add(
+        const WealthAdvisorState(
+          id: nudgeId,
+          title: 'BEHAVIORAL NUDGE • FOOD RATIO',
+          titleEn: 'BEHAVIORAL NUDGE • FOOD RATIO',
+          titleRo: 'RECOMANDARE COMPORTAMENTALĂ • RESTAURANTE VS CUMPĂRĂTURI',
+          message: en,
+          textEn: en,
+          textRo: ro,
+          icon: Icons.restaurant,
+          type: AdvisorType.nudge,
+          severity: NudgeSeverity.warning,
+        ),
+      );
+    }
+  }
+
+  // G. Ticket Allocation Rule (meal_tickets > 0 logged)
+  if (mealTicketsIncome > 0) {
+    const nudgeId = 'nudge_ticket_allocation';
+    if (!dismissedIds.contains(nudgeId)) {
+      const en =
+          'You logged meal tickets this month. Use tickets strictly for food and grocery purchases to preserve your primary cash savings.';
+      const ro =
+          'Ai înregistrat bonuri de masă. Folosește-le exclusiv pentru alimente și cumpărături casnice pentru a-ți proteja disponibilul de numerar.';
+      candidates.add(
+        const WealthAdvisorState(
+          id: nudgeId,
+          title: 'BEHAVIORAL NUDGE • MEAL TICKET ALLOCATION',
+          titleEn: 'BEHAVIORAL NUDGE • MEAL TICKET ALLOCATION',
+          titleRo: 'RECOMANDARE COMPORTAMENTALĂ • OPTIMIZARE BONURI DE MASĂ',
+          message: en,
+          textEn: en,
+          textRo: ro,
+          icon: Icons.confirmation_number,
+          type: AdvisorType.nudge,
+          severity: NudgeSeverity.info,
         ),
       );
     }

@@ -35,6 +35,7 @@ final List<Category> defaultCategories = [
     name: 'Salary',
     icon: 'attach_money',
     color: '#4CAF50',
+    isIncome: true,
     createdAt: DateTime.now(),
   ),
   Category(
@@ -56,6 +57,7 @@ final List<Category> defaultCategories = [
     name: 'Investments',
     icon: 'trending_up',
     color: '#3F51B5',
+    isIncome: true,
     createdAt: DateTime.now(),
   ),
   Category(
@@ -63,6 +65,7 @@ final List<Category> defaultCategories = [
     name: 'Gifts',
     icon: 'card_giftcard',
     color: '#FFC107',
+    isIncome: true,
     createdAt: DateTime.now(),
   ),
   Category(
@@ -100,25 +103,45 @@ final List<Category> defaultCategories = [
     color: '#607D8B',
     createdAt: DateTime.now(),
   ),
+  Category(
+    id: '00000000-0000-0000-0000-000000000c15',
+    name: 'credit_installments',
+    icon: 'account_balance',
+    color: '#D32F2F',
+    isIncome: false,
+    createdAt: DateTime.now(),
+  ),
+  Category(
+    id: '00000000-0000-0000-0000-000000000c16',
+    name: 'groceries',
+    icon: 'shopping_cart',
+    color: '#4CAF50',
+    isIncome: false,
+    createdAt: DateTime.now(),
+  ),
+  Category(
+    id: '00000000-0000-0000-0000-000000000c17',
+    name: 'meal_tickets',
+    icon: 'confirmation_number',
+    color: '#8BC34A',
+    isIncome: true,
+    createdAt: DateTime.now(),
+  ),
+  Category(
+    id: '00000000-0000-0000-0000-000000000c18',
+    name: 'side_hustle',
+    icon: 'rocket_launch',
+    color: '#00ACC1',
+    isIncome: true,
+    createdAt: DateTime.now(),
+  ),
 ];
 
-final List<Category> expenseCategories = defaultCategories.where((c) =>
-    c.id == '00000000-0000-0000-0000-0000000000c1' ||
-    c.id == '00000000-0000-0000-0000-0000000000c2' ||
-    c.id == '00000000-0000-0000-0000-0000000000c3' ||
-    c.id == '00000000-0000-0000-0000-0000000000c4' ||
-    c.id == '00000000-0000-0000-0000-0000000000c6' ||
-    c.id == '00000000-0000-0000-0000-0000000000c7' ||
-    c.id == '00000000-0000-0000-0000-000000000c10' ||
-    c.id == '00000000-0000-0000-0000-000000000c11' ||
-    c.id == '00000000-0000-0000-0000-000000000c12' ||
-    c.id == '00000000-0000-0000-0000-000000000c13' ||
-    c.id == '00000000-0000-0000-0000-000000000c14').toList();
+final List<Category> expenseCategories =
+    defaultCategories.where((c) => !c.isIncome).toList();
 
-final List<Category> incomeCategories = defaultCategories.where((c) =>
-    c.id == '00000000-0000-0000-0000-0000000000c5' ||
-    c.id == '00000000-0000-0000-0000-0000000000c8' ||
-    c.id == '00000000-0000-0000-0000-0000000000c9').toList();
+final List<Category> incomeCategories =
+    defaultCategories.where((c) => c.isIncome).toList();
 
 IconData getCategoryIcon(String? iconName) {
   switch (iconName) {
@@ -129,9 +152,12 @@ IconData getCategoryIcon(String? iconName) {
     case 'home':
       return Icons.home;
     case 'power':
-      return Icons.power;
+    case 'lightbulb':
+      return Icons.lightbulb;
     case 'attach_money':
-      return Icons.attach_money;
+    case 'payments':
+    case 'salary':
+      return Icons.payments;
     case 'sports_esports':
       return Icons.sports_esports;
     case 'shopping_bag':
@@ -157,6 +183,19 @@ IconData getCategoryIcon(String? iconName) {
     case 'category':
     case 'other':
       return Icons.inventory_2;
+    case 'account_balance':
+    case 'credit_installments':
+    case 'credit':
+      return Icons.account_balance;
+    case 'shopping_cart':
+    case 'groceries':
+      return Icons.shopping_cart;
+    case 'confirmation_number':
+    case 'meal_tickets':
+      return Icons.confirmation_number;
+    case 'rocket_launch':
+    case 'side_hustle':
+      return Icons.rocket_launch;
     default:
       return Icons.category;
   }
