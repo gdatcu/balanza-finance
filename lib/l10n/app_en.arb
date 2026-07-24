@@ -181,5 +181,32 @@
   "categoryGadgets": "Gadgets & Tech",
   "categoryTravel": "Travel & Holidays",
   "categoryPersonalCare": "Personal Care",
-  "categoryEducation": "Education"
+  "categoryEducation": "Education",
+  "breakdownTitle": "📊 Breakdown",
+  "burnRateTitle": "🔥 Burn Rate",
+  "burnRateLabel": "Burn Rate: {percentage}%",
+  "@burnRateLabel": {
+    "placeholders": {
+      "percentage": {
+        "type": "String"
+      }
+    }
+  },
+  "safeToSpend": "Safe to Spend: {amount}",
+  "@safeToSpend": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "overspentBy": "Overspent by: {amount}",
+  "@overspentBy": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "totalSpent": "Total Spent"
 }

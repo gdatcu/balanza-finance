@@ -269,3 +269,39 @@ final insightsProvider = Provider<String>((ref) {
     },
   );
 });
+
+/// Notifier to manage toggle selection of the dashboard visualization (0 = Breakdown, 1 = Burn Rate).
+class DashboardViewNotifier extends Notifier<int> {
+  @override
+  int build() => 0;
+
+  void set(int value) {
+    state = value;
+  }
+}
+
+/// Provider for toggle selection of the dashboard visualization.
+final dashboardViewProvider = NotifierProvider<DashboardViewNotifier, int>(() {
+  return DashboardViewNotifier();
+});
+
+/// Provider to calculate the current month's burn rate percentage (Expenses / Income).
+final burnRateProvider = Provider<double>((ref) {
+  final transactionsAsync = ref.watch(transactionListProvider);
+  return transactionsAsync.maybeWhen(
+    data: (transactions) {
+      double income = 0.0;
+      double expenses = 0.0;
+      for (final tx in transactions) {
+        if (tx.amount > 0) {
+          income += tx.amount;
+        } else {
+          expenses += tx.amount.abs();
+        }
+      }
+      if (income == 0.0) return 0.0;
+      return (expenses / income) * 100.0;
+    },
+    orElse: () => 0.0,
+  );
+});

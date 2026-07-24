@@ -445,4 +445,28 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get categoryEducation => 'Education';
+
+  @override
+  String get breakdownTitle => '📊 Breakdown';
+
+  @override
+  String get burnRateTitle => '🔥 Burn Rate';
+
+  @override
+  String burnRateLabel(String percentage) {
+    return 'Burn Rate: $percentage%';
+  }
+
+  @override
+  String safeToSpend(String amount) {
+    return 'Safe to Spend: $amount';
+  }
+
+  @override
+  String overspentBy(String amount) {
+    return 'Overspent by: $amount';
+  }
+
+  @override
+  String get totalSpent => 'Total Spent';
 }

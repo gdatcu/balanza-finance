@@ -56,7 +56,7 @@ class MockTransactionRepository implements TransactionRepository {
 
 void main() {
   testWidgets('HomeView displays transactions and opening add modal works', (WidgetTester tester) async {
-    tester.view.physicalSize = const Size(800, 1200);
+    tester.view.physicalSize = const Size(800, 2000);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(() {
       tester.view.resetPhysicalSize();
@@ -99,6 +99,7 @@ void main() {
 
     expect(find.text('Balanza Finance'), findsOneWidget);
     expect(find.text('Total Balance'), findsOneWidget);
+
 
     expect(find.text('Groceries Spend'), findsOneWidget);
     expect(find.text('-RON 50.00'), findsNWidgets(3));

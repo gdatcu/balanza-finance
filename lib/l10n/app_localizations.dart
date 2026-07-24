@@ -919,6 +919,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Education'**
   String get categoryEducation;
+
+  /// No description provided for @breakdownTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'📊 Breakdown'**
+  String get breakdownTitle;
+
+  /// No description provided for @burnRateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'🔥 Burn Rate'**
+  String get burnRateTitle;
+
+  /// No description provided for @burnRateLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Burn Rate: {percentage}%'**
+  String burnRateLabel(String percentage);
+
+  /// No description provided for @safeToSpend.
+  ///
+  /// In en, this message translates to:
+  /// **'Safe to Spend: {amount}'**
+  String safeToSpend(String amount);
+
+  /// No description provided for @overspentBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Overspent by: {amount}'**
+  String overspentBy(String amount);
+
+  /// No description provided for @totalSpent.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Spent'**
+  String get totalSpent;
 }
 
 class _AppLocalizationsDelegate

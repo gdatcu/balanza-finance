@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:balanza/l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import '../providers/transaction_provider.dart';
@@ -38,6 +40,7 @@ class HomeView extends ConsumerStatefulWidget {
 class _HomeViewState extends ConsumerState<HomeView> {
   ToshlSection _section = ToshlSection.overview;
   String? _selectedCategoryFilterId;
+  int _touchedPieIndex = -1;
 
   @override
   void initState() {
@@ -93,6 +96,304 @@ class _HomeViewState extends ConsumerState<HomeView> {
             },
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildDashboardCharts(List<Transaction> transactions) {
+    final selectedView = ref.watch(dashboardViewProvider);
+
+    return Card(
+      key: const ValueKey('dashboard_charts_card'),
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      color: const Color(0xFF1E293B),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(color: Colors.white.withValues(alpha: 0.05), width: 1.5),
+      ),
+      elevation: 0,
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Center(
+              child: CupertinoSlidingSegmentedControl<int>(
+                groupValue: selectedView,
+                backgroundColor: const Color(0xFF0F172A),
+                thumbColor: const Color(0xFFFF7A5A),
+                children: {
+                  0: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    child: Text(
+                      AppLocalizations.of(context)!.breakdownTitle,
+                      style: TextStyle(
+                        color: selectedView == 0 ? Colors.white : Colors.grey,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ),
+                  1: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    child: Text(
+                      AppLocalizations.of(context)!.burnRateTitle,
+                      style: TextStyle(
+                        color: selectedView == 1 ? Colors.white : Colors.grey,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ),
+                },
+                onValueChanged: (val) {
+                  if (val != null) {
+                    setState(() {
+                      _touchedPieIndex = -1;
+                    });
+                    ref.read(dashboardViewProvider.notifier).set(val);
+                  }
+                },
+              ),
+            ),
+            const SizedBox(height: 20),
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              child: selectedView == 0
+                  ? _buildDonutChart(transactions)
+                  : _buildBurnRateGauge(),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDonutChart(List<Transaction> transactions) {
+    final Map<String, double> expensesByCategory = {};
+    double totalSpent = 0.0;
+
+    for (final tx in transactions) {
+      if (tx.amount < 0) {
+        final catId = tx.categoryId ?? 'uncategorized';
+        expensesByCategory[catId] = (expensesByCategory[catId] ?? 0.0) + tx.amount.abs();
+        totalSpent += tx.amount.abs();
+      }
+    }
+
+    if (totalSpent == 0) {
+      return SizedBox(
+        key: const ValueKey('donut_chart_empty'),
+        height: 180,
+        child: Center(
+          child: Text(
+            AppLocalizations.of(context)!.noExpenseData,
+            style: const TextStyle(color: Colors.grey, fontSize: 14),
+          ),
+        ),
+      );
+    }
+
+    final sortedCategories = expensesByCategory.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+
+    final sections = List.generate(sortedCategories.length, (i) {
+      final entry = sortedCategories[i];
+      final catId = entry.key;
+      final amount = entry.value;
+      final catObj = defaultCategories.firstWhere(
+        (c) => c.id == catId,
+        orElse: () => defaultCategories.first,
+      );
+      final isTouched = i == _touchedPieIndex;
+      final radius = isTouched ? 28.0 : 20.0;
+      return PieChartSectionData(
+        value: amount,
+        color: getCategoryColor(catObj.color),
+        radius: radius,
+        showTitle: false,
+      );
+    });
+
+    String centerTitle = AppLocalizations.of(context)!.totalSpent;
+    String centerValue = CurrencyFormatter.format(totalSpent);
+    String? centerSubtitle;
+
+    if (_touchedPieIndex >= 0 && _touchedPieIndex < sortedCategories.length) {
+      final entry = sortedCategories[_touchedPieIndex];
+      final catId = entry.key;
+      final amount = entry.value;
+      final catObj = defaultCategories.firstWhere(
+        (c) => c.id == catId,
+        orElse: () => defaultCategories.first,
+      );
+      centerTitle = CategoryLocalizer.getLocalizedName(context, catObj.name);
+      centerValue = CurrencyFormatter.format(amount);
+      final pct = (amount / totalSpent) * 100;
+      centerSubtitle = '${pct.toStringAsFixed(1)}%';
+    }
+
+    return SizedBox(
+      key: const ValueKey('donut_chart_data'),
+      height: 180,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          PieChart(
+            PieChartData(
+              pieTouchData: PieTouchData(
+                touchCallback: (FlTouchEvent event, pieTouchResponse) {
+                  setState(() {
+                    if (!event.isInterestedForInteractions ||
+                        pieTouchResponse == null ||
+                        pieTouchResponse.touchedSection == null) {
+                      _touchedPieIndex = -1;
+                      return;
+                    }
+                    _touchedPieIndex = pieTouchResponse.touchedSection!.touchedSectionIndex;
+                  });
+                },
+              ),
+              sections: sections,
+              centerSpaceRadius: 55,
+              sectionsSpace: 3,
+              borderData: FlBorderData(show: false),
+            ),
+          ),
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                constraints: const BoxConstraints(maxWidth: 100),
+                child: Text(
+                  centerTitle,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Colors.grey,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                centerValue,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              if (centerSubtitle != null) ...[
+                const SizedBox(height: 2),
+                Text(
+                  centerSubtitle,
+                  style: const TextStyle(
+                    color: Color(0xFFFF7A5A),
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBurnRateGauge() {
+    final transactionsAsync = ref.watch(transactionListProvider);
+
+    return transactionsAsync.maybeWhen(
+      data: (transactions) {
+        double totalIncome = 0.0;
+        double totalExpenses = 0.0;
+
+        for (final tx in transactions) {
+          if (tx.amount > 0) {
+            totalIncome += tx.amount;
+          } else {
+            totalExpenses += tx.amount.abs();
+          }
+        }
+
+        final double burnRate = totalIncome > 0 ? (totalExpenses / totalIncome) * 100 : 0.0;
+        final double progressValue = totalIncome > 0 ? (totalExpenses / totalIncome).clamp(0.0, 1.0) : 0.0;
+
+        Color progressColor = Colors.green;
+        if (burnRate > 80) {
+          progressColor = Colors.red;
+        } else if (burnRate > 50) {
+          progressColor = Colors.orange;
+        }
+
+        final bool isOverspent = totalExpenses > totalIncome;
+        final double difference = (totalIncome - totalExpenses).abs();
+
+        return Column(
+          key: const ValueKey('burn_rate_gauge_data'),
+          children: [
+            const SizedBox(height: 10),
+            // The Gauge Bar
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: SizedBox(
+                height: 16,
+                child: LinearProgressIndicator(
+                  value: progressValue,
+                  backgroundColor: const Color(0xFF0F172A),
+                  valueColor: AlwaysStoppedAnimation<Color>(progressColor),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            // Text values row 1: Burn Rate %
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  AppLocalizations.of(context)!.burnRateLabel(burnRate.toStringAsFixed(1)),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            // Text values row 2: Safe to spend / Overspent by
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                if (!isOverspent)
+                  Text(
+                    AppLocalizations.of(context)!.safeToSpend(CurrencyFormatter.format(difference)),
+                    style: const TextStyle(
+                      color: Colors.grey,
+                      fontSize: 14,
+                    ),
+                  )
+                else
+                  Text(
+                    AppLocalizations.of(context)!.overspentBy(CurrencyFormatter.format(difference)),
+                    style: const TextStyle(
+                      color: Colors.red,
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+              ],
+            ),
+          ],
+        );
+      },
+      orElse: () => const SizedBox(
+        key: ValueKey('burn_rate_gauge_loading'),
+        height: 120,
+        child: Center(child: CircularProgressIndicator()),
       ),
     );
   }
@@ -509,6 +810,8 @@ class _HomeViewState extends ConsumerState<HomeView> {
             _buildOverviewCard(totalBalance, totalIncome, totalExpenses),
             const SizedBox(height: 16),
             _buildBudgetCard(totalExpenses.abs()),
+            const SizedBox(height: 16),
+            _buildDashboardCharts(filtered),
             const SizedBox(height: 16),
           ] else if (_section == ToshlSection.expenses) ...[
             _buildSectionSummary(AppLocalizations.of(context)!.totalExpenses, totalExpenses.abs(), const Color(0xFFFF7A5A)),
@@ -1197,36 +1500,29 @@ class _HomeViewState extends ConsumerState<HomeView> {
                 child: Icon(getCategoryIcon(cat.icon), size: 18, color: getCategoryColor(cat.color)),
               ),
               const SizedBox(width: 12),
-              Expanded(
-                child: Row(
-                  children: [
-                    Flexible(
-                      child: Text(
-                        CategoryLocalizer.getLocalizedName(context, cat.name),
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                          fontSize: 16,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    if (tx.description != null && tx.description!.trim().isNotEmpty) ...[
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          tx.description!,
-                          style: const TextStyle(
-                            color: Colors.grey,
-                            fontSize: 14,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ],
+              Text(
+                CategoryLocalizer.getLocalizedName(context, cat.name),
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  fontSize: 16,
                 ),
               ),
+              if (tx.description != null && tx.description!.trim().isNotEmpty) ...[
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    tx.description!,
+                    style: const TextStyle(
+                      color: Colors.grey,
+                      fontSize: 14,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ] else ...[
+                const Spacer(),
+              ],
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 mainAxisSize: MainAxisSize.min,

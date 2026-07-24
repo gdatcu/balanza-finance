@@ -181,5 +181,32 @@
   "categoryGadgets": "Electronice & IT",
   "categoryTravel": "Călătorii & Vacanțe",
   "categoryPersonalCare": "Îngrijire Personală",
-  "categoryEducation": "Educație & Dezvoltare"
+  "categoryEducation": "Educație & Dezvoltare",
+  "breakdownTitle": "📊 Distribuție",
+  "burnRateTitle": "🔥 Ritm de Consum",
+  "burnRateLabel": "Ritm de Consum: {percentage}%",
+  "@burnRateLabel": {
+    "placeholders": {
+      "percentage": {
+        "type": "String"
+      }
+    }
+  },
+  "safeToSpend": "Disponibil: {amount}",
+  "@safeToSpend": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "overspentBy": "Depășit cu: {amount}",
+  "@overspentBy": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "totalSpent": "Total Cheltuit"
 }

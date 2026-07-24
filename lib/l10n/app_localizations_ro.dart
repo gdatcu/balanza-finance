@@ -447,4 +447,28 @@ class AppLocalizationsRo extends AppLocalizations {
 
   @override
   String get categoryEducation => 'Educație & Dezvoltare';
+
+  @override
+  String get breakdownTitle => '📊 Distribuție';
+
+  @override
+  String get burnRateTitle => '🔥 Ritm de Consum';
+
+  @override
+  String burnRateLabel(String percentage) {
+    return 'Ritm de Consum: $percentage%';
+  }
+
+  @override
+  String safeToSpend(String amount) {
+    return 'Disponibil: $amount';
+  }
+
+  @override
+  String overspentBy(String amount) {
+    return 'Depășit cu: $amount';
+  }
+
+  @override
+  String get totalSpent => 'Total Cheltuit';
 }
