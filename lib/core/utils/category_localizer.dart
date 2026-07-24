@@ -58,6 +58,34 @@ class CategoryLocalizer {
       case 'side hustle / extra':
       case 'proiecte extra':
         return 'Side Hustle / Extra';
+      case 'clothing':
+      case 'clothing & fashion':
+      case 'îmbrăcăminte':
+      case 'imbracaminte':
+        return 'Clothing & Fashion';
+      case 'healthcare':
+      case 'health & medical':
+      case 'sănătate & farmacii':
+      case 'sanatate & farmacii':
+        return 'Health & Medical';
+      case 'gadgets':
+      case 'gadgets & tech':
+      case 'electronice & it':
+        return 'Gadgets & Tech';
+      case 'travel':
+      case 'travel & holidays':
+      case 'călătorii & vacanțe':
+      case 'calatorii & vacante':
+        return 'Travel & Holidays';
+      case 'personal_care':
+      case 'personal care':
+      case 'îngrijire personală':
+      case 'ingrijire personala':
+        return 'Personal Care';
+      case 'education':
+      case 'educație & dezvoltare':
+      case 'educatie & dezvoltare':
+        return 'Education';
       default:
         return name;
     }
@@ -68,13 +96,16 @@ class CategoryLocalizer {
       case 'food':
         return 'Mâncare';
       case 'transport':
-        return 'Transport';
+      case 'transport & auto':
+        return 'Transport & Auto';
       case 'rent':
         return 'Chirie';
       case 'utilities':
         return 'Utilități';
       case 'entertainment':
-        return 'Divertisment';
+      case 'divertisment & cultură':
+      case 'divertisment & cultura':
+        return 'Divertisment & Cultură';
       case 'shopping':
         return 'Cumpărături';
       case 'salary':
@@ -119,6 +150,34 @@ class CategoryLocalizer {
       case 'side hustle / extra':
       case 'proiecte extra':
         return 'Proiecte Extra';
+      case 'clothing':
+      case 'clothing & fashion':
+      case 'îmbrăcăminte':
+      case 'imbracaminte':
+        return 'Îmbrăcăminte';
+      case 'healthcare':
+      case 'health & medical':
+      case 'sănătate & farmacii':
+      case 'sanatate & farmacii':
+        return 'Sănătate & Farmacii';
+      case 'gadgets':
+      case 'gadgets & tech':
+      case 'electronice & it':
+        return 'Electronice & IT';
+      case 'travel':
+      case 'travel & holidays':
+      case 'călătorii & vacanțe':
+      case 'calatorii & vacante':
+        return 'Călătorii & Vacanțe';
+      case 'personal_care':
+      case 'personal care':
+      case 'îngrijire personală':
+      case 'ingrijire personala':
+        return 'Îngrijire Personală';
+      case 'education':
+      case 'educație & dezvoltare':
+      case 'educatie & dezvoltare':
+        return 'Educație & Dezvoltare';
       default:
         return name;
     }
@@ -130,12 +189,15 @@ class CategoryLocalizer {
       case 'food':
         return localizations.categoryFood;
       case 'transport':
+      case 'transport & auto':
         return localizations.categoryTransport;
       case 'rent':
         return localizations.categoryRent;
       case 'utilities':
         return localizations.categoryUtilities;
       case 'entertainment':
+      case 'divertisment & cultură':
+      case 'divertisment & cultura':
         return localizations.categoryEntertainment;
       case 'shopping':
         return localizations.categoryShopping;
@@ -181,6 +243,34 @@ class CategoryLocalizer {
       case 'side hustle / extra':
       case 'proiecte extra':
         return localizations.categorySideHustle;
+      case 'clothing':
+      case 'clothing & fashion':
+      case 'îmbrăcăminte':
+      case 'imbracaminte':
+        return localizations.categoryClothing;
+      case 'healthcare':
+      case 'health & medical':
+      case 'sănătate & farmacii':
+      case 'sanatate & farmacii':
+        return localizations.categoryHealthcare;
+      case 'gadgets':
+      case 'gadgets & tech':
+      case 'electronice & it':
+        return localizations.categoryGadgets;
+      case 'travel':
+      case 'travel & holidays':
+      case 'călătorii & vacanțe':
+      case 'calatorii & vacante':
+        return localizations.categoryTravel;
+      case 'personal_care':
+      case 'personal care':
+      case 'îngrijire personală':
+      case 'ingrijire personala':
+        return localizations.categoryPersonalCare;
+      case 'education':
+      case 'educație & dezvoltare':
+      case 'educatie & dezvoltare':
+        return localizations.categoryEducation;
       default:
         return name;
     }

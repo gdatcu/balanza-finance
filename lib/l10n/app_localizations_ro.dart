@@ -429,4 +429,22 @@ class AppLocalizationsRo extends AppLocalizations {
 
   @override
   String get addCategoryBudget => 'Adaugă Buget pe Categorie';
+
+  @override
+  String get categoryClothing => 'Îmbrăcăminte';
+
+  @override
+  String get categoryHealthcare => 'Sănătate & Farmacii';
+
+  @override
+  String get categoryGadgets => 'Electronice & IT';
+
+  @override
+  String get categoryTravel => 'Călătorii & Vacanțe';
+
+  @override
+  String get categoryPersonalCare => 'Îngrijire Personală';
+
+  @override
+  String get categoryEducation => 'Educație & Dezvoltare';
 }

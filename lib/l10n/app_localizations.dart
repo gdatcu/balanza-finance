@@ -883,6 +883,13 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Add Category Budget'**
   String get addCategoryBudget;
+
+  String get categoryClothing;
+  String get categoryHealthcare;
+  String get categoryGadgets;
+  String get categoryTravel;
+  String get categoryPersonalCare;
+  String get categoryEducation;
 }
 
 class _AppLocalizationsDelegate

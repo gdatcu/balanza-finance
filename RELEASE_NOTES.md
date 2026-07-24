@@ -1,23 +1,38 @@
-# Balanza Finance v1.10.3 Release Notes
+# Release Notes — v1.11.0
 
-## 🐛 Bug Fixes
+## ✨ New Features
 
-### 🎯 Fixed Double-Counting Bug in Category Spending Calculation
-- Resolved a critical issue in `categoryBudgetProgressProvider` where transaction amounts were double-counted across multiple map keys (`catObj.id`, `rawCatId`), causing a single 1000 RON transaction to display as 2000 RON spent in the Category Budget progress card.
-- Standardized category spending accumulation strictly by canonical category ID (`catObj.id`).
+### Extended Discretionary & Lifestyle Categories
+- Added **8 new financial categories** for comprehensive expense tracking:
+  - 👕 **Clothing & Fashion** (Îmbrăcăminte)
+  - 💊 **Health & Medical** (Sănătate & Farmacii)
+  - 💻 **Gadgets & Tech** (Electronice & IT)
+  - ✈️ **Travel & Holidays** (Călătorii & Vacanțe)
+  - 🎭 **Entertainment** (Divertisment & Cultură)
+  - 🚗 **Transport & Auto** (Transport & Auto)
+  - 🧴 **Personal Care** (Îngrijire Personală)
+  - 📚 **Education** (Educație & Dezvoltare)
+- Full **EN/RO localization** for all new categories.
+- New categories appear in transaction forms, budget setup, and dashboard charts.
 
-### ⚡ Real-Time Category Budget Reflection
-- Added `ref.invalidate(categoryBudgetsStreamProvider);` immediately following budget `upsert` and `delete` operations in `CategoryBudgetInputSheet`.
-- Newly added, edited, or deleted category budgets now update on the Dashboard in real time without requiring a manual page refresh.
+### Smart Budget Suggestion Engine
+- New `SmartBudgetProvider` with target maximum budget percentages per category:
+  - Groceries 25%, Rent 30%, Utilities 10%, Transport 10%, Credit Installments 15%, Clothing/Entertainment/Healthcare/Gadgets/Travel/Personal Care/Education 5% each, Coffee & Tea 3%, Restaurants 8%, Subscriptions 3%.
+- Automatically calculates suggested budget limits based on user income.
 
-### 🎨 Visual Progress Bars & Bottom Sheet Budget Editor
-- Upgraded the **Budgets** section (`ToshlSection.budgets`) on the Dashboard with visual progress bars:
-  - 🟢 **Green** (`#10B981`): 0% – 75% used
-  - 🟡 **Yellow/Orange** (`#F59E0B`): 75% – 99% used
-  - 🔴 **Red** (`#FF7A5A`): 100%+ used (Over budget)
-- Added explicit spending math (e.g. `350 / 500 RON`) with multi-currency support.
-- Built interactive `CategoryBudgetInputSheet` bottom sheet to set or update category limits with localized category selectors.
+### 3 New Wealth Advisor Behavioral Rules
+- **⏱ Time Cost Rule**: Alerts when a single Clothing or Gadgets purchase exceeds 8 hours of labor (hourlyRate = monthlyIncome / 160). Helps visualize expenses in work-hours.
+- **🎓 Positive Reinforcement (Education)**: Congratulates the user when an Education transaction is logged — investing in learning is the highest-return asset.
+- **✈️ Travel Sinking Fund Rule**: Suggests creating a dedicated monthly travel sinking fund when travel expenses exceed 10% of monthly income.
 
-### 💡 Wealth Advisor Integration
-- Enhanced `wealth_advisor_provider.dart` to evaluate category spending against user-configured category budget limits.
-- Automatically triggers localized EN/RO **Notice (80% Warning)** and **Budget Alert (100% Over Budget)** nudges.
+## 🧪 Testing
+- Added comprehensive unit tests for:
+  - Extended category data model validation (all 8 categories present with correct icons).
+  - Smart budget percentage calculations.
+  - All 3 new Wealth Advisor behavioral rules with proper provider isolation.
+- All **48 tests passing**, `flutter analyze` clean with 0 issues.
+
+## 🏗 Backend / Architecture
+- New file: `lib/features/budgets/providers/smart_budget_provider.dart`
+- Updated: `wealth_advisor_provider.dart` with 3 new behavioral nudge rules.
+- Fixed duplicate localization keys (`categoryEntertainment`, `categoryTransport`) that were already defined in earlier entries.

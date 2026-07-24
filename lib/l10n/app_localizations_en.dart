@@ -427,4 +427,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get addCategoryBudget => 'Add Category Budget';
+
+  @override
+  String get categoryClothing => 'Clothing & Fashion';
+
+  @override
+  String get categoryHealthcare => 'Health & Medical';
+
+  @override
+  String get categoryGadgets => 'Gadgets & Tech';
+
+  @override
+  String get categoryTravel => 'Travel & Holidays';
+
+  @override
+  String get categoryPersonalCare => 'Personal Care';
+
+  @override
+  String get categoryEducation => 'Education';
 }

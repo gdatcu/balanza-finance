@@ -454,6 +454,144 @@ final wealthAdvisorProvider = Provider<WealthAdvisorState?>((ref) {
     }
   }
 
+  // H. Time Cost Rule (Clothing / Gadgets > 8 hours of work time)
+  final double totalMonthlyIncome = salaryIncome + sideHustleIncome + mealTicketsIncome;
+  final double baseIncomeForRate = totalMonthlyIncome > 0 ? totalMonthlyIncome : monthlyBudget;
+  final double hourlyRate = baseIncomeForRate / 160.0;
+
+  Transaction? highTimeCostTx;
+  double highTimeCostHours = 0.0;
+  String highTimeCostCatName = '';
+
+  for (final tx in transactions) {
+    if (tx.amount < 0) {
+      final cat = defaultCategories.firstWhere(
+        (c) => c.id == tx.categoryId,
+        orElse: () => Category(
+          id: tx.categoryId ?? 'uncategorized',
+          name: tx.categoryId == null ? 'other' : 'uncategorized',
+          createdAt: DateTime.now(),
+        ),
+      );
+      final catName = cat.name.toLowerCase();
+      if (catName == 'clothing' || catName == 'gadgets') {
+        final hours = tx.amount.abs() / (hourlyRate > 0 ? hourlyRate : 50.0);
+        if (hours > 8.0 && hours > highTimeCostHours) {
+          highTimeCostTx = tx;
+          highTimeCostHours = hours;
+          highTimeCostCatName = catName == 'clothing' ? 'Clothing' : 'Gadgets';
+        }
+      }
+    }
+  }
+
+  if (highTimeCostTx != null) {
+    const nudgeId = 'nudge_time_cost';
+    if (!dismissedIds.contains(nudgeId)) {
+      final amountStr = CurrencyFormatter.format(highTimeCostTx.amount.abs());
+      final hoursStr = highTimeCostHours.toStringAsFixed(1);
+      final en = 'Time Check: A purchase of $amountStr in $highTimeCostCatName cost over $hoursStr hours of work! Consider if this purchase delivers lasting value.';
+      final ro = 'Verificarea Timpului: O achiziție de $amountStr la $highTimeCostCatName te-a costat peste $hoursStr ore de muncă! Verifică dacă această achiziție îți aduce valoare durabilă.';
+      candidates.add(
+        WealthAdvisorState(
+          id: nudgeId,
+          title: 'BEHAVIORAL NUDGE • TIME CHECK ($hoursStr hrs)',
+          titleEn: 'BEHAVIORAL NUDGE • TIME CHECK ($hoursStr hrs)',
+          titleRo: 'RECOMANDARE COMPORTAMENTALĂ • VERIFICAREA TIMPULUI ($hoursStr ore)',
+          message: en,
+          textEn: en,
+          textRo: ro,
+          icon: Icons.access_time_rounded,
+          type: AdvisorType.nudge,
+          severity: NudgeSeverity.warning,
+        ),
+      );
+    }
+  }
+
+  // I. Positive Reinforcement Rule (Education transaction logged)
+  bool hasEducationTx = false;
+  for (final tx in transactions) {
+    final cat = defaultCategories.firstWhere(
+      (c) => c.id == tx.categoryId,
+      orElse: () => Category(
+        id: tx.categoryId ?? 'uncategorized',
+        name: tx.categoryId == null ? 'other' : 'uncategorized',
+        createdAt: DateTime.now(),
+      ),
+    );
+    final catName = cat.name.toLowerCase();
+    if (catName == 'education' || catName == 'educație & dezvoltare' || catName == 'educatie & dezvoltare') {
+      hasEducationTx = true;
+      break;
+    }
+  }
+
+  if (hasEducationTx) {
+    const nudgeId = 'nudge_education_self_investment';
+    if (!dismissedIds.contains(nudgeId)) {
+      const en = 'Self-Investment: Congratulations on investing in your education! Up-skilling and continuous learning are the highest-return assets in your portfolio.';
+      const ro = 'Investiție în Tine: Felicitări pentru investiția în educația și dezvoltarea ta! Perfecționarea continuă este cel mai rentabil activ din portofoliul tău.';
+      candidates.add(
+        const WealthAdvisorState(
+          id: nudgeId,
+          title: 'POSITIVE REINFORCEMENT • SELF-INVESTMENT',
+          titleEn: 'POSITIVE REINFORCEMENT • SELF-INVESTMENT',
+          titleRo: 'RECOMANDARE POZITIVĂ • INVESTIȚIE ÎN TINE',
+          message: en,
+          textEn: en,
+          textRo: ro,
+          icon: Icons.school,
+          type: AdvisorType.nudge,
+          severity: NudgeSeverity.info,
+        ),
+      );
+    }
+  }
+
+  // J. Sinking Fund Rule (Travel > 10% Income)
+  double travelSpending = 0.0;
+  for (final tx in transactions) {
+    if (tx.amount < 0) {
+      final cat = defaultCategories.firstWhere(
+        (c) => c.id == tx.categoryId,
+        orElse: () => Category(
+          id: tx.categoryId ?? 'uncategorized',
+          name: tx.categoryId == null ? 'other' : 'uncategorized',
+          createdAt: DateTime.now(),
+        ),
+      );
+      final catName = cat.name.toLowerCase();
+      if (catName == 'travel' || catName == 'călătorii & vacanțe' || catName == 'calatorii & vacante') {
+        travelSpending += tx.amount.abs();
+      }
+    }
+  }
+
+  final double incomeThreshold = baseIncomeForRate * 0.10;
+  if (travelSpending > 0 && travelSpending > incomeThreshold) {
+    const nudgeId = 'nudge_travel_sinking_fund';
+    if (!dismissedIds.contains(nudgeId)) {
+      final travelStr = CurrencyFormatter.format(travelSpending);
+      final en = 'Sinking Fund: Your travel expense ($travelStr) exceeded 10% of your monthly income. Setting up a dedicated monthly travel sinking fund will keep your holiday plans stress-free.';
+      final ro = 'Fond de Rulaj: Cheltuiala ta de călătorie ($travelStr) a depășit 10% din venitul lunar. Crearea unui fond lunar dedicat pentru vacanțe te va ajuta să călătorești fără stres financiar.';
+      candidates.add(
+        WealthAdvisorState(
+          id: nudgeId,
+          title: 'BEHAVIORAL NUDGE • TRAVEL SINKING FUND',
+          titleEn: 'BEHAVIORAL NUDGE • TRAVEL SINKING FUND',
+          titleRo: 'RECOMANDARE COMPORTAMENTALĂ • FOND DE RULAJ VACANȚE',
+          message: en,
+          textEn: en,
+          textRo: ro,
+          icon: Icons.flight_takeoff,
+          type: AdvisorType.nudge,
+          severity: NudgeSeverity.info,
+        ),
+      );
+    }
+  }
+
   // 3. Evaluate Multi-Category Behavioral Nudges based on recent transaction text / keywords
   final sortedTx = List<Transaction>.from(transactions)
     ..sort((a, b) => b.date.compareTo(a.date));

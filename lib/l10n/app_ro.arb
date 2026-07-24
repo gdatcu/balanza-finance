@@ -175,5 +175,11 @@
   "noCategoryBudgetsYet": "Nu există bugete de categorie configurate. Setează un buget pentru a-ți monitoriza ritmul de cheltuieli!",
   "deleteBudgetTitle": "Ștergi bugetul?",
   "confirmDeleteBudget": "Ești sigur că vrei să elimini această limită de buget pentru categorie?",
-  "addCategoryBudget": "Adaugă Buget pe Categorie"
+  "addCategoryBudget": "Adaugă Buget pe Categorie",
+  "categoryClothing": "Îmbrăcăminte",
+  "categoryHealthcare": "Sănătate & Farmacii",
+  "categoryGadgets": "Electronice & IT",
+  "categoryTravel": "Călătorii & Vacanțe",
+  "categoryPersonalCare": "Îngrijire Personală",
+  "categoryEducation": "Educație & Dezvoltare"
 }

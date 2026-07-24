@@ -135,6 +135,70 @@ final List<Category> defaultCategories = [
     isIncome: true,
     createdAt: DateTime.now(),
   ),
+  Category(
+    id: '00000000-0000-0000-0000-000000000c19',
+    name: 'clothing',
+    icon: 'checkroom',
+    color: '#EC4899',
+    isIncome: false,
+    createdAt: DateTime.now(),
+  ),
+  Category(
+    id: '00000000-0000-0000-0000-000000000c20',
+    name: 'healthcare',
+    icon: 'medical_services',
+    color: '#EF4444',
+    isIncome: false,
+    createdAt: DateTime.now(),
+  ),
+  Category(
+    id: '00000000-0000-0000-0000-000000000c21',
+    name: 'gadgets',
+    icon: 'devices',
+    color: '#3B82F6',
+    isIncome: false,
+    createdAt: DateTime.now(),
+  ),
+  Category(
+    id: '00000000-0000-0000-0000-000000000c22',
+    name: 'travel',
+    icon: 'flight_takeoff',
+    color: '#06B6D4',
+    isIncome: false,
+    createdAt: DateTime.now(),
+  ),
+  Category(
+    id: '00000000-0000-0000-0000-000000000c23',
+    name: 'entertainment',
+    icon: 'theater_comedy',
+    color: '#8B5CF6',
+    isIncome: false,
+    createdAt: DateTime.now(),
+  ),
+  Category(
+    id: '00000000-0000-0000-0000-000000000c24',
+    name: 'transport',
+    icon: 'directions_car',
+    color: '#F59E0B',
+    isIncome: false,
+    createdAt: DateTime.now(),
+  ),
+  Category(
+    id: '00000000-0000-0000-0000-000000000c25',
+    name: 'personal_care',
+    icon: 'spa',
+    color: '#14B8A6',
+    isIncome: false,
+    createdAt: DateTime.now(),
+  ),
+  Category(
+    id: '00000000-0000-0000-0000-000000000c26',
+    name: 'education',
+    icon: 'school',
+    color: '#6366F1',
+    isIncome: false,
+    createdAt: DateTime.now(),
+  ),
 ];
 
 final List<Category> expenseCategories =
@@ -148,6 +212,7 @@ IconData getCategoryIcon(String? iconName) {
     case 'lunch_dining':
       return Icons.lunch_dining;
     case 'directions_car':
+    case 'transport':
       return Icons.directions_car;
     case 'home':
       return Icons.home;
@@ -159,6 +224,8 @@ IconData getCategoryIcon(String? iconName) {
     case 'salary':
       return Icons.payments;
     case 'sports_esports':
+    case 'theater_comedy':
+    case 'entertainment':
       return Icons.sports_esports;
     case 'shopping_bag':
       return Icons.shopping_bag;
@@ -196,6 +263,24 @@ IconData getCategoryIcon(String? iconName) {
     case 'rocket_launch':
     case 'side_hustle':
       return Icons.rocket_launch;
+    case 'checkroom':
+    case 'clothing':
+      return Icons.checkroom;
+    case 'medical_services':
+    case 'healthcare':
+      return Icons.medical_services;
+    case 'devices':
+    case 'gadgets':
+      return Icons.devices;
+    case 'flight_takeoff':
+    case 'travel':
+      return Icons.flight_takeoff;
+    case 'spa':
+    case 'personal_care':
+      return Icons.spa;
+    case 'school':
+    case 'education':
+      return Icons.school;
     default:
       return Icons.category;
   }
