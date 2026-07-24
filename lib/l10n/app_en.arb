@@ -168,5 +168,12 @@
   "edit": "Edit",
   "editTransaction": "Edit Transaction",
   "transactionUpdatedSuccessfully": "Transaction updated successfully!",
-  "noNote": "No note provided"
+  "noNote": "No note provided",
+  "setCategoryBudget": "Set Category Budget",
+  "editCategoryBudget": "Edit Category Budget",
+  "categoryBudget": "Category Budget",
+  "noCategoryBudgetsYet": "No category budgets configured yet. Set a budget to track spending pacing!",
+  "deleteBudgetTitle": "Delete Budget?",
+  "confirmDeleteBudget": "Are you sure you want to remove this category budget limit?",
+  "addCategoryBudget": "+ Add Category Budget"
 }

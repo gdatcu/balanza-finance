@@ -18,6 +18,8 @@ import '../../settings/presentation/settings_view.dart';
 import '../../settings/providers/locale_provider.dart';
 import '../../settings/providers/updater_provider.dart';
 import '../../net_worth/presentation/net_worth_view.dart';
+import '../../budgets/providers/category_budget_progress_provider.dart';
+import '../../budgets/presentation/category_budget_input_sheet.dart';
 
 enum ToshlSection {
   overview,
@@ -517,6 +519,8 @@ class _HomeViewState extends ConsumerState<HomeView> {
           ] else if (_section == ToshlSection.budgets) ...[
             _buildBudgetCard(totalExpenses.abs()),
             const SizedBox(height: 16),
+            _buildCategoryBudgetsSection(),
+            const SizedBox(height: 16),
           ],
 
           if (filtered.isEmpty)
@@ -951,6 +955,175 @@ class _HomeViewState extends ConsumerState<HomeView> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildCategoryBudgetsSection() {
+    final categoryBudgets = ref.watch(categoryBudgetProgressProvider);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                AppLocalizations.of(context)!.categoryBudget,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              TextButton.icon(
+                onPressed: () {
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    backgroundColor: const Color(0xFF1E293B),
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                    ),
+                    builder: (_) => const CategoryBudgetInputSheet(),
+                  );
+                },
+                icon: const Icon(Icons.add, size: 18, color: Color(0xFFFF7A5A)),
+                label: Text(
+                  AppLocalizations.of(context)!.addCategoryBudget,
+                  style: const TextStyle(
+                    color: Color(0xFFFF7A5A),
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        if (categoryBudgets.isEmpty)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Card(
+              color: const Color(0xFF1E293B),
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+                side: BorderSide(color: Colors.white.withValues(alpha: 0.05)),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Center(
+                  child: Text(
+                    AppLocalizations.of(context)!.noCategoryBudgetsYet,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(color: Colors.grey, fontSize: 14),
+                  ),
+                ),
+              ),
+            ),
+          )
+        else
+          ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: categoryBudgets.length,
+            itemBuilder: (context, index) {
+              final item = categoryBudgets[index];
+              final catColor = getCategoryColor(item.category.color);
+              final catIcon = getCategoryIcon(item.category.icon);
+              final localizedName = CategoryLocalizer.getLocalizedName(context, item.category.name);
+
+              Color progressColor = const Color(0xFF10B981); // Green 0-75%
+              if (item.percentageUsed >= 100) {
+                progressColor = const Color(0xFFFF7A5A); // Red 100%+
+              } else if (item.percentageUsed >= 75) {
+                progressColor = const Color(0xFFF59E0B); // Yellow/Orange 75-99%
+              }
+
+              final progressVal = (item.percentageUsed / 100.0).clamp(0.0, 1.0);
+
+              return Card(
+                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                color: const Color(0xFF1E293B),
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  side: BorderSide(color: Colors.white.withValues(alpha: 0.05)),
+                ),
+                child: InkWell(
+                  onTap: () {
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      backgroundColor: const Color(0xFF1E293B),
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                      ),
+                      builder: (_) => CategoryBudgetInputSheet(budgetToEdit: item.budget),
+                    );
+                  },
+                  borderRadius: BorderRadius.circular(16),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            CircleAvatar(
+                              radius: 16,
+                              backgroundColor: catColor.withValues(alpha: 0.2),
+                              child: Icon(catIcon, size: 18, color: catColor),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                localizedName,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ),
+                            Text(
+                              '${item.percentageUsed.toStringAsFixed(0)}%',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: progressColor,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: LinearProgressIndicator(
+                            value: progressVal,
+                            minHeight: 8,
+                            backgroundColor: Colors.white12,
+                            valueColor: AlwaysStoppedAnimation<Color>(progressColor),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          '${CurrencyFormatter.format(item.currentSpent)} / ${CurrencyFormatter.format(item.amountLimit)}',
+                          style: const TextStyle(
+                            color: Colors.grey,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+      ],
     );
   }
 

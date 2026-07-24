@@ -406,4 +406,27 @@ class AppLocalizationsRo extends AppLocalizations {
 
   @override
   String get noNote => 'Fără notă';
+
+  @override
+  String get setCategoryBudget => 'Setează Buget pe Categorie';
+
+  @override
+  String get editCategoryBudget => 'Editează Bugetul Categoriei';
+
+  @override
+  String get categoryBudget => 'Buget Categorie';
+
+  @override
+  String get noCategoryBudgetsYet =>
+      'Nu există bugete de categorie configurate. Setează un buget pentru a-ți monitoriza ritmul de cheltuieli!';
+
+  @override
+  String get deleteBudgetTitle => 'Ștergi bugetul?';
+
+  @override
+  String get confirmDeleteBudget =>
+      'Ești sigur că vrei să elimini această limită de buget pentru categorie?';
+
+  @override
+  String get addCategoryBudget => '+ Adaugă Buget pe Categorie';
 }

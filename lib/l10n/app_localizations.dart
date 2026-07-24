@@ -841,6 +841,27 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No note provided'**
   String get noNote;
+
+  /// **'Set Category Budget'**
+  String get setCategoryBudget;
+
+  /// **'Edit Category Budget'**
+  String get editCategoryBudget;
+
+  /// **'Category Budget'**
+  String get categoryBudget;
+
+  /// **'No category budgets configured yet. Set a budget to track spending pacing!'**
+  String get noCategoryBudgetsYet;
+
+  /// **'Delete Budget?'**
+  String get deleteBudgetTitle;
+
+  /// **'Are you sure you want to remove this category budget limit?'**
+  String get confirmDeleteBudget;
+
+  /// **'+ Add Category Budget'**
+  String get addCategoryBudget;
 }
 
 class _AppLocalizationsDelegate

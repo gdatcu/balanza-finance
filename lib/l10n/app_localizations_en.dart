@@ -404,4 +404,27 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noNote => 'No note provided';
+
+  @override
+  String get setCategoryBudget => 'Set Category Budget';
+
+  @override
+  String get editCategoryBudget => 'Edit Category Budget';
+
+  @override
+  String get categoryBudget => 'Category Budget';
+
+  @override
+  String get noCategoryBudgetsYet =>
+      'No category budgets configured yet. Set a budget to track spending pacing!';
+
+  @override
+  String get deleteBudgetTitle => 'Delete Budget?';
+
+  @override
+  String get confirmDeleteBudget =>
+      'Are you sure you want to remove this category budget limit?';
+
+  @override
+  String get addCategoryBudget => '+ Add Category Budget';
 }

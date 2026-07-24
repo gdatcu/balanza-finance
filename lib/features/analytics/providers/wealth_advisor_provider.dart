@@ -6,6 +6,8 @@ import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/category_localizer.dart';
 import '../../transactions/providers/transaction_provider.dart';
 import '../../transactions/presentation/categories_data.dart';
+import '../../budgets/repositories/category_budget_repository.dart';
+import '../../../models/category_budget.dart';
 import '../models/advisor_nudge.dart';
 
 /// Enum representing type of advice: Insight vs. Nudge
@@ -83,6 +85,11 @@ final wealthAdvisorProvider = Provider<WealthAdvisorState?>((ref) {
   final List<WealthAdvisorState> candidates = [];
 
   // 1. Evaluate universal category budget thresholds (Warning at 80% usage, Alert at 100%, Safe at <50%)
+  final categoryBudgets = ref.watch(categoryBudgetsStreamProvider).value ?? <CategoryBudget>[];
+  final Map<String, double> customCategoryLimits = {
+    for (final b in categoryBudgets) b.category: b.amountLimit,
+  };
+
   final Map<String, double> categoryExpenses = {};
   for (final tx in transactions) {
     if (tx.amount < 0) {
@@ -91,7 +98,7 @@ final wealthAdvisorProvider = Provider<WealthAdvisorState?>((ref) {
     }
   }
 
-  final double categoryBudgetLimit = monthlyBudget > 0 ? (monthlyBudget / 3.0) : 300.0;
+  final double fallbackLimit = monthlyBudget > 0 ? (monthlyBudget / 3.0) : 300.0;
 
   categoryExpenses.forEach((catId, spentAmount) {
     final catObj = defaultCategories.firstWhere(
@@ -100,6 +107,12 @@ final wealthAdvisorProvider = Provider<WealthAdvisorState?>((ref) {
     );
     final categoryNameEn = CategoryLocalizer.getCategoryNameEn(catObj.name);
     final categoryNameRo = CategoryLocalizer.getCategoryNameRo(catObj.name);
+
+    final double categoryBudgetLimit = customCategoryLimits[catObj.id] ??
+        customCategoryLimits[catObj.name] ??
+        customCategoryLimits[catId] ??
+        fallbackLimit;
+
     final pct = (spentAmount / categoryBudgetLimit) * 100;
 
     if (pct >= 100) {
