@@ -114,8 +114,9 @@ class _CategoryBudgetInputSheetState extends ConsumerState<CategoryBudgetInputSh
               ),
               const SizedBox(height: 20),
 
-              // Category Selector Dropdown
+              // ignore: deprecated_member_use
               DropdownButtonFormField<String>(
+                // ignore: deprecated_member_use
                 value: defaultCategories.any((c) => c.id == _selectedCategory)
                     ? _selectedCategory
                     : defaultCategories.first.id,

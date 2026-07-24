@@ -842,24 +842,45 @@ abstract class AppLocalizations {
   /// **'No note provided'**
   String get noNote;
 
+  /// No description provided for @setCategoryBudget.
+  ///
+  /// In en, this message translates to:
   /// **'Set Category Budget'**
   String get setCategoryBudget;
 
+  /// No description provided for @editCategoryBudget.
+  ///
+  /// In en, this message translates to:
   /// **'Edit Category Budget'**
   String get editCategoryBudget;
 
+  /// No description provided for @categoryBudget.
+  ///
+  /// In en, this message translates to:
   /// **'Category Budget'**
   String get categoryBudget;
 
+  /// No description provided for @noCategoryBudgetsYet.
+  ///
+  /// In en, this message translates to:
   /// **'No category budgets configured yet. Set a budget to track spending pacing!'**
   String get noCategoryBudgetsYet;
 
+  /// No description provided for @deleteBudgetTitle.
+  ///
+  /// In en, this message translates to:
   /// **'Delete Budget?'**
   String get deleteBudgetTitle;
 
+  /// No description provided for @confirmDeleteBudget.
+  ///
+  /// In en, this message translates to:
   /// **'Are you sure you want to remove this category budget limit?'**
   String get confirmDeleteBudget;
 
+  /// No description provided for @addCategoryBudget.
+  ///
+  /// In en, this message translates to:
   /// **'+ Add Category Budget'**
   String get addCategoryBudget;
 }

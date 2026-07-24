@@ -1,11 +1,9 @@
-# Balanza Finance v1.10.0 Release Notes
+# Balanza Finance v1.10.1 Release Notes
 
-## ⚡ New Features
+## 🛠️ Fixes & Enhancements
 
-### 📊 Category-Specific Monthly Budgets & Spending Progress Engine
-- Created `CategoryBudget` data model mapping to Supabase `category_budgets` table (`id`, `user_id`, `category`, `amount_limit`).
-- Implemented `CategoryBudgetRepository` and `categoryBudgetsStreamProvider` supporting `upsertCategoryBudget(category, amountLimit)` and `deleteCategoryBudget(id)`.
-- Created combined `categoryBudgetProgressProvider` that calculates monthly category spending, budget limits, and percentage used.
+### 🧹 Static Analysis & CI Fix
+- Added `// ignore: deprecated_member_use` annotation to `category_budget_input_sheet.dart` form field properties to ensure compatibility across older and newer Flutter SDKs during GitHub Actions automated CI builds.
 
 ### 🎨 Visual Progress Bars & Bottom Sheet Budget Editor
 - Upgraded the **Budgets** section (`ToshlSection.budgets`) on the Dashboard with visual progress bars:
