@@ -393,18 +393,17 @@ class _AddNetWorthItemSheetState extends ConsumerState<AddNetWorthItemSheet> {
     final keyboardInset = MediaQuery.of(context).viewInsets.bottom;
     final activeColor = _isAsset ? const Color(0xFF10B981) : const Color(0xFFFF7A5A);
 
-    return Container(
-      padding: EdgeInsets.only(
-        left: 24,
-        right: 24,
-        top: 24,
-        bottom: 24 + keyboardInset,
-      ),
-      decoration: const BoxDecoration(
-        color: Color(0xFF1E293B), // Dark Slate
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      child: Form(
+    return Material(
+      color: const Color(0xFF1E293B), // Dark Slate
+      borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+      child: Padding(
+        padding: EdgeInsets.only(
+          left: 24,
+          right: 24,
+          top: 24,
+          bottom: 24 + keyboardInset,
+        ),
+        child: Form(
         key: _formKey,
         child: SingleChildScrollView(
           child: Column(
@@ -528,6 +527,7 @@ class _AddNetWorthItemSheetState extends ConsumerState<AddNetWorthItemSheet> {
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }
