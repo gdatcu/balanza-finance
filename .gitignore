@@ -20,6 +20,7 @@
 .pub-cache/
 .pub/
 /build/
+coverage/
 
 # Android
 .gradle/
