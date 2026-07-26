@@ -29,13 +29,12 @@ void main() {
       tester.view.resetDevicePixelRatio();
     });
 
-    SharedPreferences.setMockInitialValues({
-      'net_worth_items_local': [
-        '{"id":"asset-1","user_id":"u1","name":"Investment Portfolio","balance":45000.0,"type":"asset","created_at":"2026-07-26T12:00:00Z"}',
-        '{"id":"liab-1","user_id":"u1","name":"Car Loan","balance":10000.0,"type":"liability","created_at":"2026-07-26T12:00:00Z"}'
-      ]
-    });
+    SharedPreferences.setMockInitialValues({});
     final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList('net_worth_items_local', [
+      '{"id":"asset-1","user_id":"u1","name":"Investment Portfolio","balance":45000.0,"type":"asset","created_at":"2026-07-26T12:00:00Z"}',
+      '{"id":"liab-1","user_id":"u1","name":"Car Loan","balance":10000.0,"type":"liability","created_at":"2026-07-26T12:00:00Z"}'
+    ]);
     final mockSupabase = MockSupabaseClient();
     final repo = NetWorthRepository(mockSupabase, prefs);
 
