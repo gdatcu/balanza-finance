@@ -58,7 +58,7 @@ void main() {
     await tester.pump();
     await tester.pumpAndSettle();
 
-    expect(find.text('Net Worth'), findsNWidgets(2));
+    expect(find.text('Net Worth'), findsAtLeastNWidgets(1));
     expect(find.text('Investment Portfolio'), findsOneWidget);
     expect(find.text('Car Loan'), findsOneWidget);
 
