@@ -4,7 +4,6 @@ import 'package:integration_test/integration_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:balanza/l10n/app_localizations.dart';
 import 'package:balanza/main.dart';
 import 'package:balanza/models/transaction.dart';
 import 'package:balanza/models/category.dart';
