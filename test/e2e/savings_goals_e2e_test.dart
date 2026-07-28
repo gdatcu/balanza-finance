@@ -7,6 +7,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:balanza/main.dart';
 import 'package:balanza/features/transactions/providers/transaction_provider.dart';
 import 'package:balanza/features/savings_goals/providers/savings_goal_provider.dart';
+import 'package:balanza/features/savings_goals/presentation/savings_goal_input_sheet.dart';
+import 'package:balanza/features/savings_goals/presentation/deposit_withdraw_sheet.dart';
 import 'package:balanza/features/auth/providers/auth_provider.dart';
 import 'package:balanza/features/auth/providers/biometric_provider.dart';
 import 'app_e2e_test.dart';
@@ -83,7 +85,10 @@ void main() {
     await tester.enterText(targetField, '10000');
     await tester.enterText(currentField, '2500');
 
-    final submitBtn = find.byType(ElevatedButton);
+    final submitBtn = find.descendant(
+      of: find.byType(SavingsGoalInputSheet),
+      matching: find.byType(ElevatedButton),
+    );
     expect(submitBtn, findsOneWidget);
     await tester.tap(submitBtn);
     await tester.pumpAndSettle();
@@ -103,7 +108,11 @@ void main() {
     final depositAmountField = find.byType(TextFormField).first;
     await tester.enterText(depositAmountField, '500');
 
-    final modalDepositBtn = find.byType(ElevatedButton);
+    final modalDepositBtn = find.descendant(
+      of: find.byType(DepositWithdrawSheet),
+      matching: find.byType(ElevatedButton),
+    );
+    expect(modalDepositBtn, findsOneWidget);
     await tester.tap(modalDepositBtn);
     await tester.pumpAndSettle();
 
