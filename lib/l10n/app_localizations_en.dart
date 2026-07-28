@@ -469,4 +469,52 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get totalSpent => 'Total Spent';
+
+  @override
+  String get savingsGoals => 'Savings Goals';
+
+  @override
+  String get addSavingsGoal => 'Add Savings Goal';
+
+  @override
+  String get editSavingsGoal => 'Edit Savings Goal';
+
+  @override
+  String get deleteGoal => 'Delete Goal';
+
+  @override
+  String get targetAmount => 'Target Amount';
+
+  @override
+  String get currentAmount => 'Saved Amount';
+
+  @override
+  String get deposit => 'Deposit';
+
+  @override
+  String get withdraw => 'Withdraw';
+
+  @override
+  String get targetDate => 'Target Date';
+
+  @override
+  String get totalSaved => 'Total Saved';
+
+  @override
+  String get totalTarget => 'Total Target';
+
+  @override
+  String get projectionTitle => '🎯 Projection & Savings Pace';
+
+  @override
+  String get noGoalsYet =>
+      'No savings goals defined yet. Tap + to create your first goal!';
+
+  @override
+  String get goalReached => 'Goal Reached! 🎉';
+
+  @override
+  String remainingToSave(String amount) {
+    return '$amount remaining to target';
+  }
 }

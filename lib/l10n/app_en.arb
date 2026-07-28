@@ -208,5 +208,27 @@
       }
     }
   },
-  "totalSpent": "Total Spent"
+  "totalSpent": "Total Spent",
+  "savingsGoals": "Savings Goals",
+  "addSavingsGoal": "Add Savings Goal",
+  "editSavingsGoal": "Edit Savings Goal",
+  "deleteGoal": "Delete Goal",
+  "targetAmount": "Target Amount",
+  "currentAmount": "Saved Amount",
+  "deposit": "Deposit",
+  "withdraw": "Withdraw",
+  "targetDate": "Target Date",
+  "totalSaved": "Total Saved",
+  "totalTarget": "Total Target",
+  "projectionTitle": "🎯 Projection & Savings Pace",
+  "noGoalsYet": "No savings goals defined yet. Tap + to create your first goal!",
+  "goalReached": "Goal Reached! 🎉",
+  "remainingToSave": "{amount} remaining to target",
+  "@remainingToSave": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  }
 }

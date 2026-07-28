@@ -20,6 +20,7 @@ import '../../settings/presentation/settings_view.dart';
 import '../../settings/providers/locale_provider.dart';
 import '../../settings/providers/updater_provider.dart';
 import '../../net_worth/presentation/net_worth_view.dart';
+import '../../savings_goals/presentation/savings_goals_view.dart';
 import '../../budgets/providers/category_budget_progress_provider.dart';
 import '../../budgets/presentation/category_budget_input_sheet.dart';
 
@@ -645,6 +646,16 @@ class _HomeViewState extends ConsumerState<HomeView> {
                     Navigator.of(context).pop();
                     Navigator.of(context).push(
                       MaterialPageRoute(builder: (context) => const NetWorthView()),
+                    );
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.savings, color: Color(0xFF10B981)),
+                  title: Text(AppLocalizations.of(context)!.savingsGoals, style: const TextStyle(color: Colors.white)),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => const SavingsGoalsView()),
                     );
                   },
                 ),

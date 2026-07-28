@@ -208,5 +208,27 @@
       }
     }
   },
-  "totalSpent": "Total Cheltuit"
+  "totalSpent": "Total Cheltuit",
+  "savingsGoals": "Obiective de Economisire",
+  "addSavingsGoal": "Adaugă Obiectiv",
+  "editSavingsGoal": "Editează Obiectiv",
+  "deleteGoal": "Șterge Obiectiv",
+  "targetAmount": "Suma Țintă",
+  "currentAmount": "Suma Economisită",
+  "deposit": "Depune",
+  "withdraw": "Retrage",
+  "targetDate": "Data Țintă",
+  "totalSaved": "Total Economisit",
+  "totalTarget": "Total Țintă",
+  "projectionTitle": "🎯 Ritm & Proiecție Economisire",
+  "noGoalsYet": "Niciun obiectiv definit încă. Apasă + pentru a crea primul tău obiectiv!",
+  "goalReached": "Obiectiv Atins! 🎉",
+  "remainingToSave": "Mai ai de economisit {amount}",
+  "@remainingToSave": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  }
 }

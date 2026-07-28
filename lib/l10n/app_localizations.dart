@@ -955,6 +955,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Total Spent'**
   String get totalSpent;
+
+  /// No description provided for @savingsGoals.
+  ///
+  /// In en, this message translates to:
+  /// **'Savings Goals'**
+  String get savingsGoals;
+
+  /// No description provided for @addSavingsGoal.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Savings Goal'**
+  String get addSavingsGoal;
+
+  /// No description provided for @editSavingsGoal.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Savings Goal'**
+  String get editSavingsGoal;
+
+  /// No description provided for @deleteGoal.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Goal'**
+  String get deleteGoal;
+
+  /// No description provided for @targetAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Target Amount'**
+  String get targetAmount;
+
+  /// No description provided for @currentAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved Amount'**
+  String get currentAmount;
+
+  /// No description provided for @deposit.
+  ///
+  /// In en, this message translates to:
+  /// **'Deposit'**
+  String get deposit;
+
+  /// No description provided for @withdraw.
+  ///
+  /// In en, this message translates to:
+  /// **'Withdraw'**
+  String get withdraw;
+
+  /// No description provided for @targetDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Target Date'**
+  String get targetDate;
+
+  /// No description provided for @totalSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Saved'**
+  String get totalSaved;
+
+  /// No description provided for @totalTarget.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Target'**
+  String get totalTarget;
+
+  /// No description provided for @projectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'🎯 Projection & Savings Pace'**
+  String get projectionTitle;
+
+  /// No description provided for @noGoalsYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No savings goals defined yet. Tap + to create your first goal!'**
+  String get noGoalsYet;
+
+  /// No description provided for @goalReached.
+  ///
+  /// In en, this message translates to:
+  /// **'Goal Reached! 🎉'**
+  String get goalReached;
+
+  /// No description provided for @remainingToSave.
+  ///
+  /// In en, this message translates to:
+  /// **'{amount} remaining to target'**
+  String remainingToSave(String amount);
 }
 
 class _AppLocalizationsDelegate

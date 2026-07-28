@@ -471,4 +471,52 @@ class AppLocalizationsRo extends AppLocalizations {
 
   @override
   String get totalSpent => 'Total Cheltuit';
+
+  @override
+  String get savingsGoals => 'Obiective de Economisire';
+
+  @override
+  String get addSavingsGoal => 'Adaugă Obiectiv';
+
+  @override
+  String get editSavingsGoal => 'Editează Obiectiv';
+
+  @override
+  String get deleteGoal => 'Șterge Obiectiv';
+
+  @override
+  String get targetAmount => 'Suma Țintă';
+
+  @override
+  String get currentAmount => 'Suma Economisită';
+
+  @override
+  String get deposit => 'Depune';
+
+  @override
+  String get withdraw => 'Retrage';
+
+  @override
+  String get targetDate => 'Data Țintă';
+
+  @override
+  String get totalSaved => 'Total Economisit';
+
+  @override
+  String get totalTarget => 'Total Țintă';
+
+  @override
+  String get projectionTitle => '🎯 Ritm & Proiecție Economisire';
+
+  @override
+  String get noGoalsYet =>
+      'Niciun obiectiv definit încă. Apasă + pentru a crea primul tău obiectiv!';
+
+  @override
+  String get goalReached => 'Obiectiv Atins! 🎉';
+
+  @override
+  String remainingToSave(String amount) {
+    return 'Mai ai de economisit $amount';
+  }
 }
