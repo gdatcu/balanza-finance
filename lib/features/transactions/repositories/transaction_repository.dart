@@ -4,31 +4,49 @@ import '../../../models/debug_notification.dart';
 import '../presentation/categories_data.dart';
 
 class TransactionRepository {
-  final SupabaseClient _client;
+  final SupabaseClient? _customClient;
 
-  TransactionRepository([SupabaseClient? client])
-      : _client = client ?? Supabase.instance.client;
+  TransactionRepository([SupabaseClient? client]) : _customClient = client;
 
-  Stream<List<Transaction>> getTransactionsStream(DateTime month) {
-    final start = DateTime(month.year, month.month, 1);
-    final end = DateTime(month.year, month.month + 1, 0, 23, 59, 59, 999);
-
-    return _client
-        .from('transactions')
-        .stream(primaryKey: ['id'])
-        .order('date', ascending: false)
-        .map((response) => response
-            .map((json) => Transaction.fromJson(json))
-            .where((tx) => !tx.isPendingReview && !tx.date.isBefore(start) && !tx.date.isAfter(end))
-            .toList());
+  SupabaseClient? get _client {
+    if (_customClient != null) return _customClient;
+    try {
+      return Supabase.instance.client;
+    } catch (_) {
+      return null;
+    }
   }
 
-  Future<List<Transaction>> getTransactions(DateTime month) async {
+  Stream<List<Transaction>> getTransactionsStream(DateTime month) {
+    final client = _client;
+    if (client == null) return Stream.value([]);
+
     final start = DateTime(month.year, month.month, 1);
     final end = DateTime(month.year, month.month + 1, 0, 23, 59, 59, 999);
 
     try {
-      final response = await _client
+      return client
+          .from('transactions')
+          .stream(primaryKey: ['id'])
+          .order('date', ascending: false)
+          .map((response) => response
+              .map((json) => Transaction.fromJson(json))
+              .where((tx) => !tx.isPendingReview && !tx.date.isBefore(start) && !tx.date.isAfter(end))
+              .toList());
+    } catch (_) {
+      return Stream.value([]);
+    }
+  }
+
+  Future<List<Transaction>> getTransactions(DateTime month) async {
+    final client = _client;
+    if (client == null) return [];
+
+    final start = DateTime(month.year, month.month, 1);
+    final end = DateTime(month.year, month.month + 1, 0, 23, 59, 59, 999);
+
+    try {
+      final response = await client
           .from('transactions')
           .select()
           .eq('is_pending_review', false)
@@ -45,19 +63,29 @@ class TransactionRepository {
   }
 
   Stream<List<Transaction>> getPendingTransactionsStream() {
-    return _client
-        .from('transactions')
-        .stream(primaryKey: ['id'])
-        .order('created_at', ascending: false)
-        .map((response) => response
-            .map((json) => Transaction.fromJson(json))
-            .where((tx) => tx.isPendingReview)
-            .toList());
+    final client = _client;
+    if (client == null) return Stream.value([]);
+
+    try {
+      return client
+          .from('transactions')
+          .stream(primaryKey: ['id'])
+          .order('created_at', ascending: false)
+          .map((response) => response
+              .map((json) => Transaction.fromJson(json))
+              .where((tx) => tx.isPendingReview)
+              .toList());
+    } catch (_) {
+      return Stream.value([]);
+    }
   }
 
   Future<List<Transaction>> getPendingTransactions() async {
+    final client = _client;
+    if (client == null) return [];
+
     try {
-      final response = await _client
+      final response = await client
           .from('transactions')
           .select()
           .eq('is_pending_review', true)
@@ -72,8 +100,11 @@ class TransactionRepository {
   }
 
   Future<void> approvePendingTransaction(String id) async {
+    final client = _client;
+    if (client == null) return;
+
     try {
-      await _client
+      await client
           .from('transactions')
           .update({'is_pending_review': false})
           .eq('id', id);
@@ -81,9 +112,12 @@ class TransactionRepository {
   }
 
   Future<bool> checkDuplicateRecentTransaction(double amount, {int windowSeconds = 60}) async {
+    final client = _client;
+    if (client == null) return false;
+
     try {
       final cutoff = DateTime.now().subtract(Duration(seconds: windowSeconds)).toIso8601String();
-      final response = await _client
+      final response = await client
           .from('transactions')
           .select()
           .gte('created_at', cutoff);
@@ -96,15 +130,21 @@ class TransactionRepository {
   }
 
   Future<void> logDebugNotification(DebugNotification notification) async {
+    final client = _client;
+    if (client == null) return;
+
     try {
-      await _client
+      await client
           .from('debug_notifications')
           .insert(notification.toJson());
     } catch (_) {}
   }
 
   Future<Transaction> addTransaction(Transaction transaction) async {
-    final currentUserId = _client.auth.currentUser?.id;
+    final client = _client;
+    if (client == null) return transaction;
+
+    final currentUserId = client.auth.currentUser?.id;
     final updatedTx = currentUserId != null
         ? transaction.copyWith(userId: currentUserId)
         : transaction;
@@ -114,7 +154,7 @@ class TransactionRepository {
         final cat = defaultCategories.firstWhere(
           (c) => c.id == updatedTx.categoryId,
         );
-        await _client.from('categories').upsert({
+        await client.from('categories').upsert({
           'id': cat.id,
           'name': cat.name,
           'icon': cat.icon,
@@ -126,7 +166,7 @@ class TransactionRepository {
     }
 
     try {
-      final response = await _client
+      final response = await client
           .from('transactions')
           .insert(updatedTx.toJson())
           .select()
@@ -136,19 +176,24 @@ class TransactionRepository {
     } on PostgrestException catch (e) {
       if (e.code == '23503' && updatedTx.categoryId != null) {
         final fallbackTx = updatedTx.copyWith(categoryId: null);
-        final response = await _client
+        final response = await client
             .from('transactions')
             .insert(fallbackTx.toJson())
             .select()
             .single();
         return Transaction.fromJson(response);
       }
-      rethrow;
+      return updatedTx;
+    } catch (_) {
+      return updatedTx;
     }
   }
 
   Future<Transaction> updateTransaction(Transaction transaction) async {
-    final currentUserId = _client.auth.currentUser?.id;
+    final client = _client;
+    if (client == null) return transaction;
+
+    final currentUserId = client.auth.currentUser?.id;
     final updatedTx = currentUserId != null
         ? transaction.copyWith(userId: currentUserId)
         : transaction;
@@ -158,7 +203,7 @@ class TransactionRepository {
         final cat = defaultCategories.firstWhere(
           (c) => c.id == updatedTx.categoryId,
         );
-        await _client.from('categories').upsert({
+        await client.from('categories').upsert({
           'id': cat.id,
           'name': cat.name,
           'icon': cat.icon,
@@ -170,7 +215,7 @@ class TransactionRepository {
     }
 
     try {
-      final response = await _client
+      final response = await client
           .from('transactions')
           .update(updatedTx.toJson())
           .eq('id', updatedTx.id)
@@ -181,7 +226,7 @@ class TransactionRepository {
     } on PostgrestException catch (e) {
       if (e.code == '23503' && updatedTx.categoryId != null) {
         final fallbackTx = updatedTx.copyWith(categoryId: null);
-        final response = await _client
+        final response = await client
             .from('transactions')
             .update(fallbackTx.toJson())
             .eq('id', fallbackTx.id)
@@ -189,14 +234,21 @@ class TransactionRepository {
             .single();
         return Transaction.fromJson(response);
       }
-      rethrow;
+      return updatedTx;
+    } catch (_) {
+      return updatedTx;
     }
   }
 
   Future<void> deleteTransaction(String id) async {
-    await _client
-        .from('transactions')
-        .delete()
-        .eq('id', id);
+    final client = _client;
+    if (client == null) return;
+
+    try {
+      await client
+          .from('transactions')
+          .delete()
+          .eq('id', id);
+    } catch (_) {}
   }
 }

@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_notification_listener/flutter_notification_listener.dart';
 import 'package:uuid/uuid.dart';
 import '../../../models/transaction.dart';
@@ -21,12 +22,17 @@ class NotificationSyncService {
 
   /// Top-level or static background callback for flutter_notification_listener
   @pragma('vm:entry-point')
-  static void _onNotificationData(NotificationEvent event) {
-    NotificationSyncService().handleNotificationEvent(
-      packageName: event.packageName ?? '',
-      title: event.title ?? '',
-      body: event.message ?? event.text ?? '',
-    );
+  static void _onNotificationData(NotificationEvent event) async {
+    try {
+      WidgetsFlutterBinding.ensureInitialized();
+      await NotificationSyncService().handleNotificationEvent(
+        packageName: event.packageName ?? '',
+        title: event.title ?? '',
+        body: event.message ?? event.text ?? '',
+      );
+    } catch (_) {
+      // Swallowed safely to protect the Android process from native isolate crashes
+    }
   }
 
   /// Processes an incoming notification event
@@ -35,59 +41,66 @@ class NotificationSyncService {
     required String title,
     required String body,
   }) async {
-    if (!allowedBankPackages.contains(packageName)) {
-      return false;
-    }
+    try {
+      if (!allowedBankPackages.contains(packageName)) {
+        return false;
+      }
 
-    final parsed = NotificationParser.parseNotification(
-      packageName: packageName,
-      title: title,
-      body: body,
-    );
-
-    final now = DateTime.now();
-
-    // 1. Debug Fallback: Regex failed to parse valid transaction details
-    if (parsed == null) {
-      final debugLog = DebugNotification(
-        id: const Uuid().v4(),
+      final parsed = NotificationParser.parseNotification(
         packageName: packageName,
-        rawTitle: title,
-        rawBody: body,
-        createdAt: now,
+        title: title,
+        body: body,
       );
-      await _repository.logDebugNotification(debugLog);
+
+      final now = DateTime.now();
+
+      // 1. Debug Fallback: Regex failed to parse valid transaction details
+      if (parsed == null) {
+        final debugLog = DebugNotification(
+          id: const Uuid().v4(),
+          packageName: packageName,
+          rawTitle: title,
+          rawBody: body,
+          createdAt: now,
+        );
+        await _repository.logDebugNotification(debugLog);
+        return false;
+      }
+
+      // 2. 60-Second Deduplication Check
+      final isDuplicate = await _repository.checkDuplicateRecentTransaction(parsed.amount, windowSeconds: 60);
+      if (isDuplicate) {
+        return false;
+      }
+
+      // 3. Create Pending Transaction
+      final transaction = Transaction(
+        id: const Uuid().v4(),
+        userId: '',
+        accountId: 'default-acc',
+        categoryId: parsed.categoryId,
+        amount: -parsed.amount.abs(), // Expenses are negative
+        description: parsed.merchant,
+        date: now,
+        createdAt: now,
+        originalCurrency: parsed.currency,
+        originalAmount: parsed.amount,
+        isPendingReview: true,
+      );
+
+      await _repository.addTransaction(transaction);
+      return true;
+    } catch (_) {
       return false;
     }
-
-    // 2. 60-Second Deduplication Check
-    final isDuplicate = await _repository.checkDuplicateRecentTransaction(parsed.amount, windowSeconds: 60);
-    if (isDuplicate) {
-      return false;
-    }
-
-    // 3. Create Pending Transaction
-    final transaction = Transaction(
-      id: const Uuid().v4(),
-      userId: '',
-      accountId: 'default-acc',
-      categoryId: parsed.categoryId,
-      amount: -parsed.amount.abs(), // Expenses are negative
-      description: parsed.merchant,
-      date: now,
-      createdAt: now,
-      originalCurrency: parsed.currency,
-      originalAmount: parsed.amount,
-      isPendingReview: true,
-    );
-
-    await _repository.addTransaction(transaction);
-    return true;
   }
 
-  /// Starts the notification listener service on Android
+  /// Starts the notification listener service on Android safely
   static Future<bool> startListener() async {
     try {
+      final bool granted = await isPermissionGranted();
+      if (!granted) return false;
+
       final bool? isRunning = await NotificationsListener.isRunning;
       if (isRunning != true) {
         await NotificationsListener.startService();
