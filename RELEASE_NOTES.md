@@ -1,22 +1,19 @@
-# Release Notes — v1.15.4
+# Release Notes — v1.15.5
 
-## 🚀 Instant Pending Inbox & Audit Log Resiliency
+## 🔒 Android 11+ Package Visibility Sandbox & Notification Delivery Fix
 
-### ⚡ Instant Pending Inbox Updates
-- **Hybrid Polling Stream**:
-  - Upgraded `getPendingTransactionsStream()` to a hybrid polling stream (`async*` generator with 2-second interval).
-  - Guarantees pending transactions instantly appear in the **Pending Inbox** banner on the Dashboard without relying on Supabase Realtime WebSocket configurations.
+### 🛡️ Android 11/12/13/14/15 Package Queries Permission
+- **Root Cause Identified**:
+  - On Android 11+ (API 30+), Android's Package Visibility Sandbox restricts apps from inspecting or receiving notification events from un-queried external app packages.
+- **Resolution**:
+  - Added `<uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />` and explicit `<queries>` declarations for **BCR George** (`ro.bcr.georgego`), **Revolut** (`com.revolut.office`), **ING** (`ro.ing.mobile.banking`), **Salt Bank** (`ro.salt.bank`), and **Google Wallet** (`com.google.android.apps.walletnfcrel`) in `AndroidManifest.xml`.
+  - Android OS now delivers live bank notification events directly to Balanza Finance!
 
-### 📜 Resilient Local & Remote Notification Audit Log
-- **Local Fallback Storage**:
-  - Added in-memory & local fallback caching for `logDebugNotification` in `TransactionRepository`.
-  - Captures and displays all received bank notifications in the **Bank Sync Diagnostics 🐛** audit log, even if offline or if database insertion fails.
-
-### 🌐 Expanded Revolut Notification Regex
-- Added support for English Revolut notifications matching `Paid [amount] [currency] to [merchant]` (e.g., `Paid 45.00 RON to Starbucks`).
+### 📱 Samsung One UI Battery Optimization Instructions
+- To ensure Samsung One UI / Xiaomi does not kill background sync:
+  - Open **Phone Settings ⚙️ -> Apps -> Balanza -> Battery -> Select "Unrestricted"**.
 
 ---
 
 ## 🧪 Verification
-- **`flutter test`**: 118/118 tests passed!
 - **`flutter analyze`**: 0 issues found!
