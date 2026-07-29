@@ -14,26 +14,26 @@ const List<String> allowedBankPackages = [
   'com.google.android.apps.walletnfcrel',
 ];
 
+/// Top-level background callback for flutter_notification_listener
+@pragma('vm:entry-point')
+void _onNotificationData(NotificationEvent event) async {
+  try {
+    WidgetsFlutterBinding.ensureInitialized();
+    await NotificationSyncService().handleNotificationEvent(
+      packageName: event.packageName ?? '',
+      title: event.title ?? '',
+      body: event.message ?? event.text ?? '',
+    );
+  } catch (_) {
+    // Swallowed safely to protect the Android process from native isolate crashes
+  }
+}
+
 class NotificationSyncService {
   final TransactionRepository _repository;
 
   NotificationSyncService([TransactionRepository? repository])
       : _repository = repository ?? TransactionRepository();
-
-  /// Top-level or static background callback for flutter_notification_listener
-  @pragma('vm:entry-point')
-  static void _onNotificationData(NotificationEvent event) async {
-    try {
-      WidgetsFlutterBinding.ensureInitialized();
-      await NotificationSyncService().handleNotificationEvent(
-        packageName: event.packageName ?? '',
-        title: event.title ?? '',
-        body: event.message ?? event.text ?? '',
-      );
-    } catch (_) {
-      // Swallowed safely to protect the Android process from native isolate crashes
-    }
-  }
 
   /// Processes an incoming notification event
   Future<bool> handleNotificationEvent({
@@ -98,6 +98,8 @@ class NotificationSyncService {
   /// Starts the notification listener service on Android safely
   static Future<bool> startListener() async {
     try {
+      NotificationsListener.initialize(callbackHandle: _onNotificationData);
+
       final bool granted = await isPermissionGranted();
       if (!granted) return false;
 
@@ -105,7 +107,6 @@ class NotificationSyncService {
       if (isRunning != true) {
         await NotificationsListener.startService();
       }
-      NotificationsListener.initialize(callbackHandle: _onNotificationData);
       return true;
     } catch (_) {
       return false;

@@ -1,18 +1,18 @@
-# Release Notes — v1.14.1
+# Release Notes — v1.14.2
 
-## 🐛 Bug Fixes & Stability Improvements
+## 🐛 Critical Fix & Stability Release
 
-### 🛡️ Android Background Isolate & Notification Listener Crash Protection
-- **Isolate Exception Safety**:
-  - Wrapped background notification isolate callbacks (`_onNotificationData` & `handleNotificationEvent`) in exception-safe try/catch handlers.
-- **Null-Safe Supabase Client Handling**:
-  - Refactored `TransactionRepository` to gracefully handle uninitialized `Supabase.instance` when invoked from Android background notification listener isolates, preventing native process crashes (`balanza closed because this app has a bug`).
-- **Permission Pre-Check**:
-  - `NotificationSyncService.startListener()` now checks permission state before initializing background listener service.
+### 🛡️ Fix Android App Crash on Launch & Notification Permission Toggle
+- **Startup Registration**:
+  - Registered `NotificationSyncService.startListener()` inside `main()` on app startup, ensuring the native Java `NotificationsListenerService` always finds a valid Dart callback handle registered when Android OS binds the service.
+- **Top-Level Isolate Entry-Point**:
+  - Converted `_onNotificationData` to a top-level function marked `@pragma('vm:entry-point')`, preventing native Java `NullPointerException` on Android service bind/startup.
+- **Background Exception Immunity**:
+  - Protected `TransactionRepository` and isolate background handlers against uninitialized `Supabase.instance` during Android system background events.
 
 ---
 
-## ✨ Features (from v1.14.0)
+## ✨ Key Features (v1.14.0)
 
 ### 🏦 Zero-API Bank Sync via Android Notification Listener ("Pending Inbox")
 - **Automated Banking Notification Interceptor**:
