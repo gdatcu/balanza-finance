@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:balanza/l10n/app_localizations.dart';
 import '../../../../models/savings_goal.dart';
+import '../../transactions/presentation/accounts_data.dart';
 import '../providers/savings_goal_provider.dart';
 
 class DepositWithdrawSheet extends ConsumerStatefulWidget {
@@ -21,6 +22,13 @@ class DepositWithdrawSheet extends ConsumerStatefulWidget {
 class _DepositWithdrawSheetState extends ConsumerState<DepositWithdrawSheet> {
   final _formKey = GlobalKey<FormState>();
   final _amountController = TextEditingController();
+  late String _selectedAccountId;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedAccountId = defaultAccounts.first.id;
+  }
 
   @override
   void dispose() {
@@ -31,10 +39,25 @@ class _DepositWithdrawSheetState extends ConsumerState<DepositWithdrawSheet> {
   void _submit() {
     if (_formKey.currentState!.validate()) {
       final amount = double.parse(_amountController.text.trim());
+      final isRo = Localizations.localeOf(context).languageCode == 'ro';
+      final description = widget.isDeposit
+          ? (isRo ? 'Pus la ciorap: ${widget.goal.title}' : 'Saved to Goal: ${widget.goal.title}')
+          : (isRo ? 'Retras din ciorap: ${widget.goal.title}' : 'Withdrawn from Goal: ${widget.goal.title}');
+
       if (widget.isDeposit) {
-        ref.read(savingsGoalListProvider.notifier).deposit(widget.goal.id, amount);
+        ref.read(savingsGoalListProvider.notifier).deposit(
+          widget.goal.id,
+          amount,
+          accountId: _selectedAccountId,
+          description: description,
+        );
       } else {
-        ref.read(savingsGoalListProvider.notifier).withdraw(widget.goal.id, amount);
+        ref.read(savingsGoalListProvider.notifier).withdraw(
+          widget.goal.id,
+          amount,
+          accountId: _selectedAccountId,
+          description: description,
+        );
       }
       Navigator.of(context).pop();
     }
@@ -85,6 +108,34 @@ class _DepositWithdrawSheetState extends ConsumerState<DepositWithdrawSheet> {
                 ],
               ),
               const SizedBox(height: 16),
+              DropdownButtonFormField<String>(
+                value: _selectedAccountId,
+                dropdownColor: const Color(0xFF1E293B),
+                style: const TextStyle(color: Colors.white),
+                decoration: InputDecoration(
+                  labelText: 'Account',
+                  labelStyle: const TextStyle(color: Colors.grey),
+                  filled: true,
+                  fillColor: const Color(0xFF0F172A),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                  prefixIcon: const Icon(Icons.account_balance, color: Colors.grey),
+                ),
+                items: defaultAccounts.map((acc) {
+                  return DropdownMenuItem<String>(
+                    value: acc.id,
+                    child: Text(acc.name),
+                  );
+                }).toList(),
+                onChanged: (val) {
+                  if (val != null) {
+                    setState(() => _selectedAccountId = val);
+                  }
+                },
+              ),
+              const SizedBox(height: 16),
               TextFormField(
                 controller: _amountController,
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
@@ -132,3 +183,4 @@ class _DepositWithdrawSheetState extends ConsumerState<DepositWithdrawSheet> {
     );
   }
 }
+
