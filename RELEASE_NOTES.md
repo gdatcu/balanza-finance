@@ -1,19 +1,18 @@
-# Release Notes — v1.15.5
+# Release Notes — v1.15.6
 
-## 🔒 Android 11+ Package Visibility Sandbox & Notification Delivery Fix
+## 🎯 Instant Local Pending Inbox Storage & User ID Association
 
-### 🛡️ Android 11/12/13/14/15 Package Queries Permission
-- **Root Cause Identified**:
-  - On Android 11+ (API 30+), Android's Package Visibility Sandbox restricts apps from inspecting or receiving notification events from un-queried external app packages.
-- **Resolution**:
-  - Added `<uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />` and explicit `<queries>` declarations for **BCR George** (`ro.bcr.georgego`), **Revolut** (`com.revolut.office`), **ING** (`ro.ing.mobile.banking`), **Salt Bank** (`ro.salt.bank`), and **Google Wallet** (`com.google.android.apps.walletnfcrel`) in `AndroidManifest.xml`.
-  - Android OS now delivers live bank notification events directly to Balanza Finance!
+### 📦 In-Memory Local Pending Inbox Storage
+- **Guaranteed Local Display**:
+  - Added `_localPendingTransactions` fallback cache to `TransactionRepository`.
+  - Every simulated or real bank notification is now saved locally immediately, ensuring pending transactions appear in the **Pending Inbox** banner on the Dashboard under all network and database conditions.
 
-### 📱 Samsung One UI Battery Optimization Instructions
-- To ensure Samsung One UI / Xiaomi does not kill background sync:
-  - Open **Phone Settings ⚙️ -> Apps -> Balanza -> Battery -> Select "Unrestricted"**.
+### 👤 Active User Association
+- **Direct Auth User Lookup**:
+  - Updated `NotificationSyncService` to fetch active Supabase `currentUser.id` directly before falling back to `SharedPreferences`.
 
 ---
 
 ## 🧪 Verification
+- **`flutter test`**: 118/118 tests passed!
 - **`flutter analyze`**: 0 issues found!

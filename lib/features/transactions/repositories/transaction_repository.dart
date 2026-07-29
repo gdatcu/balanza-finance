@@ -96,28 +96,39 @@ class TransactionRepository {
     }
   }
 
+  static final List<Transaction> _localPendingTransactions = [];
+
   Future<List<Transaction>> getPendingTransactions() async {
+    final List<Transaction> result = List.from(_localPendingTransactions);
+
     final client = _client;
-    if (client == null) return [];
+    if (client != null) {
+      await claimUnassignedPendingTransactions();
 
-    await claimUnassignedPendingTransactions();
+      try {
+        final response = await client
+            .from('transactions')
+            .select()
+            .eq('is_pending_review', true)
+            .order('created_at', ascending: false);
 
-    try {
-      final response = await client
-          .from('transactions')
-          .select()
-          .eq('is_pending_review', true)
-          .order('created_at', ascending: false);
+        final remote = (response as List)
+            .map((json) => Transaction.fromJson(json as Map<String, dynamic>))
+            .toList();
 
-      return (response as List)
-          .map((json) => Transaction.fromJson(json as Map<String, dynamic>))
-          .toList();
-    } catch (_) {
-      return [];
+        for (final r in remote) {
+          if (!result.any((tx) => tx.id == r.id)) {
+            result.add(r);
+          }
+        }
+      } catch (_) {}
     }
+
+    return result;
   }
 
   Future<void> approvePendingTransaction(String id) async {
+    _localPendingTransactions.removeWhere((tx) => tx.id == id);
     final client = _client;
     if (client == null) return;
 
@@ -134,15 +145,22 @@ class TransactionRepository {
     String? merchant,
     int windowSeconds = 60,
   }) async {
+    final cutoff = DateTime.now().subtract(Duration(seconds: windowSeconds));
+    final hasLocalDuplicate = _localPendingTransactions.any((tx) =>
+        tx.createdAt.isAfter(cutoff) &&
+        (tx.amount.abs() - amount.abs()).abs() < 0.01 &&
+        (merchant == null || tx.description == merchant));
+
+    if (hasLocalDuplicate) return true;
+
     final client = _client;
     if (client == null) return false;
 
     try {
-      final cutoff = DateTime.now().subtract(Duration(seconds: windowSeconds)).toIso8601String();
       final response = await client
           .from('transactions')
           .select()
-          .gte('created_at', cutoff);
+          .gte('created_at', cutoff.toIso8601String());
 
       final list = (response as List).map((json) => Transaction.fromJson(json)).toList();
       return list.any((tx) =>
@@ -188,11 +206,16 @@ class TransactionRepository {
   }
 
   Future<Transaction> addTransaction(Transaction transaction) async {
+    var updatedTx = transaction;
+    if (updatedTx.isPendingReview) {
+      _localPendingTransactions.removeWhere((t) => t.id == updatedTx.id);
+      _localPendingTransactions.insert(0, updatedTx);
+    }
+
     final client = _client;
-    if (client == null) return transaction;
+    if (client == null) return updatedTx;
 
     final currentUserId = client.auth.currentUser?.id;
-    var updatedTx = transaction;
     if (currentUserId != null && currentUserId.isNotEmpty) {
       updatedTx = updatedTx.copyWith(userId: currentUserId);
     } else if (updatedTx.userId.isEmpty) {
@@ -226,7 +249,12 @@ class TransactionRepository {
           .select()
           .single();
 
-      return Transaction.fromJson(response);
+      final saved = Transaction.fromJson(response);
+      if (saved.isPendingReview) {
+        _localPendingTransactions.removeWhere((t) => t.id == saved.id);
+        _localPendingTransactions.insert(0, saved);
+      }
+      return saved;
     } on PostgrestException catch (e) {
       if ((e.code == '23503' || e.code == '22P02') && updatedTx.categoryId != null) {
         final fallbackTx = updatedTx.copyWith(categoryId: null);
@@ -299,6 +327,7 @@ class TransactionRepository {
   }
 
   Future<void> deleteTransaction(String id) async {
+    _localPendingTransactions.removeWhere((tx) => tx.id == id);
     final client = _client;
     if (client == null) return;
 

@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_notification_listener/flutter_notification_listener.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 import '../../../models/transaction.dart';
 import '../../../models/debug_notification.dart';
@@ -145,10 +146,15 @@ class NotificationSyncService {
       // Read last authenticated user ID if available
       String userId = '00000000-0000-0000-0000-000000000000';
       try {
-        final prefs = await SharedPreferences.getInstance();
-        final storedId = prefs.getString('last_authenticated_user_id');
-        if (storedId != null && storedId.isNotEmpty) {
-          userId = storedId;
+        final currentAuthId = Supabase.instance.client.auth.currentUser?.id;
+        if (currentAuthId != null && currentAuthId.isNotEmpty) {
+          userId = currentAuthId;
+        } else {
+          final prefs = await SharedPreferences.getInstance();
+          final storedId = prefs.getString('last_authenticated_user_id');
+          if (storedId != null && storedId.isNotEmpty) {
+            userId = storedId;
+          }
         }
       } catch (_) {}
 
