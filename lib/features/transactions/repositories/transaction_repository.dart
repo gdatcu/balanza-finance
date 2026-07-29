@@ -52,7 +52,7 @@ class TransactionRepository {
         final response = await client
             .from('transactions')
             .select()
-            .eq('is_pending_review', false)
+            .or('is_pending_review.eq.false,is_pending_review.is.null')
             .gte('date', start.toIso8601String())
             .lte('date', end.toIso8601String())
             .order('date', ascending: false);

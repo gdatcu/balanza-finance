@@ -1,14 +1,14 @@
-# Release Notes — v1.15.7
+# Release Notes — v1.15.8
 
-## 🚀 Approved Transactions Retention & Display Fix
+## 📜 Historical Database Transactions Display Restoration
 
-### 📈 Instant Display in Budget & Lists
-- **Root Cause Fixed**:
-  - When approving a pending transaction, if local storage was cleared before remote database sync finished (or if foreign key constraints occurred), the transaction disappeared from view.
+### 🛠️ Null/False Query Filter Fix
+- **Root Cause Identified**:
+  - In previous builds, querying non-pending transactions used `.eq('is_pending_review', false)`.
+  - In SQL/PostgREST, rows where `is_pending_review` was `NULL` (such as historical transactions logged before the pending feature addition) were excluded by `.eq(...)`.
 - **Resolution**:
-  - Added `_localApprovedTransactions` store in `TransactionRepository`.
-  - When a transaction is approved (or swiped right), it is marked `isPendingReview = false` and stored in `_localApprovedTransactions`.
-  - Both `getTransactions()` and `getTransactionsStream()` merge local approved transactions with remote database queries, guaranteeing approved transactions immediately appear under **Expenses** / **Incomes** on the Dashboard!
+  - Updated database query to `.or('is_pending_review.eq.false,is_pending_review.is.null')` in `TransactionRepository`.
+  - All your historical transactions, past spending, and newly approved transactions are now displayed on your Dashboard!
 
 ---
 
