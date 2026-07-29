@@ -4,6 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:balanza/l10n/app_localizations.dart';
 import '../../transactions/providers/transaction_provider.dart';
 import '../../notifications/services/notification_sync_service.dart';
+import '../../notifications/presentation/bank_sync_diagnostics_screen.dart';
 import '../providers/user_settings_provider.dart';
 
 class SettingsView extends ConsumerStatefulWidget {
@@ -248,25 +249,43 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      OutlinedButton.icon(
-                        onPressed: () async {
-                          await NotificationSyncService.openPermissionSettings();
-                          await NotificationSyncService.startListener();
-                        },
-                        icon: const Icon(Icons.notifications_active_rounded, color: Color(0xFF10B981)),
-                        label: Text(
-                          AppLocalizations.of(context)!.grantNotificationAccess,
-                          style: const TextStyle(
-                            color: Color(0xFF10B981),
-                            fontWeight: FontWeight.bold,
+                      Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton.icon(
+                              onPressed: () async {
+                                await NotificationSyncService.openPermissionSettings();
+                                await NotificationSyncService.startListener();
+                              },
+                              icon: const Icon(Icons.notifications_active_rounded, color: Color(0xFF10B981)),
+                              label: Text(
+                                AppLocalizations.of(context)!.grantNotificationAccess,
+                                style: const TextStyle(
+                                  color: Color(0xFF10B981),
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              style: OutlinedButton.styleFrom(
+                                side: const BorderSide(color: Color(0xFF10B981)),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                            ),
                           ),
-                        ),
-                        style: OutlinedButton.styleFrom(
-                          side: const BorderSide(color: Color(0xFF10B981)),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                          const SizedBox(width: 8),
+                          IconButton(
+                            icon: const Icon(Icons.bug_report, color: Colors.cyan),
+                            tooltip: 'Diagnostics & Logs',
+                            onPressed: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) => const BankSyncDiagnosticsScreen(),
+                                ),
+                              );
+                            },
                           ),
-                        ),
+                        ],
                       ),
                     ],
                   ),

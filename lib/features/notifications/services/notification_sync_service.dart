@@ -177,7 +177,16 @@ class NotificationSyncService {
   /// Starts the notification listener service on Android safely
   static Future<bool> startListener() async {
     try {
-      NotificationsListener.initialize(callbackHandle: _onNotificationData);
+      try {
+        final port = NotificationsListener.receivePort;
+        port?.listen((evt) {
+          if (evt is NotificationEvent) {
+            _onNotificationData(evt);
+          }
+        });
+      } catch (_) {}
+
+      await NotificationsListener.initialize(callbackHandle: _onNotificationData);
 
       final bool granted = await isPermissionGranted();
       if (!granted) return false;

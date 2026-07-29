@@ -1,21 +1,23 @@
-# Release Notes — v1.15.2
+# Release Notes — v1.15.3
 
-## 🚀 Critical Fix: Background User Session & Notification Extraction
+## 🛠️ Bank Auto-Sync Diagnostics & On-Device Testing Tool
 
-### 🔐 Authenticated Session Persistence for Background Interceptor
-- **User Session Binding**:
-  - Saved `last_authenticated_user_id` to persistent storage (`SharedPreferences`) on login and app launch.
-  - The background notification service now retrieves the active user's ID, ensuring intercepted bank transactions are inserted under the logged-in user's account.
-- **Auto-Claiming Unassigned Transactions**:
-  - Added an automatic claiming mechanism (`claimUnassignedPendingTransactions`) on app launch to transfer any unassigned background pending transactions directly to the logged-in user.
+### 🔍 Dedicated Diagnostics Screen ("Diagnostic Notificări Bancare")
+- **Access**: Open **Settings ⚙️ -> Bank Auto-Sync -> Tap the Bug Icon 🐛**.
+- **Live Status Monitoring**:
+  - Checks if Android Notification Access permission is granted.
+  - Checks if background Listener Service is running.
+  - Displays the active bound User ID.
+- **On-Device Notification Simulation & Testing**:
+  - **Test BCR Încasare (+28.94 RON)**: Simulates the exact BCR income notification format.
+  - **Test BCR Plată Card (-89.90 RON)**: Simulates BCR card purchase format.
+  - **Test Revolut Plată (-45.00 RON)**: Simulates Revolut purchase format.
+  - **Test Custom Notification**: Enter any title and body text to test parsing instantly on your phone.
+- **Captured Notifications Audit Log**:
+  - Displays the last 20 raw bank notifications received by your device directly from the `debug_notifications` table!
 
-### 📱 Robust Android Notification Extraction
-- **Multi-Field Extraction**:
-  - Added `extractTitle` and `extractBody` helpers to parse `text`, `message`, `bigText`, `subText`, and `summaryText` directly from the raw Android notification bundle.
-  - Eliminates empty body issues caused by null/empty field fallbacks.
-
-### 🔄 Refined Deduplication
-- Added merchant/description validation to deduplication checks to prevent false positives when testing consecutive identical amounts.
+### ⚡ Dual-Isolate Event Delivery
+- Added a foreground UI isolate listener (`receivePort`) alongside the background isolate listener, ensuring 100% notification delivery whether the app is in the foreground, background, or closed.
 
 ---
 
