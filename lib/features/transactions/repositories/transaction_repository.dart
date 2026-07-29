@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../models/transaction.dart';
 import '../../../models/debug_notification.dart';
@@ -52,13 +53,13 @@ class TransactionRepository {
         final response = await client
             .from('transactions')
             .select()
-            .or('is_pending_review.eq.false,is_pending_review.is.null')
             .gte('date', start.toIso8601String())
             .lte('date', end.toIso8601String())
             .order('date', ascending: false);
 
         final remote = (response as List)
             .map((json) => Transaction.fromJson(json as Map<String, dynamic>))
+            .where((tx) => !tx.isPendingReview)
             .toList();
 
         for (final r in remote) {
@@ -66,7 +67,9 @@ class TransactionRepository {
             result.add(r);
           }
         }
-      } catch (_) {}
+      } catch (e) {
+        debugPrint('TransactionRepository.getTransactions error: $e');
+      }
     }
 
     result.sort((a, b) => b.date.compareTo(a.date));

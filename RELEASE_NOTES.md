@@ -1,14 +1,13 @@
-# Release Notes — v1.15.8
+# Release Notes — v1.15.9
 
-## 📜 Historical Database Transactions Display Restoration
+## 🚀 Complete Restoration of Historical & Database Transactions
 
-### 🛠️ Null/False Query Filter Fix
-- **Root Cause Identified**:
-  - In previous builds, querying non-pending transactions used `.eq('is_pending_review', false)`.
-  - In SQL/PostgREST, rows where `is_pending_review` was `NULL` (such as historical transactions logged before the pending feature addition) were excluded by `.eq(...)`.
+### ⚡ PostgREST Query Clean-up
+- **Root Cause Fixed**:
+  - An invalid PostgREST `.or(...)` filter was causing database queries to return an error, which defaulted to an empty list on the Dashboard.
 - **Resolution**:
-  - Updated database query to `.or('is_pending_review.eq.false,is_pending_review.is.null')` in `TransactionRepository`.
-  - All your historical transactions, past spending, and newly approved transactions are now displayed on your Dashboard!
+  - Cleaned up the query in `TransactionRepository` to use standard, reliable database fetches combined with Dart memory filtering (`!tx.isPendingReview`).
+  - All your historical transactions stored in your Supabase database are now fetched and rendered on the Dashboard!
 
 ---
 
