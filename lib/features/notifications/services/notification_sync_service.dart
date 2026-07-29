@@ -35,6 +35,17 @@ class NotificationSyncService {
   NotificationSyncService([TransactionRepository? repository])
       : _repository = repository ?? TransactionRepository();
 
+  static bool isAllowedPackage(String pkg) {
+    if (allowedBankPackages.contains(pkg)) return true;
+    final lower = pkg.toLowerCase();
+    return lower.contains('revolut') ||
+        lower.contains('bcr') ||
+        lower.contains('george') ||
+        lower.contains('salt') ||
+        lower.contains('ing') ||
+        lower.contains('wallet');
+  }
+
   /// Processes an incoming notification event
   Future<bool> handleNotificationEvent({
     required String packageName,
@@ -42,7 +53,7 @@ class NotificationSyncService {
     required String body,
   }) async {
     try {
-      if (!allowedBankPackages.contains(packageName)) {
+      if (!isAllowedPackage(packageName)) {
         return false;
       }
 
@@ -54,16 +65,18 @@ class NotificationSyncService {
 
       final now = DateTime.now();
 
+      // Always log notification to debug_notifications table for auditing
+      final debugLog = DebugNotification(
+        id: const Uuid().v4(),
+        packageName: packageName,
+        rawTitle: title,
+        rawBody: body,
+        createdAt: now,
+      );
+      await _repository.logDebugNotification(debugLog);
+
       // 1. Debug Fallback: Regex failed to parse valid transaction details
       if (parsed == null) {
-        final debugLog = DebugNotification(
-          id: const Uuid().v4(),
-          packageName: packageName,
-          rawTitle: title,
-          rawBody: body,
-          createdAt: now,
-        );
-        await _repository.logDebugNotification(debugLog);
         return false;
       }
 
@@ -73,11 +86,11 @@ class NotificationSyncService {
         return false;
       }
 
-      // 3. Create Pending Transaction
+      // 3. Create Pending Transaction with valid UUID fallbacks
       final transaction = Transaction(
         id: const Uuid().v4(),
-        userId: '',
-        accountId: 'default-acc',
+        userId: '00000000-0000-0000-0000-000000000000',
+        accountId: '00000000-0000-0000-0000-000000000001',
         categoryId: parsed.categoryId,
         amount: parsed.isIncome ? parsed.amount.abs() : -parsed.amount.abs(),
         description: parsed.merchant,

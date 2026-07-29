@@ -145,11 +145,18 @@ class TransactionRepository {
     if (client == null) return transaction;
 
     final currentUserId = client.auth.currentUser?.id;
-    final updatedTx = currentUserId != null
-        ? transaction.copyWith(userId: currentUserId)
-        : transaction;
+    var updatedTx = transaction;
+    if (currentUserId != null && currentUserId.isNotEmpty) {
+      updatedTx = updatedTx.copyWith(userId: currentUserId);
+    } else if (updatedTx.userId.isEmpty) {
+      updatedTx = updatedTx.copyWith(userId: '00000000-0000-0000-0000-000000000000');
+    }
 
-    if (updatedTx.categoryId != null) {
+    if (updatedTx.accountId.isEmpty || updatedTx.accountId == 'default-acc') {
+      updatedTx = updatedTx.copyWith(accountId: '00000000-0000-0000-0000-000000000001');
+    }
+
+    if (updatedTx.categoryId != null && updatedTx.categoryId!.isNotEmpty) {
       try {
         final cat = defaultCategories.firstWhere(
           (c) => c.id == updatedTx.categoryId,
@@ -159,7 +166,7 @@ class TransactionRepository {
           'name': cat.name,
           'icon': cat.icon,
           'color': cat.color,
-          if (currentUserId != null) 'user_id': currentUserId,
+          if (currentUserId != null && currentUserId.isNotEmpty) 'user_id': currentUserId,
           'created_at': cat.createdAt.toIso8601String(),
         }, onConflict: 'id');
       } catch (_) {}
@@ -174,14 +181,18 @@ class TransactionRepository {
 
       return Transaction.fromJson(response);
     } on PostgrestException catch (e) {
-      if (e.code == '23503' && updatedTx.categoryId != null) {
+      if ((e.code == '23503' || e.code == '22P02') && updatedTx.categoryId != null) {
         final fallbackTx = updatedTx.copyWith(categoryId: null);
-        final response = await client
-            .from('transactions')
-            .insert(fallbackTx.toJson())
-            .select()
-            .single();
-        return Transaction.fromJson(response);
+        try {
+          final response = await client
+              .from('transactions')
+              .insert(fallbackTx.toJson())
+              .select()
+              .single();
+          return Transaction.fromJson(response);
+        } catch (_) {
+          return fallbackTx;
+        }
       }
       return updatedTx;
     } catch (_) {
