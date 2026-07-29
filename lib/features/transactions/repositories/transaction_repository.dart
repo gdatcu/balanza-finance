@@ -62,9 +62,27 @@ class TransactionRepository {
     }
   }
 
+  Future<void> claimUnassignedPendingTransactions() async {
+    final client = _client;
+    if (client == null) return;
+
+    final currentUserId = client.auth.currentUser?.id;
+    if (currentUserId == null || currentUserId.isEmpty) return;
+
+    try {
+      await client
+          .from('transactions')
+          .update({'user_id': currentUserId})
+          .eq('is_pending_review', true)
+          .eq('user_id', '00000000-0000-0000-0000-000000000000');
+    } catch (_) {}
+  }
+
   Stream<List<Transaction>> getPendingTransactionsStream() {
     final client = _client;
     if (client == null) return Stream.value([]);
+
+    claimUnassignedPendingTransactions();
 
     try {
       return client
@@ -83,6 +101,8 @@ class TransactionRepository {
   Future<List<Transaction>> getPendingTransactions() async {
     final client = _client;
     if (client == null) return [];
+
+    await claimUnassignedPendingTransactions();
 
     try {
       final response = await client
@@ -111,7 +131,11 @@ class TransactionRepository {
     } catch (_) {}
   }
 
-  Future<bool> checkDuplicateRecentTransaction(double amount, {int windowSeconds = 60}) async {
+  Future<bool> checkDuplicateRecentTransaction(
+    double amount, {
+    String? merchant,
+    int windowSeconds = 60,
+  }) async {
     final client = _client;
     if (client == null) return false;
 
@@ -123,7 +147,9 @@ class TransactionRepository {
           .gte('created_at', cutoff);
 
       final list = (response as List).map((json) => Transaction.fromJson(json)).toList();
-      return list.any((tx) => (tx.amount.abs() - amount.abs()).abs() < 0.01);
+      return list.any((tx) =>
+          (tx.amount.abs() - amount.abs()).abs() < 0.01 &&
+          (merchant == null || tx.description == merchant));
     } catch (_) {
       return false;
     }

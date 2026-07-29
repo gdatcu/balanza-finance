@@ -51,9 +51,11 @@ class E2EMockTransactionRepository implements TransactionRepository {
   @override
   Future<void> approvePendingTransaction(String id) async {}
   @override
-  Future<bool> checkDuplicateRecentTransaction(double amount, {int windowSeconds = 60}) async => false;
+  Future<bool> checkDuplicateRecentTransaction(double amount, {String? merchant, int windowSeconds = 60}) async => false;
   @override
   Future<void> logDebugNotification(dynamic notification) async {}
+  @override
+  Future<void> claimUnassignedPendingTransactions() async {}
 }
 
 class E2EFakeBiometricLockNotifier extends BiometricLockNotifier {

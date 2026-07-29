@@ -21,9 +21,12 @@ class FakeTransactionRepository implements TransactionRepository {
   }
 
   @override
-  Future<bool> checkDuplicateRecentTransaction(double amount, {int windowSeconds = 60}) async {
+  Future<bool> checkDuplicateRecentTransaction(double amount, {String? merchant, int windowSeconds = 60}) async {
     return shouldReturnDuplicate;
   }
+
+  @override
+  Future<void> claimUnassignedPendingTransactions() async {}
 
   @override
   Stream<List<Transaction>> getTransactionsStream(DateTime month) => Stream.value([]);

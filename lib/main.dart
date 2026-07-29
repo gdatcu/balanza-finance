@@ -29,6 +29,11 @@ void main() async {
     publishableKey: 'sb_publishable_qI0TdNv5VJQpKvlkSCassA_1slJiy9K',
   );
 
+  final currentUserId = Supabase.instance.client.auth.currentUser?.id;
+  if (currentUserId != null && currentUserId.isNotEmpty) {
+    await prefs.setString('last_authenticated_user_id', currentUserId);
+  }
+
   try {
     await NotificationSyncService.startListener();
   } catch (e) {
