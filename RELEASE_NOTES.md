@@ -1,15 +1,14 @@
-# Release Notes — v1.15.6
+# Release Notes — v1.15.7
 
-## 🎯 Instant Local Pending Inbox Storage & User ID Association
+## 🚀 Approved Transactions Retention & Display Fix
 
-### 📦 In-Memory Local Pending Inbox Storage
-- **Guaranteed Local Display**:
-  - Added `_localPendingTransactions` fallback cache to `TransactionRepository`.
-  - Every simulated or real bank notification is now saved locally immediately, ensuring pending transactions appear in the **Pending Inbox** banner on the Dashboard under all network and database conditions.
-
-### 👤 Active User Association
-- **Direct Auth User Lookup**:
-  - Updated `NotificationSyncService` to fetch active Supabase `currentUser.id` directly before falling back to `SharedPreferences`.
+### 📈 Instant Display in Budget & Lists
+- **Root Cause Fixed**:
+  - When approving a pending transaction, if local storage was cleared before remote database sync finished (or if foreign key constraints occurred), the transaction disappeared from view.
+- **Resolution**:
+  - Added `_localApprovedTransactions` store in `TransactionRepository`.
+  - When a transaction is approved (or swiped right), it is marked `isPendingReview = false` and stored in `_localApprovedTransactions`.
+  - Both `getTransactions()` and `getTransactionsStream()` merge local approved transactions with remote database queries, guaranteeing approved transactions immediately appear under **Expenses** / **Incomes** on the Dashboard!
 
 ---
 

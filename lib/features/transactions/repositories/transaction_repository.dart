@@ -17,49 +17,60 @@ class TransactionRepository {
     }
   }
 
+  static final List<Transaction> _localApprovedTransactions = [];
+  static final List<Transaction> _localPendingTransactions = [];
+  static final List<DebugNotification> _localDebugLogs = [];
+
   Stream<List<Transaction>> getTransactionsStream(DateTime month) {
     final client = _client;
-    if (client == null) return Stream.value([]);
-
-    final start = DateTime(month.year, month.month, 1);
-    final end = DateTime(month.year, month.month + 1, 0, 23, 59, 59, 999);
+    if (client == null) {
+      return Stream.fromFuture(getTransactions(month));
+    }
 
     try {
       return client
           .from('transactions')
           .stream(primaryKey: ['id'])
           .order('date', ascending: false)
-          .map((response) => response
-              .map((json) => Transaction.fromJson(json))
-              .where((tx) => !tx.isPendingReview && !tx.date.isBefore(start) && !tx.date.isAfter(end))
-              .toList());
+          .asyncMap((_) async => await getTransactions(month));
     } catch (_) {
-      return Stream.value([]);
+      return Stream.fromFuture(getTransactions(month));
     }
   }
 
   Future<List<Transaction>> getTransactions(DateTime month) async {
-    final client = _client;
-    if (client == null) return [];
-
     final start = DateTime(month.year, month.month, 1);
     final end = DateTime(month.year, month.month + 1, 0, 23, 59, 59, 999);
 
-    try {
-      final response = await client
-          .from('transactions')
-          .select()
-          .eq('is_pending_review', false)
-          .gte('date', start.toIso8601String())
-          .lte('date', end.toIso8601String())
-          .order('date', ascending: false);
+    final List<Transaction> result = _localApprovedTransactions.where((tx) {
+      return !tx.isPendingReview && !tx.date.isBefore(start) && !tx.date.isAfter(end);
+    }).toList();
 
-      return (response as List)
-          .map((json) => Transaction.fromJson(json as Map<String, dynamic>))
-          .toList();
-    } catch (_) {
-      return [];
+    final client = _client;
+    if (client != null) {
+      try {
+        final response = await client
+            .from('transactions')
+            .select()
+            .eq('is_pending_review', false)
+            .gte('date', start.toIso8601String())
+            .lte('date', end.toIso8601String())
+            .order('date', ascending: false);
+
+        final remote = (response as List)
+            .map((json) => Transaction.fromJson(json as Map<String, dynamic>))
+            .toList();
+
+        for (final r in remote) {
+          if (!result.any((tx) => tx.id == r.id)) {
+            result.add(r);
+          }
+        }
+      } catch (_) {}
     }
+
+    result.sort((a, b) => b.date.compareTo(a.date));
+    return result;
   }
 
   Future<void> claimUnassignedPendingTransactions() async {
@@ -78,25 +89,21 @@ class TransactionRepository {
     } catch (_) {}
   }
 
-  static final List<DebugNotification> _localDebugLogs = [];
-
-  Stream<List<Transaction>> getPendingTransactionsStream() async* {
+  Stream<List<Transaction>> getPendingTransactionsStream() {
     final client = _client;
     if (client == null) {
-      yield [];
-      return;
+      return Stream.fromFuture(getPendingTransactions());
     }
 
-    await claimUnassignedPendingTransactions();
-    yield await getPendingTransactions();
-
-    await for (final _ in Stream.periodic(const Duration(seconds: 2))) {
-      await claimUnassignedPendingTransactions();
-      yield await getPendingTransactions();
+    try {
+      return client
+          .from('transactions')
+          .stream(primaryKey: ['id'])
+          .asyncMap((_) async => await getPendingTransactions());
+    } catch (_) {
+      return Stream.fromFuture(getPendingTransactions());
     }
   }
-
-  static final List<Transaction> _localPendingTransactions = [];
 
   Future<List<Transaction>> getPendingTransactions() async {
     final List<Transaction> result = List.from(_localPendingTransactions);
@@ -128,16 +135,45 @@ class TransactionRepository {
   }
 
   Future<void> approvePendingTransaction(String id) async {
-    _localPendingTransactions.removeWhere((tx) => tx.id == id);
-    final client = _client;
-    if (client == null) return;
+    Transaction? found;
+    final index = _localPendingTransactions.indexWhere((tx) => tx.id == id);
+    if (index != -1) {
+      found = _localPendingTransactions.removeAt(index);
+    }
 
-    try {
-      await client
-          .from('transactions')
-          .update({'is_pending_review': false})
-          .eq('id', id);
-    } catch (_) {}
+    if (found == null) {
+      final client = _client;
+      if (client != null) {
+        try {
+          final response = await client
+              .from('transactions')
+              .select()
+              .eq('id', id)
+              .maybeSingle();
+          if (response != null) {
+            found = Transaction.fromJson(response);
+          }
+        } catch (_) {}
+      }
+    }
+
+    if (found != null) {
+      final approvedTx = found.copyWith(isPendingReview: false);
+      _localApprovedTransactions.removeWhere((tx) => tx.id == approvedTx.id);
+      _localApprovedTransactions.insert(0, approvedTx);
+
+      final client = _client;
+      if (client != null) {
+        try {
+          await client
+              .from('transactions')
+              .update({'is_pending_review': false})
+              .eq('id', id);
+        } catch (_) {
+          await addTransaction(approvedTx);
+        }
+      }
+    }
   }
 
   Future<bool> checkDuplicateRecentTransaction(
@@ -210,6 +246,9 @@ class TransactionRepository {
     if (updatedTx.isPendingReview) {
       _localPendingTransactions.removeWhere((t) => t.id == updatedTx.id);
       _localPendingTransactions.insert(0, updatedTx);
+    } else {
+      _localApprovedTransactions.removeWhere((t) => t.id == updatedTx.id);
+      _localApprovedTransactions.insert(0, updatedTx);
     }
 
     final client = _client;
@@ -253,6 +292,9 @@ class TransactionRepository {
       if (saved.isPendingReview) {
         _localPendingTransactions.removeWhere((t) => t.id == saved.id);
         _localPendingTransactions.insert(0, saved);
+      } else {
+        _localApprovedTransactions.removeWhere((t) => t.id == saved.id);
+        _localApprovedTransactions.insert(0, saved);
       }
       return saved;
     } on PostgrestException catch (e) {
@@ -276,6 +318,13 @@ class TransactionRepository {
   }
 
   Future<Transaction> updateTransaction(Transaction transaction) async {
+    final index = _localApprovedTransactions.indexWhere((tx) => tx.id == transaction.id);
+    if (index != -1) {
+      _localApprovedTransactions[index] = transaction;
+    } else {
+      _localApprovedTransactions.insert(0, transaction);
+    }
+
     final client = _client;
     if (client == null) return transaction;
 
@@ -328,6 +377,7 @@ class TransactionRepository {
 
   Future<void> deleteTransaction(String id) async {
     _localPendingTransactions.removeWhere((tx) => tx.id == id);
+    _localApprovedTransactions.removeWhere((tx) => tx.id == id);
     final client = _client;
     if (client == null) return;
 
