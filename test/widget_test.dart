@@ -13,6 +13,8 @@ import 'package:balanza/features/auth/providers/biometric_provider.dart';
 import 'package:balanza/models/transaction.dart';
 import 'package:balanza/models/category.dart';
 
+import 'package:balanza/models/debug_notification.dart';
+
 class MockTransactionRepository implements TransactionRepository {
   @override
   Stream<List<Transaction>> getTransactionsStream(DateTime month) {
@@ -65,6 +67,8 @@ class MockTransactionRepository implements TransactionRepository {
   Future<void> logDebugNotification(dynamic notification) async {}
   @override
   Future<void> claimUnassignedPendingTransactions() async {}
+  @override
+  Future<List<DebugNotification>> getDebugNotifications() async => [];
 }
 
 void main() {

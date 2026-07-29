@@ -109,15 +109,9 @@ class NotificationSyncService {
         return false;
       }
 
-      final parsed = NotificationParser.parseNotification(
-        packageName: packageName,
-        title: title,
-        body: body,
-      );
-
       final now = DateTime.now();
 
-      // Always log notification to debug_notifications table for auditing
+      // Always log notification to debug_notifications table for auditing for allowed bank packages
       final debugLog = DebugNotification(
         id: const Uuid().v4(),
         packageName: packageName,
@@ -126,6 +120,12 @@ class NotificationSyncService {
         createdAt: now,
       );
       await _repository.logDebugNotification(debugLog);
+
+      final parsed = NotificationParser.parseNotification(
+        packageName: packageName,
+        title: title,
+        body: body,
+      );
 
       // 1. Debug Fallback: Regex failed to parse valid transaction details
       if (parsed == null) {

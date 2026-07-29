@@ -78,23 +78,21 @@ class TransactionRepository {
     } catch (_) {}
   }
 
-  Stream<List<Transaction>> getPendingTransactionsStream() {
+  static final List<DebugNotification> _localDebugLogs = [];
+
+  Stream<List<Transaction>> getPendingTransactionsStream() async* {
     final client = _client;
-    if (client == null) return Stream.value([]);
+    if (client == null) {
+      yield [];
+      return;
+    }
 
-    claimUnassignedPendingTransactions();
+    await claimUnassignedPendingTransactions();
+    yield await getPendingTransactions();
 
-    try {
-      return client
-          .from('transactions')
-          .stream(primaryKey: ['id'])
-          .order('created_at', ascending: false)
-          .map((response) => response
-              .map((json) => Transaction.fromJson(json))
-              .where((tx) => tx.isPendingReview)
-              .toList());
-    } catch (_) {
-      return Stream.value([]);
+    await for (final _ in Stream.periodic(const Duration(seconds: 2))) {
+      await claimUnassignedPendingTransactions();
+      yield await getPendingTransactions();
     }
   }
 
@@ -156,6 +154,11 @@ class TransactionRepository {
   }
 
   Future<void> logDebugNotification(DebugNotification notification) async {
+    _localDebugLogs.insert(0, notification);
+    if (_localDebugLogs.length > 50) {
+      _localDebugLogs.removeLast();
+    }
+
     final client = _client;
     if (client == null) return;
 
@@ -164,6 +167,24 @@ class TransactionRepository {
           .from('debug_notifications')
           .insert(notification.toJson());
     } catch (_) {}
+  }
+
+  Future<List<DebugNotification>> getDebugNotifications() async {
+    final client = _client;
+    if (client != null) {
+      try {
+        final response = await client
+            .from('debug_notifications')
+            .select()
+            .order('created_at', ascending: false)
+            .limit(20);
+        final remote = (response as List)
+            .map((json) => DebugNotification.fromJson(json as Map<String, dynamic>))
+            .toList();
+        if (remote.isNotEmpty) return remote;
+      } catch (_) {}
+    }
+    return List.from(_localDebugLogs);
   }
 
   Future<Transaction> addTransaction(Transaction transaction) async {

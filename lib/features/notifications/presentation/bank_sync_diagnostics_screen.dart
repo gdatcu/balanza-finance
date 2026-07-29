@@ -379,13 +379,9 @@ class _BankSyncDiagnosticsScreenState extends ConsumerState<BankSyncDiagnosticsS
 
   Future<List<Map<String, dynamic>>> _fetchDebugLogs() async {
     try {
-      final client = Supabase.instance.client;
-      final response = await client
-          .from('debug_notifications')
-          .select()
-          .order('created_at', ascending: false)
-          .limit(20);
-      return (response as List).cast<Map<String, dynamic>>();
+      final repo = ref.read(transactionRepositoryProvider);
+      final logs = await repo.getDebugNotifications();
+      return logs.map((l) => l.toJson()).toList();
     } catch (_) {
       return [];
     }

@@ -93,7 +93,7 @@ class NotificationParser {
     // 1. Revolut (com.revolut.office)
     if (packageName == 'com.revolut.office') {
       final revExpenseRegex = RegExp(
-        r'(?:spent|ai cheltuit)\s+([\d.,\s]+)\s*(RON|EUR|LEI|USD|GBP)\s+(?:at|la)\s+(.*?)(?=\s*sold|\s*pe\s+\d{1,2}|\.$|$)',
+        r'(?:spent|paid|ai cheltuit|ai platit)\s+([\d.,\s]+)\s*(RON|EUR|LEI|USD|GBP)\s+(?:at|to|la)\s+(.*?)(?=\s*sold|\s*pe\s+\d{1,2}|\.$|$)',
         caseSensitive: false,
       );
       final revIncomeRegex = RegExp(

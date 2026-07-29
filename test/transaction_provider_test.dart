@@ -8,6 +8,8 @@ import 'package:balanza/models/transaction.dart';
 import 'package:balanza/features/transactions/repositories/transaction_repository.dart';
 import 'package:balanza/features/transactions/providers/transaction_provider.dart';
 
+import 'package:balanza/models/debug_notification.dart';
+
 class MockTransactionRepository implements TransactionRepository {
   final List<Transaction> transactions;
   final StreamController<List<Transaction>> _controller = StreamController<List<Transaction>>.broadcast();
@@ -87,6 +89,8 @@ class MockTransactionRepository implements TransactionRepository {
   Future<void> logDebugNotification(dynamic notification) async {}
   @override
   Future<void> claimUnassignedPendingTransactions() async {}
+  @override
+  Future<List<DebugNotification>> getDebugNotifications() async => [];
 }
 
 void main() {

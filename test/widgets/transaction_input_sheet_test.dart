@@ -10,6 +10,8 @@ import 'package:balanza/features/transactions/providers/exchange_rate_provider.d
 import 'package:balanza/models/transaction.dart';
 import 'package:balanza/models/category.dart';
 
+import 'package:balanza/models/debug_notification.dart';
+
 class MockSheetTransactionRepo implements TransactionRepository {
   bool added = false;
   bool updated = false;
@@ -47,6 +49,8 @@ class MockSheetTransactionRepo implements TransactionRepository {
   Future<void> logDebugNotification(dynamic notification) async {}
   @override
   Future<void> claimUnassignedPendingTransactions() async {}
+  @override
+  Future<List<DebugNotification>> getDebugNotifications() async => [];
 }
 
 void main() {

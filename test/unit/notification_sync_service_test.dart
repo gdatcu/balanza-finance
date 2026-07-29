@@ -27,6 +27,8 @@ class FakeTransactionRepository implements TransactionRepository {
 
   @override
   Future<void> claimUnassignedPendingTransactions() async {}
+  @override
+  Future<List<DebugNotification>> getDebugNotifications() async => [];
 
   @override
   Stream<List<Transaction>> getTransactionsStream(DateTime month) => Stream.value([]);
