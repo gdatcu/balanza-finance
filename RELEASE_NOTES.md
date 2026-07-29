@@ -1,13 +1,14 @@
-# Release Notes — v1.14.3
+# Release Notes — v1.14.4
 
-## 🐛 Critical Android Manifest Service Fix
+## 🐛 Fix Notification Listener Visibility in Android Settings
 
-### 🛡️ Remove Invalid Legacy Service Declaration in AndroidManifest.xml
+### 🛡️ Add Official Plugin Service & Receiver to AndroidManifest.xml
 - **Root Cause**:
-  - Removed an invalid, non-existent legacy service tag (`com.cachet.flutter_notification_listener.NotificationListener`) from `android/app/src/main/AndroidManifest.xml`.
-  - Android OS attempted to instantiate this non-existent class whenever Notification Access was enabled, triggering an unhandled native `ClassNotFoundException` that crashed the app process immediately on launch (`balanza closed because this app has a bug`).
+  - `balanza` disappeared from Android's **Notification Access** settings list because Android OS requires an explicit `<service>` tag with `android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE"` and `<action android:name="android.service.notification.NotificationListenerService"/>`.
 - **Resolution**:
-  - `flutter_notification_listener`'s valid native service (`im.nian.flutter_notification_listener.NotificationsListenerService`) is now automatically merged by Gradle without conflicts, completely fixing the startup and permission crash.
+  - Configured the official package service (`im.zoe.labs.flutter_notification_listener.NotificationsHandlerService`) and `RebootBroadcastReceiver` in `android/app/src/main/AndroidManifest.xml`.
+  - Added Android 13/14 foreground service & notification permissions (`WAKE_LOCK`, `RECEIVE_BOOT_COMPLETED`, `FOREGROUND_SERVICE`, `POST_NOTIFICATIONS`, `FOREGROUND_SERVICE_SPECIAL_USE`).
+  - `balanza` now correctly appears in Android's **Notification Access** settings screen and allows toggling permission without crashing or disappearing!
 
 ---
 
@@ -19,7 +20,7 @@
 - **Robust Notification Parsing Engine**:
   - `NotificationParser` utility with diacritic cleaning (`ă->a`, `ș->s`, `ț->t`), European (`1.250,50`) vs US (`1,250.50`) number parsing, and merchant auto-tagging.
 - **60-Second Deduplication**:
-  - Built-in deduplication engine discards duplicate transactions logged within 60 seconds.
+  - Discards duplicate transactions logged within 60 seconds.
 - **Interactive Pending Inbox Banner**:
   - Dashboard banner displaying pending notifications for review with `Dismissible` swipe gestures (Swipe Right = Approve, Swipe Left = Reject, Tap = Edit).
 
