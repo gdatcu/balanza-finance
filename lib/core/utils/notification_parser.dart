@@ -267,6 +267,14 @@ class NotificationParser {
       categoryId = tagResult?.categoryId;
     }
 
+    if (categoryId == null) {
+      if (isIncome) {
+        categoryId = '00000000-0000-0000-0000-0000000000c5'; // Salary / Income
+      } else {
+        categoryId = '00000000-0000-0000-0000-000000000c14'; // Other / Expense
+      }
+    }
+
     return ParsedBankNotification(
       amount: parsedAmount,
       currency: currency,

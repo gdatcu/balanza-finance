@@ -1449,7 +1449,9 @@ class _HomeViewState extends ConsumerState<HomeView> {
   Widget _buildTransactionRow(Transaction tx) {
     final cat = defaultCategories.firstWhere(
       (c) => c.id == tx.categoryId,
-      orElse: () => defaultCategories.first,
+      orElse: () => tx.amount > 0
+          ? defaultCategories.firstWhere((c) => c.id == '00000000-0000-0000-0000-0000000000c5')
+          : defaultCategories.firstWhere((c) => c.id == '00000000-0000-0000-0000-000000000c14'),
     );
 
     return Dismissible(

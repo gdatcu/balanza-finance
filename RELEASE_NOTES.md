@@ -1,13 +1,14 @@
-# Release Notes — v1.15.9
+# Release Notes — v1.16.0
 
-## 🚀 Complete Restoration of Historical & Database Transactions
+## 🏷️ Intelligent Income & Expense Auto-Categorization
 
-### ⚡ PostgREST Query Clean-up
-- **Root Cause Fixed**:
-  - An invalid PostgREST `.or(...)` filter was causing database queries to return an error, which defaulted to an empty list on the Dashboard.
+### 💡 Income Default Category Fix
+- **Root Cause Identified**:
+  - Previously, when an incoming transfer (e.g. BCR, Revolut) arrived without a specific merchant rule, `categoryId` was left null and the UI fell back to index 0 of `defaultCategories`, which was **Food**.
 - **Resolution**:
-  - Cleaned up the query in `TransactionRepository` to use standard, reliable database fetches combined with Dart memory filtering (`!tx.isPendingReview`).
-  - All your historical transactions stored in your Supabase database are now fetched and rendered on the Dashboard!
+  - `NotificationParser` and `home_view.dart` now intelligently assign:
+    - **Income Transactions** (`isIncome == true`): Defaults to **Salary / Income** (`c5`).
+    - **Expense Transactions** (`isIncome == false`): Defaults to **Other / Expense** (`c14`).
 
 ---
 
