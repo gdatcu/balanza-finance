@@ -1,18 +1,17 @@
-# Release Notes — v1.14.2
+# Release Notes — v1.14.3
 
-## 🐛 Critical Fix & Stability Release
+## 🐛 Critical Android Manifest Service Fix
 
-### 🛡️ Fix Android App Crash on Launch & Notification Permission Toggle
-- **Startup Registration**:
-  - Registered `NotificationSyncService.startListener()` inside `main()` on app startup, ensuring the native Java `NotificationsListenerService` always finds a valid Dart callback handle registered when Android OS binds the service.
-- **Top-Level Isolate Entry-Point**:
-  - Converted `_onNotificationData` to a top-level function marked `@pragma('vm:entry-point')`, preventing native Java `NullPointerException` on Android service bind/startup.
-- **Background Exception Immunity**:
-  - Protected `TransactionRepository` and isolate background handlers against uninitialized `Supabase.instance` during Android system background events.
+### 🛡️ Remove Invalid Legacy Service Declaration in AndroidManifest.xml
+- **Root Cause**:
+  - Removed an invalid, non-existent legacy service tag (`com.cachet.flutter_notification_listener.NotificationListener`) from `android/app/src/main/AndroidManifest.xml`.
+  - Android OS attempted to instantiate this non-existent class whenever Notification Access was enabled, triggering an unhandled native `ClassNotFoundException` that crashed the app process immediately on launch (`balanza closed because this app has a bug`).
+- **Resolution**:
+  - `flutter_notification_listener`'s valid native service (`im.nian.flutter_notification_listener.NotificationsListenerService`) is now automatically merged by Gradle without conflicts, completely fixing the startup and permission crash.
 
 ---
 
-## ✨ Key Features (v1.14.0)
+## ✨ Features (v1.14.0)
 
 ### 🏦 Zero-API Bank Sync via Android Notification Listener ("Pending Inbox")
 - **Automated Banking Notification Interceptor**:
@@ -20,11 +19,11 @@
 - **Robust Notification Parsing Engine**:
   - `NotificationParser` utility with diacritic cleaning (`ă->a`, `ș->s`, `ț->t`), European (`1.250,50`) vs US (`1,250.50`) number parsing, and merchant auto-tagging.
 - **60-Second Deduplication**:
-  - Built-in deduplication engine discards duplicate transactions logged within 60 seconds (preventing double entries from Google Wallet + Bank notification pairs).
+  - Built-in deduplication engine discards duplicate transactions logged within 60 seconds.
 - **Interactive Pending Inbox Banner**:
   - Dashboard banner displaying pending notifications for review with `Dismissible` swipe gestures (Swipe Right = Approve, Swipe Left = Reject, Tap = Edit).
 
 ---
 
 ## 🧪 Verification
-- Verified **`flutter test` (118/118 tests passed)** and **`flutter analyze` (0 issues found)**.
+- Verified **`flutter analyze` (0 issues found)**.
