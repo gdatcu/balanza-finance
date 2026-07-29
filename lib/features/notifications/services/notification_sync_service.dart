@@ -79,7 +79,7 @@ class NotificationSyncService {
         userId: '',
         accountId: 'default-acc',
         categoryId: parsed.categoryId,
-        amount: -parsed.amount.abs(), // Expenses are negative
+        amount: parsed.isIncome ? parsed.amount.abs() : -parsed.amount.abs(),
         description: parsed.merchant,
         date: now,
         createdAt: now,

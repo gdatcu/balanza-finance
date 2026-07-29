@@ -53,6 +53,18 @@ void main() {
       expect(res!.amount, equals(89.90));
       expect(res.currency, equals('RON'));
       expect(res.merchant, equals('Kaufland'));
+      expect(res.isIncome, isFalse);
+
+      final resIncome = NotificationParser.parseNotification(
+        packageName: 'ro.bcr.georgego',
+        title: 'Info incasari',
+        body: '🥳🥳 Ai primit 28.94 RON in contul George Platinum de la Datcu George Cristian in 29/07/2026 15:38.',
+      );
+      expect(resIncome, isNotNull);
+      expect(resIncome!.amount, equals(28.94));
+      expect(resIncome.currency, equals('RON'));
+      expect(resIncome.merchant, equals('Datcu George Cristian'));
+      expect(resIncome.isIncome, isTrue);
     });
 
     test('parseNotification parses Google Wallet notification', () {
