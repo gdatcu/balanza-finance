@@ -460,5 +460,41 @@ void main() {
       var updatedNudge = container.read(wealthAdvisorProvider);
       expect(updatedNudge?.id, isNot(equals(nudge.id)));
     });
+
+    test('Behavioral Nudge: Uncategorized expense 12-hour rule trigger (>12 hours working time cost)', () async {
+      final container = ProviderContainer(
+        overrides: [
+          monthlyBudgetProvider.overrideWith((ref) => Stream.value(1000.0)),
+          transactionListProvider.overrideWith(
+            (ref) => Stream.value([
+              Transaction(
+                id: 'tx-uncat-1',
+                userId: 'user-1',
+                accountId: 'acc-1',
+                categoryId: '00000000-0000-0000-0000-000000000c14',
+                amount: -1000.0,
+                description: 'Large mystery payment',
+                date: DateTime.now(),
+                createdAt: DateTime.now(),
+              ),
+            ]),
+          ),
+        ],
+      );
+
+      container.listen(transactionListProvider, (prev, next) {});
+      container.listen(monthlyBudgetProvider, (prev, next) {});
+      await pumpEventQueue();
+
+      final nudge = container.read(wealthAdvisorProvider);
+      expect(nudge, isNotNull);
+      expect(nudge!.id, equals('nudge_uncategorized_time_cost'));
+      expect(nudge.targetTransaction, isNotNull);
+      expect(nudge.targetTransaction!.id, equals('tx-uncat-1'));
+      expect(nudge.textEn, contains('Major Uncategorized Expense'));
+      expect(nudge.textRo, contains('Cheltuială Majoră Necategorisită'));
+      expect(nudge.getLocalizedActionLabel('en'), equals('Categorize Now'));
+      expect(nudge.getLocalizedActionLabel('ro'), equals('Categorisește Acum'));
+    });
   });
 }

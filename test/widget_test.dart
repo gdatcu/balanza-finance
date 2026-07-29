@@ -52,6 +52,17 @@ class MockTransactionRepository implements TransactionRepository {
 
   @override
   Future<void> deleteTransaction(String id) async {}
+
+  @override
+  Stream<List<Transaction>> getPendingTransactionsStream() => Stream.value([]);
+  @override
+  Future<List<Transaction>> getPendingTransactions() async => [];
+  @override
+  Future<void> approvePendingTransaction(String id) async {}
+  @override
+  Future<bool> checkDuplicateRecentTransaction(double amount, {int windowSeconds = 60}) async => false;
+  @override
+  Future<void> logDebugNotification(dynamic notification) async {}
 }
 
 void main() {
@@ -166,8 +177,8 @@ void main() {
     expect(find.text('Settings'), findsOneWidget);
     expect(find.text('Configure Budget'), findsOneWidget);
 
-    final textFormField = find.byType(TextFormField);
-    expect(textFormField, findsOneWidget);
+    final textFormField = find.byType(TextFormField).first;
+    expect(find.byType(TextFormField), findsNWidgets(2));
 
     await tester.enterText(textFormField, '1500.0');
     await tester.pump();

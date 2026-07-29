@@ -99,6 +99,12 @@ final transactionListProvider = StreamProvider<List<Transaction>>((ref) {
   return repository.getTransactionsStream(selectedMonth);
 });
 
+/// StreamProvider responsible for fetching live pending review transactions from Supabase.
+final pendingTransactionsProvider = StreamProvider<List<Transaction>>((ref) {
+  final repository = ref.watch(transactionRepositoryProvider);
+  return repository.getPendingTransactionsStream();
+});
+
 /// Provider to fetch categories dynamically from Supabase, merged with defaultCategories.
 final supabaseCategoriesProvider = FutureProvider<List<Category>>((ref) async {
   List<Category> remote = [];

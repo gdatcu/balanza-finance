@@ -23,6 +23,7 @@ import '../../net_worth/presentation/net_worth_view.dart';
 import '../../savings_goals/presentation/savings_goals_view.dart';
 import '../../budgets/providers/category_budget_progress_provider.dart';
 import '../../budgets/presentation/category_budget_input_sheet.dart';
+import '../../notifications/presentation/pending_inbox_banner.dart';
 
 enum ToshlSection {
   overview,
@@ -815,6 +816,10 @@ class _HomeViewState extends ConsumerState<HomeView> {
           const SizedBox(height: 8),
 
           if (_section == ToshlSection.overview) ...[
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.0),
+              child: PendingInboxBanner(),
+            ),
             if (advisorState != null) WealthAdvisorCard(state: advisorState),
             _buildAdvisorWidget(context),
             const SizedBox(height: 16),

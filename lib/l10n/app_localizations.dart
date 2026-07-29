@@ -1045,6 +1045,108 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{amount} remaining to target'**
   String remainingToSave(String amount);
+
+  /// No description provided for @dailyWorkingHours.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily working hours'**
+  String get dailyWorkingHours;
+
+  /// No description provided for @enterDailyWorkingHours.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter daily working hours (e.g. 8)'**
+  String get enterDailyWorkingHours;
+
+  /// No description provided for @dailyWorkingHoursHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Used to convert purchases into working time equivalent.'**
+  String get dailyWorkingHoursHelp;
+
+  /// No description provided for @categorizeNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Categorize Now'**
+  String get categorizeNow;
+
+  /// No description provided for @majorUncategorizedNudge.
+  ///
+  /// In en, this message translates to:
+  /// **'Major Uncategorized Expense: This purchase costs {hours} hours of your life energy. Large uncategorized expenses create budget blind spots. Please assign it a specific category to keep your financial goals on track.'**
+  String majorUncategorizedNudge(String hours);
+
+  /// No description provided for @bankAutoSync.
+  ///
+  /// In en, this message translates to:
+  /// **'Bank Auto-Sync'**
+  String get bankAutoSync;
+
+  /// No description provided for @bankAutoSyncHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Automatically intercepts push notifications from Revolut, BCR, Salt Bank, ING, and Google Wallet into a Pending Inbox.'**
+  String get bankAutoSyncHelp;
+
+  /// No description provided for @enableAutoSync.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable Auto-Sync'**
+  String get enableAutoSync;
+
+  /// No description provided for @autoSyncEnabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto-Sync Enabled'**
+  String get autoSyncEnabled;
+
+  /// No description provided for @autoSyncDisabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Notification Access Required'**
+  String get autoSyncDisabled;
+
+  /// No description provided for @grantNotificationAccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Grant Notification Access'**
+  String get grantNotificationAccess;
+
+  /// No description provided for @pendingInboxTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending Transactions ({count})'**
+  String pendingInboxTitle(int count);
+
+  /// No description provided for @pendingInboxSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Swipe right to approve, left to reject, or tap to edit.'**
+  String get pendingInboxSubtitle;
+
+  /// No description provided for @approve.
+  ///
+  /// In en, this message translates to:
+  /// **'Approve'**
+  String get approve;
+
+  /// No description provided for @reject.
+  ///
+  /// In en, this message translates to:
+  /// **'Reject'**
+  String get reject;
+
+  /// No description provided for @pendingTransactionApproved.
+  ///
+  /// In en, this message translates to:
+  /// **'Transaction approved into budget'**
+  String get pendingTransactionApproved;
+
+  /// No description provided for @pendingTransactionRejected.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending transaction rejected'**
+  String get pendingTransactionRejected;
 }
 
 class _AppLocalizationsDelegate

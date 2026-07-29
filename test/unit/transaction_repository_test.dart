@@ -32,6 +32,17 @@ class MockFullTransactionRepo implements TransactionRepository {
   Future<void> deleteTransaction(String id) async {
     _list.removeWhere((t) => t.id == id);
   }
+
+  @override
+  Stream<List<Transaction>> getPendingTransactionsStream() => Stream.value([]);
+  @override
+  Future<List<Transaction>> getPendingTransactions() async => [];
+  @override
+  Future<void> approvePendingTransaction(String id) async {}
+  @override
+  Future<bool> checkDuplicateRecentTransaction(double amount, {int windowSeconds = 60}) async => false;
+  @override
+  Future<void> logDebugNotification(dynamic notification) async {}
 }
 
 void main() {

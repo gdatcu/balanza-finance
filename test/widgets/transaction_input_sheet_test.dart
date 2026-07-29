@@ -34,6 +34,17 @@ class MockSheetTransactionRepo implements TransactionRepository {
 
   @override
   Stream<List<Transaction>> getTransactionsStream(DateTime month) => Stream.value([]);
+
+  @override
+  Stream<List<Transaction>> getPendingTransactionsStream() => Stream.value([]);
+  @override
+  Future<List<Transaction>> getPendingTransactions() async => [];
+  @override
+  Future<void> approvePendingTransaction(String id) async {}
+  @override
+  Future<bool> checkDuplicateRecentTransaction(double amount, {int windowSeconds = 60}) async => false;
+  @override
+  Future<void> logDebugNotification(dynamic notification) async {}
 }
 
 void main() {

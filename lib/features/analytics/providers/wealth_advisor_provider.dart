@@ -4,9 +4,11 @@ import '../../../models/transaction.dart';
 import '../../../models/category.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/category_localizer.dart';
+import '../../../core/utils/working_days_calculator.dart';
 import '../../transactions/providers/transaction_provider.dart';
 import '../../transactions/presentation/categories_data.dart';
 import '../../budgets/repositories/category_budget_repository.dart';
+import '../../settings/providers/user_settings_provider.dart';
 import '../../../models/category_budget.dart';
 import '../models/advisor_nudge.dart';
 
@@ -28,6 +30,9 @@ class WealthAdvisorState {
   final NudgeSeverity severity;
   final String textEn;
   final String textRo;
+  final Transaction? targetTransaction;
+  final String? actionLabelEn;
+  final String? actionLabelRo;
 
   const WealthAdvisorState({
     required this.id,
@@ -40,6 +45,9 @@ class WealthAdvisorState {
     this.severity = NudgeSeverity.info,
     String? textEn,
     String? textRo,
+    this.targetTransaction,
+    this.actionLabelEn,
+    this.actionLabelRo,
   })  : titleEn = titleEn ?? title,
         titleRo = titleRo ?? title,
         textEn = textEn ?? message,
@@ -51,6 +59,11 @@ class WealthAdvisorState {
 
   String getLocalizedText(String languageCode) {
     return languageCode == 'ro' ? textRo : textEn;
+  }
+
+  String? getLocalizedActionLabel(String languageCode) {
+    if (targetTransaction == null) return null;
+    return languageCode == 'ro' ? (actionLabelRo ?? 'Categorisește Acum') : (actionLabelEn ?? 'Categorize Now');
   }
 }
 
@@ -356,8 +369,108 @@ final wealthAdvisorProvider = Provider<WealthAdvisorState?>((ref) {
     }
   }
 
+  // H. Dynamic Time-Cost Engine (using exact monthly working days)
+  final selectedMonth = ref.watch(selectedMonthProvider);
+  final dailyWorkingHours = ref.watch(dailyWorkingHoursProvider).value ?? 8.0;
+  final int workingDaysInMonth = WorkingDaysCalculator.getWorkingDaysInMonth(selectedMonth);
+  final double totalWorkingHours = workingDaysInMonth * dailyWorkingHours;
+
+  final double totalMonthlyIncome = salaryIncome + sideHustleIncome + mealTicketsIncome;
+  final double baseIncomeForRate = totalMonthlyIncome > 0 ? totalMonthlyIncome : monthlyBudget;
+  final double hourlyRate = (baseIncomeForRate > 0 && totalWorkingHours > 0)
+      ? baseIncomeForRate / totalWorkingHours
+      : 0.0;
+
+  Transaction? highTimeCostTx;
+  double highTimeCostHours = 0.0;
+  String highTimeCostCatName = '';
+
+  Transaction? uncategorizedTimeCostTx;
+  double uncategorizedTimeCostHours = 0.0;
+
+  for (final tx in transactions) {
+    if (tx.amount < 0) {
+      final cat = defaultCategories.firstWhere(
+        (c) => c.id == tx.categoryId,
+        orElse: () => Category(
+          id: tx.categoryId ?? 'uncategorized',
+          name: tx.categoryId == null ? 'other' : 'uncategorized',
+          createdAt: DateTime.now(),
+        ),
+      );
+      final catName = cat.name.toLowerCase();
+      final effectiveRate = hourlyRate > 0 ? hourlyRate : 50.0;
+      final hours = tx.amount.abs() / effectiveRate;
+
+      if (catName == 'clothing' || catName == 'gadgets') {
+        if (hours > 8.0 && hours > highTimeCostHours) {
+          highTimeCostTx = tx;
+          highTimeCostHours = hours;
+          highTimeCostCatName = catName == 'clothing' ? 'Clothing' : 'Gadgets';
+        }
+      } else if (catName == 'other' || catName == 'uncategorized') {
+        if (hours > 12.0 && hours > uncategorizedTimeCostHours) {
+          uncategorizedTimeCostTx = tx;
+          uncategorizedTimeCostHours = hours;
+        }
+      }
+    }
+  }
+
+  // H1. Category-specific Time Cost Nudge (Clothing / Gadgets > 8 hours)
+  if (highTimeCostTx != null) {
+    const nudgeId = 'nudge_time_cost';
+    if (!dismissedIds.contains(nudgeId)) {
+      final amountStr = CurrencyFormatter.format(highTimeCostTx.amount.abs());
+      final hoursStr = highTimeCostHours.toStringAsFixed(1);
+      final en = 'Time Check: A purchase of $amountStr in $highTimeCostCatName cost over $hoursStr hours of work! Consider if this purchase delivers lasting value.';
+      final ro = 'Verificarea Timpului: O achiziție de $amountStr la $highTimeCostCatName te-a costat peste $hoursStr ore de muncă! Verifică dacă această achiziție îți aduce valoare durabilă.';
+      candidates.add(
+        WealthAdvisorState(
+          id: nudgeId,
+          title: 'BEHAVIORAL NUDGE • TIME CHECK ($hoursStr hrs)',
+          titleEn: 'BEHAVIORAL NUDGE • TIME CHECK ($hoursStr hrs)',
+          titleRo: 'RECOMANDARE COMPORTAMENTALĂ • VERIFICAREA TIMPULUI ($hoursStr ore)',
+          message: en,
+          textEn: en,
+          textRo: ro,
+          icon: Icons.access_time_rounded,
+          type: AdvisorType.nudge,
+          severity: NudgeSeverity.warning,
+        ),
+      );
+    }
+  }
+
+  // H2. Uncategorized Expense 12-Hour Rule Nudge
+  if (uncategorizedTimeCostTx != null) {
+    const nudgeId = 'nudge_uncategorized_time_cost';
+    if (!dismissedIds.contains(nudgeId)) {
+      final hoursStr = uncategorizedTimeCostHours.toStringAsFixed(1);
+      final en = 'Major Uncategorized Expense: This purchase costs $hoursStr hours of your life energy. Large uncategorized expenses create budget blind spots. Please assign it a specific category to keep your financial goals on track.';
+      final ro = 'Cheltuială Majoră Necategorisită: Această achiziție te costă $hoursStr ore din viață. Sumele mari necategorisite creează unghiuri moarte în buget. Te rugăm să îi asignezi o categorie pentru a-ți proteja obiectivele financiare.';
+      candidates.add(
+        WealthAdvisorState(
+          id: nudgeId,
+          title: 'BEHAVIORAL NUDGE • UNCATEGORIZED TIME COST ($hoursStr hrs)',
+          titleEn: 'BEHAVIORAL NUDGE • UNCATEGORIZED TIME COST ($hoursStr hrs)',
+          titleRo: 'RECOMANDARE COMPORTAMENTALĂ • COST ÎN TIMP NECATEGORISIT ($hoursStr ore)',
+          message: en,
+          textEn: en,
+          textRo: ro,
+          icon: Icons.help_outline_rounded,
+          type: AdvisorType.nudge,
+          severity: NudgeSeverity.warning,
+          targetTransaction: uncategorizedTimeCostTx,
+          actionLabelEn: 'Categorize Now',
+          actionLabelRo: 'Categorisește Acum',
+        ),
+      );
+    }
+  }
+
   // D. other trigger (> 20% spending uncategorized / other) -> Eliminate budget blind spots
-  if (totalExpenseSum > 0 && (otherSpending / totalExpenseSum) > 0.20) {
+  if (totalExpenseSum > 0 && (otherSpending / totalExpenseSum) > 0.20 && !candidates.any((c) => c.id == 'nudge_uncategorized_time_cost')) {
     const nudgeId = 'nudge_other_uncategorized';
     if (!dismissedIds.contains(nudgeId)) {
       const en = 'Over 20% of your total spending is uncategorized or marked as Other. Tagging transactions eliminates budget blind spots and keeps your tracking accurate.';
@@ -452,61 +565,6 @@ final wealthAdvisorProvider = Provider<WealthAdvisorState?>((ref) {
           icon: Icons.confirmation_number,
           type: AdvisorType.nudge,
           severity: NudgeSeverity.info,
-        ),
-      );
-    }
-  }
-
-  // H. Time Cost Rule (Clothing / Gadgets > 8 hours of work time)
-  final double totalMonthlyIncome = salaryIncome + sideHustleIncome + mealTicketsIncome;
-  final double baseIncomeForRate = totalMonthlyIncome > 0 ? totalMonthlyIncome : monthlyBudget;
-  final double hourlyRate = baseIncomeForRate / 160.0;
-
-  Transaction? highTimeCostTx;
-  double highTimeCostHours = 0.0;
-  String highTimeCostCatName = '';
-
-  for (final tx in transactions) {
-    if (tx.amount < 0) {
-      final cat = defaultCategories.firstWhere(
-        (c) => c.id == tx.categoryId,
-        orElse: () => Category(
-          id: tx.categoryId ?? 'uncategorized',
-          name: tx.categoryId == null ? 'other' : 'uncategorized',
-          createdAt: DateTime.now(),
-        ),
-      );
-      final catName = cat.name.toLowerCase();
-      if (catName == 'clothing' || catName == 'gadgets') {
-        final hours = tx.amount.abs() / (hourlyRate > 0 ? hourlyRate : 50.0);
-        if (hours > 8.0 && hours > highTimeCostHours) {
-          highTimeCostTx = tx;
-          highTimeCostHours = hours;
-          highTimeCostCatName = catName == 'clothing' ? 'Clothing' : 'Gadgets';
-        }
-      }
-    }
-  }
-
-  if (highTimeCostTx != null) {
-    const nudgeId = 'nudge_time_cost';
-    if (!dismissedIds.contains(nudgeId)) {
-      final amountStr = CurrencyFormatter.format(highTimeCostTx.amount.abs());
-      final hoursStr = highTimeCostHours.toStringAsFixed(1);
-      final en = 'Time Check: A purchase of $amountStr in $highTimeCostCatName cost over $hoursStr hours of work! Consider if this purchase delivers lasting value.';
-      final ro = 'Verificarea Timpului: O achiziție de $amountStr la $highTimeCostCatName te-a costat peste $hoursStr ore de muncă! Verifică dacă această achiziție îți aduce valoare durabilă.';
-      candidates.add(
-        WealthAdvisorState(
-          id: nudgeId,
-          title: 'BEHAVIORAL NUDGE • TIME CHECK ($hoursStr hrs)',
-          titleEn: 'BEHAVIORAL NUDGE • TIME CHECK ($hoursStr hrs)',
-          titleRo: 'RECOMANDARE COMPORTAMENTALĂ • VERIFICAREA TIMPULUI ($hoursStr ore)',
-          message: en,
-          textEn: en,
-          textRo: ro,
-          icon: Icons.access_time_rounded,
-          type: AdvisorType.nudge,
-          severity: NudgeSeverity.warning,
         ),
       );
     }

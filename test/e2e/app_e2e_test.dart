@@ -63,6 +63,17 @@ class E2EMockTransactionRepository implements TransactionRepository {
     _list.removeWhere((t) => t.id == id);
     _notify();
   }
+
+  @override
+  Stream<List<Transaction>> getPendingTransactionsStream() => Stream.value([]);
+  @override
+  Future<List<Transaction>> getPendingTransactions() async => [];
+  @override
+  Future<void> approvePendingTransaction(String id) async {}
+  @override
+  Future<bool> checkDuplicateRecentTransaction(double amount, {int windowSeconds = 60}) async => false;
+  @override
+  Future<void> logDebugNotification(dynamic notification) async {}
 }
 
 class E2EFakeBiometricLockNotifier extends BiometricLockNotifier {
@@ -156,7 +167,7 @@ void main() {
 
     // 6. Change Budget in Settings
     expect(find.text('Settings'), findsOneWidget);
-    final budgetField = find.byType(TextFormField);
+    final budgetField = find.byType(TextFormField).first;
     await tester.enterText(budgetField, '2000.0');
 
     final saveBudgetBtn = find.text('Save Budget');

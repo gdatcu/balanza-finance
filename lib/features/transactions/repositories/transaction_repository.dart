@@ -1,5 +1,6 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../models/transaction.dart';
+import '../../../models/debug_notification.dart';
 import '../presentation/categories_data.dart';
 
 class TransactionRepository {
@@ -18,7 +19,7 @@ class TransactionRepository {
         .order('date', ascending: false)
         .map((response) => response
             .map((json) => Transaction.fromJson(json))
-            .where((tx) => !tx.date.isBefore(start) && !tx.date.isAfter(end))
+            .where((tx) => !tx.isPendingReview && !tx.date.isBefore(start) && !tx.date.isAfter(end))
             .toList());
   }
 
@@ -26,16 +27,80 @@ class TransactionRepository {
     final start = DateTime(month.year, month.month, 1);
     final end = DateTime(month.year, month.month + 1, 0, 23, 59, 59, 999);
 
-    final response = await _client
-        .from('transactions')
-        .select()
-        .gte('date', start.toIso8601String())
-        .lte('date', end.toIso8601String())
-        .order('date', ascending: false);
+    try {
+      final response = await _client
+          .from('transactions')
+          .select()
+          .eq('is_pending_review', false)
+          .gte('date', start.toIso8601String())
+          .lte('date', end.toIso8601String())
+          .order('date', ascending: false);
 
-    return (response as List)
-        .map((json) => Transaction.fromJson(json as Map<String, dynamic>))
-        .toList();
+      return (response as List)
+          .map((json) => Transaction.fromJson(json as Map<String, dynamic>))
+          .toList();
+    } catch (_) {
+      return [];
+    }
+  }
+
+  Stream<List<Transaction>> getPendingTransactionsStream() {
+    return _client
+        .from('transactions')
+        .stream(primaryKey: ['id'])
+        .order('created_at', ascending: false)
+        .map((response) => response
+            .map((json) => Transaction.fromJson(json))
+            .where((tx) => tx.isPendingReview)
+            .toList());
+  }
+
+  Future<List<Transaction>> getPendingTransactions() async {
+    try {
+      final response = await _client
+          .from('transactions')
+          .select()
+          .eq('is_pending_review', true)
+          .order('created_at', ascending: false);
+
+      return (response as List)
+          .map((json) => Transaction.fromJson(json as Map<String, dynamic>))
+          .toList();
+    } catch (_) {
+      return [];
+    }
+  }
+
+  Future<void> approvePendingTransaction(String id) async {
+    try {
+      await _client
+          .from('transactions')
+          .update({'is_pending_review': false})
+          .eq('id', id);
+    } catch (_) {}
+  }
+
+  Future<bool> checkDuplicateRecentTransaction(double amount, {int windowSeconds = 60}) async {
+    try {
+      final cutoff = DateTime.now().subtract(Duration(seconds: windowSeconds)).toIso8601String();
+      final response = await _client
+          .from('transactions')
+          .select()
+          .gte('created_at', cutoff);
+
+      final list = (response as List).map((json) => Transaction.fromJson(json)).toList();
+      return list.any((tx) => (tx.amount.abs() - amount.abs()).abs() < 0.01);
+    } catch (_) {
+      return false;
+    }
+  }
+
+  Future<void> logDebugNotification(DebugNotification notification) async {
+    try {
+      await _client
+          .from('debug_notifications')
+          .insert(notification.toJson());
+    } catch (_) {}
   }
 
   Future<Transaction> addTransaction(Transaction transaction) async {

@@ -519,4 +519,62 @@ class AppLocalizationsRo extends AppLocalizations {
   String remainingToSave(String amount) {
     return 'Mai ai de economisit $amount';
   }
+
+  @override
+  String get dailyWorkingHours => 'Ore de lucru pe zi';
+
+  @override
+  String get enterDailyWorkingHours => 'Introdu orele de lucru pe zi (ex: 8)';
+
+  @override
+  String get dailyWorkingHoursHelp =>
+      'Folosit pentru a converti achizițiile în echivalent ore de muncă.';
+
+  @override
+  String get categorizeNow => 'Categorisește Acum';
+
+  @override
+  String majorUncategorizedNudge(String hours) {
+    return 'Cheltuială Majoră Necategorisită: Această achiziție te costă $hours ore din viață. Sumele mari necategorisite creează unghiuri moarte în buget. Te rugăm să îi asignezi o categorie pentru a-ți proteja obiectivele financiare.';
+  }
+
+  @override
+  String get bankAutoSync => 'Sincronizare Automată Bancară';
+
+  @override
+  String get bankAutoSyncHelp =>
+      'Preia automat notificările bancare de la Revolut, BCR, Salt Bank, ING și Google Wallet într-un Inbox în Așteptare.';
+
+  @override
+  String get enableAutoSync => 'Activează Sincronizarea';
+
+  @override
+  String get autoSyncEnabled => 'Sincronizare Activă';
+
+  @override
+  String get autoSyncDisabled => 'Acces Notificări Necesari';
+
+  @override
+  String get grantNotificationAccess => 'Permite Acces Notificări';
+
+  @override
+  String pendingInboxTitle(int count) {
+    return 'Tranzacții în Așteptare ($count)';
+  }
+
+  @override
+  String get pendingInboxSubtitle =>
+      'Glisează la dreapta pentru aprobare, la stânga pentru respingere, sau atinge pentru editare.';
+
+  @override
+  String get approve => 'Aprobă';
+
+  @override
+  String get reject => 'Respinge';
+
+  @override
+  String get pendingTransactionApproved => 'Tranzacție aprobată în buget';
+
+  @override
+  String get pendingTransactionRejected => 'Tranzacție respinsă';
 }

@@ -29,6 +29,17 @@ class MockTransactionRepo implements TransactionRepository {
 
   @override
   Future<Transaction> updateTransaction(Transaction transaction) async => transaction;
+
+  @override
+  Stream<List<Transaction>> getPendingTransactionsStream() => Stream.value([]);
+  @override
+  Future<List<Transaction>> getPendingTransactions() async => [];
+  @override
+  Future<void> approvePendingTransaction(String id) async {}
+  @override
+  Future<bool> checkDuplicateRecentTransaction(double amount, {int windowSeconds = 60}) async => false;
+  @override
+  Future<void> logDebugNotification(dynamic notification) async {}
 }
 
 class FakeTaggingRulesNotifier extends TaggingRulesNotifier {
