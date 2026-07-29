@@ -1,4 +1,4 @@
-# Release Notes — v1.13.1
+# Release Notes — v1.13.2
 
 ## ✨ New Features
 
