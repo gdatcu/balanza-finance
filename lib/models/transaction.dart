@@ -9,6 +9,7 @@ class Transaction {
   final DateTime createdAt;
   final String originalCurrency;
   final double? originalAmount;
+  final String emotionalStatus; // 'worth_it', 'regret', 'neutral'
 
   const Transaction({
     required this.id,
@@ -21,6 +22,7 @@ class Transaction {
     required this.createdAt,
     this.originalCurrency = 'RON',
     this.originalAmount,
+    this.emotionalStatus = 'neutral',
   });
 
   factory Transaction.fromJson(Map<String, dynamic> json) {
@@ -37,6 +39,7 @@ class Transaction {
       originalAmount: json['original_amount'] != null
           ? (json['original_amount'] as num).toDouble()
           : null,
+      emotionalStatus: json['emotional_status'] as String? ?? 'neutral',
     );
   }
 
@@ -52,6 +55,7 @@ class Transaction {
       'created_at': createdAt.toIso8601String(),
       'original_currency': originalCurrency,
       'original_amount': originalAmount,
+      'emotional_status': emotionalStatus,
     };
   }
 
@@ -66,6 +70,7 @@ class Transaction {
     DateTime? createdAt,
     String? originalCurrency,
     double? originalAmount,
+    String? emotionalStatus,
   }) {
     return Transaction(
       id: id ?? this.id,
@@ -78,6 +83,7 @@ class Transaction {
       createdAt: createdAt ?? this.createdAt,
       originalCurrency: originalCurrency ?? this.originalCurrency,
       originalAmount: originalAmount ?? this.originalAmount,
+      emotionalStatus: emotionalStatus ?? this.emotionalStatus,
     );
   }
 }

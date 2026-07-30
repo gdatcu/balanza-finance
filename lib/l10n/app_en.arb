@@ -245,5 +245,25 @@
   "noIncomeWarning": "Log income to enable Time Cost calculation",
   "putInWishlist": "Put it in the Wishlist",
   "walkAway": "Walk Away",
-  "buyingAnyway": "I'm buying it anyway"
+  "buyingAnyway": "I'm buying it anyway",
+  "emotionalEvaluation": "How do you feel about this purchase?",
+  "worthIt": "Worth it 🔥",
+  "regret": "Regret 🤦",
+  "timeBurnCalendar": "Time-Burn Calendar",
+  "regretDaysSummary": "You spent {days} working days this month on things you regret",
+  "@regretDaysSummary": {
+    "placeholders": {
+      "days": {
+        "type": "String"
+      }
+    }
+  },
+  "regretDayDetails": "You worked this day and regretted {amount}",
+  "@regretDayDetails": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  }
 }

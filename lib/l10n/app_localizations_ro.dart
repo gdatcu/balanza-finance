@@ -547,4 +547,27 @@ class AppLocalizationsRo extends AppLocalizations {
 
   @override
   String get buyingAnyway => 'Cumpăr oricum';
+
+  @override
+  String get emotionalEvaluation =>
+      'Cum te simți în legătură cu această achiziție?';
+
+  @override
+  String get worthIt => 'A meritat 🔥';
+
+  @override
+  String get regret => 'Regret 🤦';
+
+  @override
+  String get timeBurnCalendar => 'Calendarul Arderii Timpului';
+
+  @override
+  String regretDaysSummary(String days) {
+    return 'Ai petrecut $days zile de muncă în această lună pe lucruri pe care le regreți';
+  }
+
+  @override
+  String regretDayDetails(String amount) {
+    return 'Ai muncit în această zi și ai regretat $amount';
+  }
 }

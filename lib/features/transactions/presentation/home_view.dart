@@ -24,6 +24,7 @@ import '../../savings_goals/presentation/savings_goals_view.dart';
 import '../../budgets/providers/category_budget_progress_provider.dart';
 import '../../budgets/presentation/category_budget_input_sheet.dart';
 import '../../analytics/presentation/reality_check_sheet.dart';
+import '../../analytics/presentation/time_burn_calendar_view.dart';
 
 enum ToshlSection {
   overview,
@@ -666,6 +667,16 @@ class _HomeViewState extends ConsumerState<HomeView> {
                   onTap: () {
                     Navigator.of(context).pop();
                     RealityCheckSheet.show(context);
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.calendar_today, color: Color(0xFFFF7A5A)),
+                  title: Text(AppLocalizations.of(context)!.timeBurnCalendar, style: const TextStyle(color: Colors.white)),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => const TimeBurnCalendarView()),
+                    );
                   },
                 ),
                 const Divider(color: Colors.white12),

@@ -245,5 +245,25 @@
   "noIncomeWarning": "Adaugă venituri pentru a calcula costul în timp",
   "putInWishlist": "Pune în Lista de Dorințe",
   "walkAway": "Renunță și pleacă",
-  "buyingAnyway": "Cumpăr oricum"
+  "buyingAnyway": "Cumpăr oricum",
+  "emotionalEvaluation": "Cum te simți în legătură cu această achiziție?",
+  "worthIt": "A meritat 🔥",
+  "regret": "Regret 🤦",
+  "timeBurnCalendar": "Calendarul Arderii Timpului",
+  "regretDaysSummary": "Ai petrecut {days} zile de muncă în această lună pe lucruri pe care le regreți",
+  "@regretDaysSummary": {
+    "placeholders": {
+      "days": {
+        "type": "String"
+      }
+    }
+  },
+  "regretDayDetails": "Ai muncit în această zi și ai regretat {amount}",
+  "@regretDayDetails": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  }
 }

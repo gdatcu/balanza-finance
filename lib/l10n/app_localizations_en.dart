@@ -543,4 +543,26 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get buyingAnyway => 'I\'m buying it anyway';
+
+  @override
+  String get emotionalEvaluation => 'How do you feel about this purchase?';
+
+  @override
+  String get worthIt => 'Worth it 🔥';
+
+  @override
+  String get regret => 'Regret 🤦';
+
+  @override
+  String get timeBurnCalendar => 'Time-Burn Calendar';
+
+  @override
+  String regretDaysSummary(String days) {
+    return 'You spent $days working days this month on things you regret';
+  }
+
+  @override
+  String regretDayDetails(String amount) {
+    return 'You worked this day and regretted $amount';
+  }
 }

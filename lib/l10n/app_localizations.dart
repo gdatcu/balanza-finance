@@ -1093,6 +1093,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'I\'m buying it anyway'**
   String get buyingAnyway;
+
+  /// No description provided for @emotionalEvaluation.
+  ///
+  /// In en, this message translates to:
+  /// **'How do you feel about this purchase?'**
+  String get emotionalEvaluation;
+
+  /// No description provided for @worthIt.
+  ///
+  /// In en, this message translates to:
+  /// **'Worth it 🔥'**
+  String get worthIt;
+
+  /// No description provided for @regret.
+  ///
+  /// In en, this message translates to:
+  /// **'Regret 🤦'**
+  String get regret;
+
+  /// No description provided for @timeBurnCalendar.
+  ///
+  /// In en, this message translates to:
+  /// **'Time-Burn Calendar'**
+  String get timeBurnCalendar;
+
+  /// No description provided for @regretDaysSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'You spent {days} working days this month on things you regret'**
+  String regretDaysSummary(String days);
+
+  /// No description provided for @regretDayDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'You worked this day and regretted {amount}'**
+  String regretDayDetails(String amount);
 }
 
 class _AppLocalizationsDelegate

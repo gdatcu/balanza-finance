@@ -31,6 +31,7 @@ class _TransactionInputSheetState extends ConsumerState<TransactionInputSheet> {
   DateTime _selectedDate = DateTime.now();
   String _selectedCurrency = 'RON';
   String? _lastAutoTaggedRuleId;
+  String _emotionalStatus = 'neutral';
 
   // Seeded Account IDs: Main Checking is default
   final String _selectedAccountId = '00000000-0000-0000-0000-000000000001';
@@ -44,6 +45,7 @@ class _TransactionInputSheetState extends ConsumerState<TransactionInputSheet> {
       _selectedCategoryId = tx.categoryId;
       _selectedDate = tx.date;
       _selectedCurrency = tx.originalCurrency;
+      _emotionalStatus = tx.emotionalStatus;
       final absAmt = tx.originalAmount != null
           ? tx.originalAmount!.abs()
           : tx.amount.abs();
@@ -148,6 +150,7 @@ class _TransactionInputSheetState extends ConsumerState<TransactionInputSheet> {
           createdAt: widget.transactionToEdit!.createdAt,
           originalCurrency: originalCurrencyVal,
           originalAmount: originalAmount,
+          emotionalStatus: _emotionalStatus,
         );
 
         try {
@@ -185,6 +188,7 @@ class _TransactionInputSheetState extends ConsumerState<TransactionInputSheet> {
         createdAt: DateTime.now(),
         originalCurrency: originalCurrencyVal,
         originalAmount: originalAmount,
+        emotionalStatus: _emotionalStatus,
       );
 
       try {
@@ -494,6 +498,73 @@ class _TransactionInputSheetState extends ConsumerState<TransactionInputSheet> {
                     ),
                   ),
                 ),
+                if (!_isIncome) ...[
+                  const SizedBox(height: 16),
+                  Text(
+                    AppLocalizations.of(context)!.emotionalEvaluation,
+                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.grey),
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () {
+                            setState(() {
+                              _emotionalStatus = 'worth_it';
+                            });
+                          },
+                          style: OutlinedButton.styleFrom(
+                            side: BorderSide(
+                              color: _emotionalStatus == 'worth_it' ? const Color(0xFF10B981) : Colors.grey.shade700,
+                              width: _emotionalStatus == 'worth_it' ? 2.0 : 1.0,
+                            ),
+                            backgroundColor: _emotionalStatus == 'worth_it'
+                                ? const Color(0xFF10B981).withValues(alpha: 0.15)
+                                : Colors.transparent,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          ),
+                          child: Text(
+                            AppLocalizations.of(context)!.worthIt,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: _emotionalStatus == 'worth_it' ? const Color(0xFF10B981) : Colors.white70,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () {
+                            setState(() {
+                              _emotionalStatus = 'regret';
+                            });
+                          },
+                          style: OutlinedButton.styleFrom(
+                            side: BorderSide(
+                              color: _emotionalStatus == 'regret' ? const Color(0xFFFF7A5A) : Colors.grey.shade700,
+                              width: _emotionalStatus == 'regret' ? 2.0 : 1.0,
+                            ),
+                            backgroundColor: _emotionalStatus == 'regret'
+                                ? const Color(0xFFFF7A5A).withValues(alpha: 0.15)
+                                : Colors.transparent,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          ),
+                          child: Text(
+                            AppLocalizations.of(context)!.regret,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: _emotionalStatus == 'regret' ? const Color(0xFFFF7A5A) : Colors.white70,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
                 const SizedBox(height: 24),
 
                 ElevatedButton(
