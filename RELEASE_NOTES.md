@@ -1,14 +1,19 @@
-# Release Notes — v1.16.0
+# Release Notes — v1.16.1
 
-## 🏷️ Intelligent Income & Expense Auto-Categorization
+## 🛒 Built-in Merchant Auto-Tagging & Smart Category Matching
 
-### 💡 Income Default Category Fix
+### ⚡ Automatic Merchant Categorization
 - **Root Cause Identified**:
-  - Previously, when an incoming transfer (e.g. BCR, Revolut) arrived without a specific merchant rule, `categoryId` was left null and the UI fell back to index 0 of `defaultCategories`, which was **Food**.
+  - Bank notifications for popular merchants (such as **Kaufland** or **Starbucks**) fell back to `Other` because built-in merchant rules had not been initialized in background notification parsing.
 - **Resolution**:
-  - `NotificationParser` and `home_view.dart` now intelligently assign:
-    - **Income Transactions** (`isIncome == true`): Defaults to **Salary / Income** (`c5`).
-    - **Expense Transactions** (`isIncome == false`): Defaults to **Other / Expense** (`c14`).
+  - Created `defaultTaggingRules` containing keyword rules for major merchants & services:
+    - **Groceries**: Kaufland, Lidl, Carrefour, Mega Image, Profi, Auchan, Penny.
+    - **Coffee & Tea**: Starbucks, 5 to go, Tucano, McCafé.
+    - **Restaurants & Delivery**: McDonald's, KFC, Glovo, Tazz, Wolt.
+    - **Transport**: Uber, Bolt, OMV, Petrom.
+    - **Subscriptions**: Netflix, Spotify, YouTube.
+    - **Shopping**: eMAG, Zara, H&M.
+  - Updated `NotificationParser` and `home_view.dart` to auto-resolve merchant names dynamically. **Kaufland** automatically categorizes as **Groceries** and **Starbucks** automatically categorizes as **Coffee & Tea**!
 
 ---
 

@@ -1,5 +1,6 @@
 import '../../features/transactions/utils/transaction_parser.dart';
 import '../../models/tagging_rule.dart';
+import 'default_tagging_rules.dart';
 
 class ParsedBankNotification {
   final double amount;
@@ -262,10 +263,9 @@ class NotificationParser {
 
     // Auto-Tagging Merchant
     String? categoryId;
-    if (rules != null && rules.isNotEmpty) {
-      final tagResult = TransactionParser.parseText(merchant, rules);
-      categoryId = tagResult?.categoryId;
-    }
+    final activeRules = (rules != null && rules.isNotEmpty) ? rules : defaultTaggingRules;
+    final tagResult = TransactionParser.parseText(merchant, activeRules);
+    categoryId = tagResult?.categoryId;
 
     if (categoryId == null) {
       if (isIncome) {
