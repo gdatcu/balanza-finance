@@ -139,7 +139,7 @@ class TransactionRepository {
           }, onConflict: 'id');
         } catch (_) {}
 
-        await client.from('transactions').upsert(updatedTx.toJson(), onConflict: 'id');
+        await client.from('transactions').upsert(updatedTx.toDbJson(), onConflict: 'id');
       } catch (e) {
         debugPrint('_syncLocalTransactionsToSupabase error: $e');
       }
@@ -389,7 +389,7 @@ class TransactionRepository {
     try {
       final response = await client
           .from('transactions')
-          .insert(updatedTx.toJson())
+          .insert(updatedTx.toDbJson())
           .select()
           .single();
 
@@ -408,7 +408,7 @@ class TransactionRepository {
         try {
           final response = await client
               .from('transactions')
-              .insert(fallbackTx.toJson())
+              .insert(fallbackTx.toDbJson())
               .select()
               .single();
           return Transaction.fromJson(response);
