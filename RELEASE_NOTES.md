@@ -1,9 +1,9 @@
-# Release Notes — v1.17.5
+# Release Notes — v1.17.6
 
-## 🐛 Fixes & Improvements
+## 🐛 Critical Fixes & Improvements
 
-- **Core fix**: `is_pending_review` field removed from Supabase writes (continues from v1.17.4).
-- **Version bump**: Updated app version to `1.17.5+48`.
-- Minor dependency upgrades where possible.
+- **Database & Sync Fix**: Resolved PostgREST schema mismatch error (`PGRST204: Column Not Found: is_pending_review`) by updating transaction edits and notification approvals to use `.toDbJson()`.
+- **Notification Interceptor Isolate Guard**: Added safe null-guards for Supabase client references in `PushNotificationService` and `NotificationSyncService` to prevent background isolate crashes on incoming bank notifications.
+- **Agent Policy Update**: Added mandatory explicit user approval rule to `.agents/AGENTS.md`.
 
-All tests pass (`120/120`).
+All tests passing (`120/120`).
