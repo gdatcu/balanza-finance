@@ -26,7 +26,6 @@ void main() async {
 
   await Supabase.initialize(
     url: 'https://rlgnmcqergdjuxknhqhw.supabase.co',
-    // The publishable (anon) key for Supabase.
     publishableKey: 'sb_publishable_qI0TdNv5VJQpKvlkSCassA_1slJiy9K',
   );
 

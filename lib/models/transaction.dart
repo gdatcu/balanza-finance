@@ -59,23 +59,6 @@ class Transaction {
     };
   }
 
-  /// JSON safe for Supabase writes — omits columns not present in the DB schema.
-  Map<String, dynamic> toDbJson() {
-    return {
-      'id': id,
-      'user_id': userId,
-      'account_id': accountId,
-      'category_id': categoryId,
-      'amount': amount,
-      'description': description,
-      'date': date.toIso8601String(),
-      'created_at': createdAt.toIso8601String(),
-      'original_currency': originalCurrency,
-      'original_amount': originalAmount,
-      // 'is_pending_review' intentionally excluded — column does not exist in Supabase transactions table
-    };
-  }
-
   Transaction copyWith({
     String? id,
     String? userId,

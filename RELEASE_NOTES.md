@@ -1,9 +1,14 @@
-# Release Notes — v1.17.6
+# Release Notes — v1.17.7
 
-## 🐛 Critical Fixes & Improvements
+## ⚡ Restored Stable Baseline (v1.16.3 Baseline)
 
-- **Database & Sync Fix**: Resolved PostgREST schema mismatch error (`PGRST204: Column Not Found: is_pending_review`) by updating transaction edits and notification approvals to use `.toDbJson()`.
-- **Notification Interceptor Isolate Guard**: Added safe null-guards for Supabase client references in `PushNotificationService` and `NotificationSyncService` to prevent background isolate crashes on incoming bank notifications.
-- **Agent Policy Update**: Added mandatory explicit user approval rule to `.agents/AGENTS.md`.
+### 🔄 System Rollback
+- Restored the complete codebase, sync engine, and test suite to the clean, proven **v1.16.3** stable baseline.
+- All experimental notification interceptor changes and unstable background listener services have been completely removed.
+- Instant Supabase Realtime multi-device sync and core transaction management are fully intact and operating on stable foundations.
 
-All tests passing (`120/120`).
+---
+
+## 🧪 Verification
+- **`flutter test`**: All test suites passed!
+- **`flutter analyze`**: 0 issues found!

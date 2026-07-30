@@ -14,17 +14,6 @@ const List<String> allowedBankPackages = [
   'ro.salt.bank',
   'ro.ing.mobile.banking',
   'com.google.android.apps.walletnfcrel',
-  'com.google.android.gms',
-  'com.google.android.apps.messaging',
-  'com.bancatransilvania.bft',
-  'ro.bancatransilvania.btpay',
-  'ro.raiffeisen.smartmobile',
-  'ro.cec.mobile',
-  'ro.unicredit.mobile',
-  'com.transferwise.android',
-  'com.curvecard',
-  'com.alphabank.ro',
-  'ro.brd.brd',
 ];
 
 /// Top-level background callback for flutter_notification_listener
@@ -107,17 +96,7 @@ class NotificationSyncService {
         lower.contains('george') ||
         lower.contains('salt') ||
         lower.contains('ing') ||
-        lower.contains('wallet') ||
-        lower.contains('pay') ||
-        lower.contains('bank') ||
-        lower.contains('transilvania') ||
-        lower.contains('btpay') ||
-        lower.contains('raiffeisen') ||
-        lower.contains('wise') ||
-        lower.contains('cec') ||
-        lower.contains('unicredit') ||
-        lower.contains('alpha') ||
-        lower.contains('brd');
+        lower.contains('wallet');
   }
 
   /// Processes an incoming notification event
@@ -167,10 +146,7 @@ class NotificationSyncService {
       // Read last authenticated user ID if available
       String userId = '00000000-0000-0000-0000-000000000000';
       try {
-        String? currentAuthId;
-        try {
-          currentAuthId = Supabase.instance.client.auth.currentUser?.id;
-        } catch (_) {}
+        final currentAuthId = Supabase.instance.client.auth.currentUser?.id;
         if (currentAuthId != null && currentAuthId.isNotEmpty) {
           userId = currentAuthId;
         } else {

@@ -62,88 +62,40 @@ class TransactionRepository {
   }
 
   Future<List<Transaction>> getTransactions(DateTime month) async {
+    final start = DateTime(month.year, month.month, 1);
+    final end = DateTime(month.year, month.month + 1, 0, 23, 59, 59, 999);
+
+    final List<Transaction> result = _localApprovedTransactions.where((tx) {
+      return !tx.isPendingReview && !tx.date.isBefore(start) && !tx.date.isAfter(end);
+    }).toList();
+
     final client = _client;
     if (client != null) {
-      await _syncLocalTransactionsToSupabase();
-      await claimUnassignedPendingTransactions();
-
       try {
         final response = await client
             .from('transactions')
             .select()
-            .order('date', ascending: false)
-            .limit(500);
+            .gte('date', start.toIso8601String())
+            .lte('date', end.toIso8601String())
+            .order('date', ascending: false);
 
         final remote = (response as List)
             .map((json) => Transaction.fromJson(json as Map<String, dynamic>))
-            .where((tx) => !tx.isPendingReview && tx.date.year == month.year && tx.date.month == month.month)
+            .where((tx) => !tx.isPendingReview)
             .toList();
 
         for (final r in remote) {
-          _localApprovedTransactions.removeWhere((tx) => tx.id == r.id);
-          _localApprovedTransactions.add(r);
-        }
-
-        final resultList = <Transaction>[...remote];
-        for (final localTx in _localApprovedTransactions) {
-          if (!localTx.isPendingReview &&
-              localTx.date.year == month.year &&
-              localTx.date.month == month.month &&
-              !resultList.any((r) => r.id == localTx.id)) {
-            resultList.add(localTx);
+          if (!result.any((tx) => tx.id == r.id)) {
+            result.add(r);
           }
         }
-
-        resultList.sort((a, b) => b.date.compareTo(a.date));
-        return resultList;
       } catch (e) {
         debugPrint('TransactionRepository.getTransactions error: $e');
       }
     }
 
-    final List<Transaction> result = _localApprovedTransactions.where((tx) {
-      return !tx.isPendingReview && tx.date.year == month.year && tx.date.month == month.month;
-    }).toList();
     result.sort((a, b) => b.date.compareTo(a.date));
     return result;
-  }
-
-  Future<void> _syncLocalTransactionsToSupabase() async {
-    final client = _client;
-    if (client == null) return;
-
-    final currentUserId = client.auth.currentUser?.id;
-    final targetUserId = (currentUserId != null && currentUserId.isNotEmpty)
-        ? currentUserId
-        : '00000000-0000-0000-0000-000000000000';
-
-    for (final tx in List<Transaction>.from(_localApprovedTransactions)) {
-      try {
-        var updatedTx = tx;
-        if (updatedTx.userId.isEmpty || updatedTx.userId == '00000000-0000-0000-0000-000000000000') {
-          updatedTx = updatedTx.copyWith(userId: targetUserId);
-        }
-        if (updatedTx.accountId.isEmpty || updatedTx.accountId == 'default-acc') {
-          updatedTx = updatedTx.copyWith(accountId: '00000000-0000-0000-0000-000000000001');
-        }
-
-        try {
-          await client.from('accounts').upsert({
-            'id': updatedTx.accountId,
-            'name': 'Main Account',
-            'type': 'checking',
-            'balance': 0.0,
-            'currency': 'RON',
-            if (targetUserId.isNotEmpty) 'user_id': targetUserId,
-            'created_at': DateTime.now().toIso8601String(),
-          }, onConflict: 'id');
-        } catch (_) {}
-
-        await client.from('transactions').upsert(updatedTx.toDbJson(), onConflict: 'id');
-      } catch (e) {
-        debugPrint('_syncLocalTransactionsToSupabase error: $e');
-      }
-    }
   }
 
   Future<void> claimUnassignedPendingTransactions() async {
@@ -157,6 +109,7 @@ class TransactionRepository {
       await client
           .from('transactions')
           .update({'user_id': currentUserId})
+          .eq('is_pending_review', true)
           .eq('user_id', '00000000-0000-0000-0000-000000000000');
     } catch (_) {}
   }
@@ -199,7 +152,32 @@ class TransactionRepository {
   }
 
   Future<List<Transaction>> getPendingTransactions() async {
-    return List.from(_localPendingTransactions);
+    final List<Transaction> result = List.from(_localPendingTransactions);
+
+    final client = _client;
+    if (client != null) {
+      await claimUnassignedPendingTransactions();
+
+      try {
+        final response = await client
+            .from('transactions')
+            .select()
+            .eq('is_pending_review', true)
+            .order('created_at', ascending: false);
+
+        final remote = (response as List)
+            .map((json) => Transaction.fromJson(json as Map<String, dynamic>))
+            .toList();
+
+        for (final r in remote) {
+          if (!result.any((tx) => tx.id == r.id)) {
+            result.add(r);
+          }
+        }
+      } catch (_) {}
+    }
+
+    return result;
   }
 
   Future<void> approvePendingTransaction(String id) async {
@@ -210,9 +188,18 @@ class TransactionRepository {
     }
 
     if (found == null) {
-      final indexApproved = _localApprovedTransactions.indexWhere((tx) => tx.id == id);
-      if (indexApproved != -1) {
-        found = _localApprovedTransactions[indexApproved];
+      final client = _client;
+      if (client != null) {
+        try {
+          final response = await client
+              .from('transactions')
+              .select()
+              .eq('id', id)
+              .maybeSingle();
+          if (response != null) {
+            found = Transaction.fromJson(response);
+          }
+        } catch (_) {}
       }
     }
 
@@ -220,7 +207,18 @@ class TransactionRepository {
       final approvedTx = found.copyWith(isPendingReview: false);
       _localApprovedTransactions.removeWhere((tx) => tx.id == approvedTx.id);
       _localApprovedTransactions.insert(0, approvedTx);
-      await addTransaction(approvedTx);
+
+      final client = _client;
+      if (client != null) {
+        try {
+          await client
+              .from('transactions')
+              .update({'is_pending_review': false})
+              .eq('id', id);
+        } catch (_) {
+          await addTransaction(approvedTx);
+        }
+      }
     }
   }
 
@@ -313,18 +311,6 @@ class TransactionRepository {
       updatedTx = updatedTx.copyWith(accountId: '00000000-0000-0000-0000-000000000001');
     }
 
-    try {
-      await client.from('accounts').upsert({
-        'id': updatedTx.accountId,
-        'name': 'Main Account',
-        'type': 'checking',
-        'balance': 0.0,
-        'currency': 'RON',
-        if (currentUserId != null && currentUserId.isNotEmpty) 'user_id': currentUserId,
-        'created_at': DateTime.now().toIso8601String(),
-      }, onConflict: 'id');
-    } catch (_) {}
-
     if (updatedTx.categoryId != null && updatedTx.categoryId!.isNotEmpty) {
       try {
         final cat = defaultCategories.firstWhere(
@@ -344,7 +330,7 @@ class TransactionRepository {
     try {
       final response = await client
           .from('transactions')
-          .insert(updatedTx.toDbJson())
+          .insert(updatedTx.toJson())
           .select()
           .single();
 
@@ -363,7 +349,7 @@ class TransactionRepository {
         try {
           final response = await client
               .from('transactions')
-              .insert(fallbackTx.toDbJson())
+              .insert(fallbackTx.toJson())
               .select()
               .single();
           return Transaction.fromJson(response);
@@ -412,7 +398,7 @@ class TransactionRepository {
     try {
       final response = await client
           .from('transactions')
-          .update(updatedTx.toDbJson())
+          .update(updatedTx.toJson())
           .eq('id', updatedTx.id)
           .select()
           .single();
@@ -423,7 +409,7 @@ class TransactionRepository {
         final fallbackTx = updatedTx.copyWith(categoryId: null);
         final response = await client
             .from('transactions')
-            .update(fallbackTx.toDbJson())
+            .update(fallbackTx.toJson())
             .eq('id', fallbackTx.id)
             .select()
             .single();
