@@ -27,7 +27,7 @@ void main() async {
   await Supabase.initialize(
     url: 'https://rlgnmcqergdjuxknhqhw.supabase.co',
     // The publishable (anon) key for Supabase.
-    anonKey: 'sb_publishable_qI0TdNv5VJQpKvlkSCassA_1slJiy9K',
+    publishableKey: 'sb_publishable_qI0TdNv5VJQpKvlkSCassA_1slJiy9K',
   );
 
   final currentUserId = Supabase.instance.client.auth.currentUser?.id;
