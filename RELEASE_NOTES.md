@@ -1,14 +1,14 @@
-# Release Notes — v1.17.1
+# Release Notes — v1.17.2
 
-## ⚡ Cross-Device Supabase Sync & Account Foreign Key Auto-Setup
+## ⚡ Multi-Device Realtime Cloud Synchronization Engine
 
-### 🌐 Instant Multi-Device Sync Fix
+### 🌐 Cross-Device Sync & Unauthenticated Session Handling
 - **Root Cause Identified**:
-  - Transactions added on one device (e.g. Web `Entertainment -45 RON`) were failing silently on cloud database insert because the default account (`00000000-0000-0000-0000-000000000001`) had not been upserted into Supabase's `accounts` table, triggering PostgreSQL foreign key constraint errors (`23503`).
+  - When running the app on Web (or a new session), if the user is unauthenticated or has local-only transactions (e.g. `Entertainment -45 RON`), they remained stored in local RAM and were not synced to Supabase Cloud DB.
 - **Resolution**:
-  - Implemented automatic account record upserting in `TransactionRepository.addTransaction()` so all transaction inserts succeed on Supabase cloud database 100% of the time.
-  - Implemented `claimUnassignedPendingTransactions()` auto-claimer: Any bank notifications intercepted in guest or background mode are automatically claimed by your active Supabase user account and broadcasted to Web and Mobile apps in real time.
-  - Prioritized Supabase cloud database as the single source of truth in `getTransactions()`, keeping local memory caches 100% synchronized across all connected devices.
+  - Implemented `_syncLocalTransactionsToSupabase()` background sync engine: automatically uploads any unsynced local transactions to Supabase Cloud DB on every sync cycle.
+  - Implemented Ground Truth Cloud Sync in `getTransactions()`: fetches all Cloud DB records, merges them with local transactions, and broadcasts the unified transaction stream to Web, Android, and iOS devices in real time.
+  - Resolved Chrome hot-reload / stale instance state synchronization across devices.
 
 ---
 

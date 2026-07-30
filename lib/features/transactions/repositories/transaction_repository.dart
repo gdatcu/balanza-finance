@@ -67,6 +67,7 @@ class TransactionRepository {
 
     final client = _client;
     if (client != null) {
+      await _syncLocalTransactionsToSupabase();
       await claimUnassignedPendingTransactions();
 
       try {
@@ -109,6 +110,25 @@ class TransactionRepository {
     }).toList();
     result.sort((a, b) => b.date.compareTo(a.date));
     return result;
+  }
+
+  Future<void> _syncLocalTransactionsToSupabase() async {
+    final client = _client;
+    if (client == null) return;
+
+    final currentUserId = client.auth.currentUser?.id;
+    final targetUserId = (currentUserId != null && currentUserId.isNotEmpty)
+        ? currentUserId
+        : '00000000-0000-0000-0000-000000000000';
+
+    for (final tx in List<Transaction>.from(_localApprovedTransactions)) {
+      try {
+        final updatedTx = tx.copyWith(userId: targetUserId);
+        await client.from('transactions').upsert(updatedTx.toJson(), onConflict: 'id');
+      } catch (e) {
+        debugPrint('_syncLocalTransactionsToSupabase error: $e');
+      }
+    }
   }
 
   Future<void> claimUnassignedPendingTransactions() async {
