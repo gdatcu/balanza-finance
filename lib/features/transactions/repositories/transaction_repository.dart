@@ -61,14 +61,28 @@ class TransactionRepository {
     }
 
     try {
+      final jsonPayload = updatedTx.toJson();
       final response = await _client
           .from('transactions')
-          .insert(updatedTx.toJson())
+          .insert(jsonPayload)
           .select()
           .single();
 
       return Transaction.fromJson(response);
     } on PostgrestException catch (e) {
+      if (e.code == 'PGRST204' || e.message.contains('emotional_status')) {
+        final fallbackPayload = updatedTx.toJson()..remove('emotional_status');
+        try {
+          final response = await _client
+              .from('transactions')
+              .insert(fallbackPayload)
+              .select()
+              .single();
+          return Transaction.fromJson(response);
+        } catch (_) {
+          return updatedTx;
+        }
+      }
       if (e.code == '23503' && updatedTx.categoryId != null) {
         final fallbackTx = updatedTx.copyWith(categoryId: null);
         final response = await _client
@@ -105,15 +119,30 @@ class TransactionRepository {
     }
 
     try {
+      final jsonPayload = updatedTx.toJson();
       final response = await _client
           .from('transactions')
-          .update(updatedTx.toJson())
+          .update(jsonPayload)
           .eq('id', updatedTx.id)
           .select()
           .single();
 
       return Transaction.fromJson(response);
     } on PostgrestException catch (e) {
+      if (e.code == 'PGRST204' || e.message.contains('emotional_status')) {
+        final fallbackPayload = updatedTx.toJson()..remove('emotional_status');
+        try {
+          final response = await _client
+              .from('transactions')
+              .update(fallbackPayload)
+              .eq('id', updatedTx.id)
+              .select()
+              .single();
+          return Transaction.fromJson(response);
+        } catch (_) {
+          return updatedTx;
+        }
+      }
       if (e.code == '23503' && updatedTx.categoryId != null) {
         final fallbackTx = updatedTx.copyWith(categoryId: null);
         final response = await _client

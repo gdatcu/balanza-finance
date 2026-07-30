@@ -1129,6 +1129,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'You worked this day and regretted {amount}'**
   String regretDayDetails(String amount);
+
+  /// No description provided for @coolingOffWishlist.
+  ///
+  /// In en, this message translates to:
+  /// **'Cooling-Off Wishlist'**
+  String get coolingOffWishlist;
+
+  /// No description provided for @coolingOffSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'RON {amount} held in reflection ({hours} hours of work)'**
+  String coolingOffSummary(Object amount, Object hours);
+
+  /// No description provided for @daysLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'{days} days left in cooling-off'**
+  String daysLeft(int days);
+
+  /// No description provided for @buyNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Buy Now'**
+  String get buyNow;
+
+  /// No description provided for @discardItem.
+  ///
+  /// In en, this message translates to:
+  /// **'I Don\'t Need It (Saved!)'**
+  String get discardItem;
+
+  /// No description provided for @noWishlistItemsYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No items in your Wishlist yet. Use Reality Check to add purchases for a cooling-off period!'**
+  String get noWishlistItemsYet;
 }
 
 class _AppLocalizationsDelegate

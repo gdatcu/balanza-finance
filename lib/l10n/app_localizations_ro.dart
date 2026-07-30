@@ -570,4 +570,27 @@ class AppLocalizationsRo extends AppLocalizations {
   String regretDayDetails(String amount) {
     return 'Ai muncit în această zi și ai regretat $amount';
   }
+
+  @override
+  String get coolingOffWishlist => 'Lista de Dorințe & Reflecție';
+
+  @override
+  String coolingOffSummary(Object amount, Object hours) {
+    return '$amount RON în perioada de reflecție ($hours ore de muncă)';
+  }
+
+  @override
+  String daysLeft(int days) {
+    return 'Mai sunt $days zile din perioada de reflecție';
+  }
+
+  @override
+  String get buyNow => 'Cumpără acum';
+
+  @override
+  String get discardItem => 'Nu mai am nevoie (Bani economisiți!)';
+
+  @override
+  String get noWishlistItemsYet =>
+      'Niciun obiectiv în Lista de Dorințe. Folosește Verificare Realitate pentru a adăuga achiziții în perioada de reflecție!';
 }

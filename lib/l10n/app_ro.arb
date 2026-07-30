@@ -265,5 +265,18 @@
         "type": "String"
       }
     }
-  }
+  },
+  "coolingOffWishlist": "Lista de Dorințe & Reflecție",
+  "coolingOffSummary": "{amount} RON în perioada de reflecție ({hours} ore de muncă)",
+  "daysLeft": "Mai sunt {days} zile din perioada de reflecție",
+  "@daysLeft": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "buyNow": "Cumpără acum",
+  "discardItem": "Nu mai am nevoie (Bani economisiți!)",
+  "noWishlistItemsYet": "Niciun obiectiv în Lista de Dorințe. Folosește Verificare Realitate pentru a adăuga achiziții în perioada de reflecție!"
 }

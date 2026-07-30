@@ -265,5 +265,18 @@
         "type": "String"
       }
     }
-  }
+  },
+  "coolingOffWishlist": "Cooling-Off Wishlist",
+  "coolingOffSummary": "RON {amount} held in reflection ({hours} hours of work)",
+  "daysLeft": "{days} days left in cooling-off",
+  "@daysLeft": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "buyNow": "Buy Now",
+  "discardItem": "I Don't Need It (Saved!)",
+  "noWishlistItemsYet": "No items in your Wishlist yet. Use Reality Check to add purchases for a cooling-off period!"
 }

@@ -5,6 +5,8 @@ import '../../settings/providers/time_cost_provider.dart';
 import '../../transactions/providers/transaction_provider.dart';
 import '../../settings/providers/locale_provider.dart';
 import '../../transactions/presentation/transaction_input_sheet.dart';
+import '../../wishlist/providers/wishlist_provider.dart';
+import '../../wishlist/presentation/wishlist_view.dart';
 
 /// Full-screen / BottomSheet pre-purchase "Reality Check" behavioral intervention calculator.
 class RealityCheckSheet extends ConsumerStatefulWidget {
@@ -68,10 +70,19 @@ class _RealityCheckSheetState extends ConsumerState<RealityCheckSheet> {
     Navigator.of(context).pop();
   }
 
-  void _onPutInWishlist(double amount) {
-    final scaffold = ScaffoldMessenger.of(context);
+  Future<void> _onPutInWishlist(double amount) async {
     final isRo = ref.read(localeProvider).languageCode == 'ro';
-    Navigator.of(context).pop();
+    final scaffold = ScaffoldMessenger.of(context);
+    final nav = Navigator.of(context);
+
+    await ref.read(wishlistProvider.notifier).addItem(amount);
+    if (!mounted) return;
+
+    nav.pop();
+    nav.push(
+      MaterialPageRoute(builder: (context) => const WishlistView()),
+    );
+
     scaffold.showSnackBar(
       SnackBar(
         content: Text(

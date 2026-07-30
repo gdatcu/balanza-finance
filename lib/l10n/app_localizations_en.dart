@@ -565,4 +565,27 @@ class AppLocalizationsEn extends AppLocalizations {
   String regretDayDetails(String amount) {
     return 'You worked this day and regretted $amount';
   }
+
+  @override
+  String get coolingOffWishlist => 'Cooling-Off Wishlist';
+
+  @override
+  String coolingOffSummary(Object amount, Object hours) {
+    return 'RON $amount held in reflection ($hours hours of work)';
+  }
+
+  @override
+  String daysLeft(int days) {
+    return '$days days left in cooling-off';
+  }
+
+  @override
+  String get buyNow => 'Buy Now';
+
+  @override
+  String get discardItem => 'I Don\'t Need It (Saved!)';
+
+  @override
+  String get noWishlistItemsYet =>
+      'No items in your Wishlist yet. Use Reality Check to add purchases for a cooling-off period!';
 }

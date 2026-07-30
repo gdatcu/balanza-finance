@@ -25,6 +25,7 @@ import '../../budgets/providers/category_budget_progress_provider.dart';
 import '../../budgets/presentation/category_budget_input_sheet.dart';
 import '../../analytics/presentation/reality_check_sheet.dart';
 import '../../analytics/presentation/time_burn_calendar_view.dart';
+import '../../wishlist/presentation/wishlist_view.dart';
 
 enum ToshlSection {
   overview,
@@ -676,6 +677,16 @@ class _HomeViewState extends ConsumerState<HomeView> {
                     Navigator.of(context).pop();
                     Navigator.of(context).push(
                       MaterialPageRoute(builder: (context) => const TimeBurnCalendarView()),
+                    );
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.bookmark_added, color: Color(0xFFFF7A5A)),
+                  title: Text(AppLocalizations.of(context)!.coolingOffWishlist, style: const TextStyle(color: Colors.white)),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => const WishlistView()),
                     );
                   },
                 ),
