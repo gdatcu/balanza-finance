@@ -1,14 +1,13 @@
-# Release Notes — v1.17.7
+# Release Notes — v1.17.8
 
-## ⚡ Restored Stable Baseline (v1.16.3 Baseline)
+## ⚡ Restored Stable Baseline (v1.13.2 Baseline)
 
 ### 🔄 System Rollback
-- Restored the complete codebase, sync engine, and test suite to the clean, proven **v1.16.3** stable baseline.
-- All experimental notification interceptor changes and unstable background listener services have been completely removed.
-- Instant Supabase Realtime multi-device sync and core transaction management are fully intact and operating on stable foundations.
+- Restored the complete codebase, sync engine, models, and test suite to the exact **v1.13.2** release baseline (commit `0dfc8d4`).
+- All notification interceptor changes and experimental listener additions have been completely removed.
 
 ---
 
 ## 🧪 Verification
-- **`flutter test`**: All test suites passed!
+- **`flutter test`**: All 101/101 tests passed!
 - **`flutter analyze`**: 0 issues found!

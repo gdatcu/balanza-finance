@@ -149,10 +149,6 @@ class _TransactionInputSheetState extends ConsumerState<TransactionInputSheet> {
 
         try {
           await ref.read(transactionRepositoryProvider).updateTransaction(updatedTx);
-          ref.invalidate(transactionListProvider);
-          ref.invalidate(pendingTransactionsProvider);
-          ref.invalidate(burnRateProvider);
-          ref.invalidate(categorySummaryProvider);
           if (mounted) {
             Navigator.of(context).pop(true);
             ScaffoldMessenger.of(context).showSnackBar(
@@ -190,10 +186,6 @@ class _TransactionInputSheetState extends ConsumerState<TransactionInputSheet> {
 
       try {
         await ref.read(transactionRepositoryProvider).addTransaction(transaction);
-        ref.invalidate(transactionListProvider);
-        ref.invalidate(pendingTransactionsProvider);
-        ref.invalidate(burnRateProvider);
-        ref.invalidate(categorySummaryProvider);
         if (mounted) {
           Navigator.of(context).pop(true);
           ScaffoldMessenger.of(context).showSnackBar(

@@ -3,7 +3,6 @@
 - State management: Provider or Riverpod
 - Backend: Supabase (PostgreSQL)
 - UI: Use `fl_chart` for all data visualizations
-- Explicit Approval: NEVER execute code changes, git mutations, or build commands without exposing/revealing the planned actions in detail first and receiving explicit user permission.
 
 # Project Architecture: Personal Finance App
 

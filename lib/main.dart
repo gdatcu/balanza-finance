@@ -11,7 +11,6 @@ import 'features/transactions/providers/transaction_provider.dart';
 import 'features/settings/providers/locale_provider.dart';
 import 'features/auth/presentation/biometric_lock_wrapper.dart';
 import 'features/notifications/providers/push_notification_provider.dart';
-import 'features/notifications/services/notification_sync_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,17 +27,6 @@ void main() async {
     url: 'https://rlgnmcqergdjuxknhqhw.supabase.co',
     publishableKey: 'sb_publishable_qI0TdNv5VJQpKvlkSCassA_1slJiy9K',
   );
-
-  final currentUserId = Supabase.instance.client.auth.currentUser?.id;
-  if (currentUserId != null && currentUserId.isNotEmpty) {
-    await prefs.setString('last_authenticated_user_id', currentUserId);
-  }
-
-  try {
-    await NotificationSyncService.startListener();
-  } catch (e) {
-    debugPrint('NotificationSyncService startListener error: $e');
-  }
 
   runApp(
     ProviderScope(

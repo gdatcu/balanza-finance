@@ -13,8 +13,6 @@ import 'package:balanza/features/transactions/providers/exchange_rate_provider.d
 import 'package:balanza/features/auth/providers/auth_provider.dart';
 import 'package:balanza/features/auth/providers/biometric_provider.dart';
 
-import 'package:balanza/models/debug_notification.dart';
-
 class E2EMockTransactionRepository implements TransactionRepository {
   final List<Transaction> _list = [];
   final StreamController<List<Transaction>> _controller = StreamController<List<Transaction>>.broadcast();
@@ -65,21 +63,6 @@ class E2EMockTransactionRepository implements TransactionRepository {
     _list.removeWhere((t) => t.id == id);
     _notify();
   }
-
-  @override
-  Stream<List<Transaction>> getPendingTransactionsStream() => Stream.value([]);
-  @override
-  Future<List<Transaction>> getPendingTransactions() async => [];
-  @override
-  Future<void> approvePendingTransaction(String id) async {}
-  @override
-  Future<bool> checkDuplicateRecentTransaction(double amount, {String? merchant, int windowSeconds = 60}) async => false;
-  @override
-  Future<void> logDebugNotification(dynamic notification) async {}
-  @override
-  Future<void> claimUnassignedPendingTransactions() async {}
-  @override
-  Future<List<DebugNotification>> getDebugNotifications() async => [];
 }
 
 class E2EFakeBiometricLockNotifier extends BiometricLockNotifier {
@@ -173,7 +156,7 @@ void main() {
 
     // 6. Change Budget in Settings
     expect(find.text('Settings'), findsOneWidget);
-    final budgetField = find.byType(TextFormField).first;
+    final budgetField = find.byType(TextFormField);
     await tester.enterText(budgetField, '2000.0');
 
     final saveBudgetBtn = find.text('Save Budget');

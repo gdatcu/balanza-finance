@@ -230,36 +230,5 @@
         "type": "String"
       }
     }
-  },
-  "dailyWorkingHours": "Daily working hours",
-  "enterDailyWorkingHours": "Enter daily working hours (e.g. 8)",
-  "dailyWorkingHoursHelp": "Used to convert purchases into working time equivalent.",
-  "categorizeNow": "Categorize Now",
-  "majorUncategorizedNudge": "Major Uncategorized Expense: This purchase costs {hours} hours of your life energy. Large uncategorized expenses create budget blind spots. Please assign it a specific category to keep your financial goals on track.",
-  "@majorUncategorizedNudge": {
-    "placeholders": {
-      "hours": {
-        "type": "String"
-      }
-    }
-  },
-  "bankAutoSync": "Bank Auto-Sync",
-  "bankAutoSyncHelp": "Automatically intercepts push notifications from Revolut, BCR, Salt Bank, ING, and Google Wallet into a Pending Inbox.",
-  "enableAutoSync": "Enable Auto-Sync",
-  "autoSyncEnabled": "Auto-Sync Enabled",
-  "autoSyncDisabled": "Notification Access Required",
-  "grantNotificationAccess": "Grant Notification Access",
-  "pendingInboxTitle": "Pending Transactions ({count})",
-  "@pendingInboxTitle": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "pendingInboxSubtitle": "Swipe right to approve, left to reject, or tap to edit.",
-  "approve": "Approve",
-  "reject": "Reject",
-  "pendingTransactionApproved": "Transaction approved into budget",
-  "pendingTransactionRejected": "Pending transaction rejected"
+  }
 }

@@ -230,36 +230,5 @@
         "type": "String"
       }
     }
-  },
-  "dailyWorkingHours": "Ore de lucru pe zi",
-  "enterDailyWorkingHours": "Introdu orele de lucru pe zi (ex: 8)",
-  "dailyWorkingHoursHelp": "Folosit pentru a converti achizițiile în echivalent ore de muncă.",
-  "categorizeNow": "Categorisește Acum",
-  "majorUncategorizedNudge": "Cheltuială Majoră Necategorisită: Această achiziție te costă {hours} ore din viață. Sumele mari necategorisite creează unghiuri moarte în buget. Te rugăm să îi asignezi o categorie pentru a-ți proteja obiectivele financiare.",
-  "@majorUncategorizedNudge": {
-    "placeholders": {
-      "hours": {
-        "type": "String"
-      }
-    }
-  },
-  "bankAutoSync": "Sincronizare Automată Bancară",
-  "bankAutoSyncHelp": "Preia automat notificările bancare de la Revolut, BCR, Salt Bank, ING și Google Wallet într-un Inbox în Așteptare.",
-  "enableAutoSync": "Activează Sincronizarea",
-  "autoSyncEnabled": "Sincronizare Activă",
-  "autoSyncDisabled": "Acces Notificări Necesari",
-  "grantNotificationAccess": "Permite Acces Notificări",
-  "pendingInboxTitle": "Tranzacții în Așteptare ({count})",
-  "@pendingInboxTitle": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "pendingInboxSubtitle": "Glisează la dreapta pentru aprobare, la stânga pentru respingere, sau atinge pentru editare.",
-  "approve": "Aprobă",
-  "reject": "Respinge",
-  "pendingTransactionApproved": "Tranzacție aprobată în buget",
-  "pendingTransactionRejected": "Tranzacție respinsă"
+  }
 }

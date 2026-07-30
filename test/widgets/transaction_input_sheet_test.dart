@@ -10,8 +10,6 @@ import 'package:balanza/features/transactions/providers/exchange_rate_provider.d
 import 'package:balanza/models/transaction.dart';
 import 'package:balanza/models/category.dart';
 
-import 'package:balanza/models/debug_notification.dart';
-
 class MockSheetTransactionRepo implements TransactionRepository {
   bool added = false;
   bool updated = false;
@@ -36,21 +34,6 @@ class MockSheetTransactionRepo implements TransactionRepository {
 
   @override
   Stream<List<Transaction>> getTransactionsStream(DateTime month) => Stream.value([]);
-
-  @override
-  Stream<List<Transaction>> getPendingTransactionsStream() => Stream.value([]);
-  @override
-  Future<List<Transaction>> getPendingTransactions() async => [];
-  @override
-  Future<void> approvePendingTransaction(String id) async {}
-  @override
-  Future<bool> checkDuplicateRecentTransaction(double amount, {String? merchant, int windowSeconds = 60}) async => false;
-  @override
-  Future<void> logDebugNotification(dynamic notification) async {}
-  @override
-  Future<void> claimUnassignedPendingTransactions() async {}
-  @override
-  Future<List<DebugNotification>> getDebugNotifications() async => [];
 }
 
 void main() {

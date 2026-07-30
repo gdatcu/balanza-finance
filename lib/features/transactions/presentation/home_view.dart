@@ -7,12 +7,9 @@ import 'package:balanza/l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import '../providers/transaction_provider.dart';
 import '../../../models/transaction.dart';
-import '../../../models/category.dart';
 import '../../../models/category_summary.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/category_localizer.dart';
-import '../../../core/utils/default_tagging_rules.dart';
-import '../utils/transaction_parser.dart';
 import 'transaction_input_sheet.dart';
 import 'transaction_details_screen.dart';
 import 'categories_data.dart';
@@ -26,7 +23,6 @@ import '../../net_worth/presentation/net_worth_view.dart';
 import '../../savings_goals/presentation/savings_goals_view.dart';
 import '../../budgets/providers/category_budget_progress_provider.dart';
 import '../../budgets/presentation/category_budget_input_sheet.dart';
-import '../../notifications/presentation/pending_inbox_banner.dart';
 
 enum ToshlSection {
   overview,
@@ -819,10 +815,6 @@ class _HomeViewState extends ConsumerState<HomeView> {
           const SizedBox(height: 8),
 
           if (_section == ToshlSection.overview) ...[
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.0),
-              child: PendingInboxBanner(),
-            ),
             if (advisorState != null) WealthAdvisorCard(state: advisorState),
             _buildAdvisorWidget(context),
             const SizedBox(height: 16),
@@ -1450,31 +1442,9 @@ class _HomeViewState extends ConsumerState<HomeView> {
   }
 
   Widget _buildTransactionRow(Transaction tx) {
-    Category? matchedCat;
-    if (tx.categoryId != null && tx.categoryId!.isNotEmpty && tx.categoryId != '00000000-0000-0000-0000-000000000c14') {
-      matchedCat = defaultCategories.firstWhere(
-        (c) => c.id == tx.categoryId,
-        orElse: () => defaultCategories.first,
-      );
-    }
-
-    if (matchedCat == null || matchedCat.id == '00000000-0000-0000-0000-000000000c14') {
-      final autoTag = TransactionParser.parseText(tx.description ?? '', defaultTaggingRules);
-      final tagCatId = autoTag?.categoryId;
-      if (tagCatId != null && tagCatId.isNotEmpty) {
-        final String targetId = tagCatId;
-        matchedCat = defaultCategories.firstWhere(
-          (c) => c.id == targetId,
-          orElse: () => defaultCategories.first,
-        );
-      }
-    }
-
-    final cat = matchedCat ?? defaultCategories.firstWhere(
-      (c) => tx.categoryId != null && c.id == tx.categoryId,
-      orElse: () => tx.amount > 0
-          ? defaultCategories.firstWhere((c) => c.id == '00000000-0000-0000-0000-0000000000c5')
-          : defaultCategories.firstWhere((c) => c.id == '00000000-0000-0000-0000-000000000c14'),
+    final cat = defaultCategories.firstWhere(
+      (c) => c.id == tx.categoryId,
+      orElse: () => defaultCategories.first,
     );
 
     return Dismissible(

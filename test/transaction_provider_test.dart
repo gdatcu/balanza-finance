@@ -8,8 +8,6 @@ import 'package:balanza/models/transaction.dart';
 import 'package:balanza/features/transactions/repositories/transaction_repository.dart';
 import 'package:balanza/features/transactions/providers/transaction_provider.dart';
 
-import 'package:balanza/models/debug_notification.dart';
-
 class MockTransactionRepository implements TransactionRepository {
   final List<Transaction> transactions;
   final StreamController<List<Transaction>> _controller = StreamController<List<Transaction>>.broadcast();
@@ -20,16 +18,9 @@ class MockTransactionRepository implements TransactionRepository {
     _controller.close();
   }
 
-  void _notify(DateTime month) {
-    final start = DateTime(month.year, month.month, 1);
-    final end = DateTime(month.year, month.month + 1, 0, 23, 59, 59, 999);
-    final filtered = transactions
-        .where((tx) => tx.date.isAfter(start.subtract(const Duration(milliseconds: 1))) &&
-                       tx.date.isBefore(end.add(const Duration(milliseconds: 1))))
-        .toList()
-      ..sort((a, b) => b.date.compareTo(a.date));
+  void _notify(DateTime month) async {
     if (!_controller.isClosed) {
-      _controller.add(filtered);
+      _controller.add(await getTransactions(month));
     }
   }
 
@@ -83,21 +74,6 @@ class MockTransactionRepository implements TransactionRepository {
     transactions.removeWhere((tx) => tx.id == id);
     _notify(date);
   }
-
-  @override
-  Stream<List<Transaction>> getPendingTransactionsStream() => Stream.value([]);
-  @override
-  Future<List<Transaction>> getPendingTransactions() async => [];
-  @override
-  Future<void> approvePendingTransaction(String id) async {}
-  @override
-  Future<bool> checkDuplicateRecentTransaction(double amount, {String? merchant, int windowSeconds = 60}) async => false;
-  @override
-  Future<void> logDebugNotification(dynamic notification) async {}
-  @override
-  Future<void> claimUnassignedPendingTransactions() async {}
-  @override
-  Future<List<DebugNotification>> getDebugNotifications() async => [];
 }
 
 void main() {

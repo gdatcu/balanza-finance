@@ -9,8 +9,6 @@ import 'package:balanza/models/transaction.dart';
 import 'package:balanza/features/transactions/providers/tagging_rules_provider.dart';
 import 'package:balanza/models/tagging_rule.dart';
 
-import 'package:balanza/models/debug_notification.dart';
-
 class MockTransactionRepo implements TransactionRepository {
   Transaction? addedTransaction;
 
@@ -31,21 +29,6 @@ class MockTransactionRepo implements TransactionRepository {
 
   @override
   Future<Transaction> updateTransaction(Transaction transaction) async => transaction;
-
-  @override
-  Stream<List<Transaction>> getPendingTransactionsStream() => Stream.value([]);
-  @override
-  Future<List<Transaction>> getPendingTransactions() async => [];
-  @override
-  Future<void> approvePendingTransaction(String id) async {}
-  @override
-  Future<bool> checkDuplicateRecentTransaction(double amount, {String? merchant, int windowSeconds = 60}) async => false;
-  @override
-  Future<void> logDebugNotification(dynamic notification) async {}
-  @override
-  Future<void> claimUnassignedPendingTransactions() async {}
-  @override
-  Future<List<DebugNotification>> getDebugNotifications() async => [];
 }
 
 class FakeTaggingRulesNotifier extends TaggingRulesNotifier {

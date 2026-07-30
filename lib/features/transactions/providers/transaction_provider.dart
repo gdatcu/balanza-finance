@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -94,16 +93,10 @@ final monthlyBudgetProvider = StreamProvider<double>((ref) {
 });
 
 /// StreamProvider responsible for fetching live realtime transaction updates from Supabase.
-final transactionListProvider = StreamProvider<List<Transaction>>((ref) async* {
+final transactionListProvider = StreamProvider<List<Transaction>>((ref) {
   final selectedMonth = ref.watch(selectedMonthProvider);
   final repository = ref.watch(transactionRepositoryProvider);
-  yield* repository.getTransactionsStream(selectedMonth);
-});
-
-/// StreamProvider responsible for fetching live pending review transactions from Supabase.
-final pendingTransactionsProvider = StreamProvider<List<Transaction>>((ref) async* {
-  final repository = ref.watch(transactionRepositoryProvider);
-  yield* repository.getPendingTransactionsStream();
+  return repository.getTransactionsStream(selectedMonth);
 });
 
 /// Provider to fetch categories dynamically from Supabase, merged with defaultCategories.

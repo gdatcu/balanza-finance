@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../settings/providers/locale_provider.dart';
-import '../../transactions/presentation/transaction_input_sheet.dart';
 import '../models/advisor_nudge.dart';
 import '../providers/wealth_advisor_provider.dart';
 
@@ -97,35 +96,6 @@ class WealthAdvisorBanner extends ConsumerWidget {
                     height: 1.35,
                   ),
                 ),
-                if (nudge.targetTransaction != null) ...[
-                  const SizedBox(height: 10),
-                  OutlinedButton.icon(
-                    onPressed: () {
-                      showModalBottomSheet(
-                        context: context,
-                        isScrollControlled: true,
-                        backgroundColor: const Color(0xFF1E293B),
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-                        ),
-                        builder: (_) => TransactionInputSheet(transactionToEdit: nudge.targetTransaction),
-                      );
-                    },
-                    icon: const Icon(Icons.edit, size: 14),
-                    label: Text(
-                      nudge.getLocalizedActionLabel(currentLocale.languageCode) ?? 'Categorize Now',
-                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-                    ),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: accentColor,
-                      side: BorderSide(color: accentColor, width: 1.2),
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                  ),
-                ],
               ],
             ),
           ),

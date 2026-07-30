@@ -9,7 +9,6 @@ class Transaction {
   final DateTime createdAt;
   final String originalCurrency;
   final double? originalAmount;
-  final bool isPendingReview;
 
   const Transaction({
     required this.id,
@@ -22,7 +21,6 @@ class Transaction {
     required this.createdAt,
     this.originalCurrency = 'RON',
     this.originalAmount,
-    this.isPendingReview = false,
   });
 
   factory Transaction.fromJson(Map<String, dynamic> json) {
@@ -39,7 +37,6 @@ class Transaction {
       originalAmount: json['original_amount'] != null
           ? (json['original_amount'] as num).toDouble()
           : null,
-      isPendingReview: json['is_pending_review'] as bool? ?? false,
     );
   }
 
@@ -55,7 +52,6 @@ class Transaction {
       'created_at': createdAt.toIso8601String(),
       'original_currency': originalCurrency,
       'original_amount': originalAmount,
-      'is_pending_review': isPendingReview,
     };
   }
 
@@ -70,7 +66,6 @@ class Transaction {
     DateTime? createdAt,
     String? originalCurrency,
     double? originalAmount,
-    bool? isPendingReview,
   }) {
     return Transaction(
       id: id ?? this.id,
@@ -83,7 +78,6 @@ class Transaction {
       createdAt: createdAt ?? this.createdAt,
       originalCurrency: originalCurrency ?? this.originalCurrency,
       originalAmount: originalAmount ?? this.originalAmount,
-      isPendingReview: isPendingReview ?? this.isPendingReview,
     );
   }
 }

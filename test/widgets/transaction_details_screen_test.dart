@@ -8,8 +8,6 @@ import 'package:balanza/features/transactions/presentation/transaction_details_s
 import 'package:balanza/features/transactions/repositories/transaction_repository.dart';
 import 'package:balanza/features/transactions/providers/transaction_provider.dart';
 
-import 'package:balanza/models/debug_notification.dart';
-
 class MockDetailsRepo implements TransactionRepository {
   bool deleted = false;
 
@@ -29,21 +27,6 @@ class MockDetailsRepo implements TransactionRepository {
 
   @override
   Future<Transaction> updateTransaction(Transaction transaction) async => transaction;
-
-  @override
-  Stream<List<Transaction>> getPendingTransactionsStream() => Stream.value([]);
-  @override
-  Future<List<Transaction>> getPendingTransactions() async => [];
-  @override
-  Future<void> approvePendingTransaction(String id) async {}
-  @override
-  Future<bool> checkDuplicateRecentTransaction(double amount, {String? merchant, int windowSeconds = 60}) async => false;
-  @override
-  Future<void> logDebugNotification(dynamic notification) async {}
-  @override
-  Future<void> claimUnassignedPendingTransactions() async {}
-  @override
-  Future<List<DebugNotification>> getDebugNotifications() async => [];
 }
 
 void main() {

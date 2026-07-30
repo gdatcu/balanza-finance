@@ -93,10 +93,6 @@ class TransactionDetailsScreen extends ConsumerWidget {
 
               if (confirmed == true) {
                 await ref.read(transactionRepositoryProvider).deleteTransaction(currentTx.id);
-                ref.invalidate(transactionListProvider);
-                ref.invalidate(pendingTransactionsProvider);
-                ref.invalidate(burnRateProvider);
-                ref.invalidate(categorySummaryProvider);
                 if (context.mounted) {
                   Navigator.of(context).pop();
                   ScaffoldMessenger.of(context).showSnackBar(

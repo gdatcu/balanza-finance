@@ -13,8 +13,6 @@ import 'package:balanza/features/transactions/providers/exchange_rate_provider.d
 import 'package:balanza/features/auth/providers/auth_provider.dart';
 import 'package:balanza/features/auth/providers/biometric_provider.dart';
 
-import 'package:balanza/models/debug_notification.dart';
-
 class E2EMockTransactionRepository implements TransactionRepository {
   final List<Transaction> _list = [];
 
@@ -45,21 +43,6 @@ class E2EMockTransactionRepository implements TransactionRepository {
   Future<void> deleteTransaction(String id) async {
     _list.removeWhere((t) => t.id == id);
   }
-
-  @override
-  Stream<List<Transaction>> getPendingTransactionsStream() => Stream.value([]);
-  @override
-  Future<List<Transaction>> getPendingTransactions() async => [];
-  @override
-  Future<void> approvePendingTransaction(String id) async {}
-  @override
-  Future<bool> checkDuplicateRecentTransaction(double amount, {String? merchant, int windowSeconds = 60}) async => false;
-  @override
-  Future<void> logDebugNotification(dynamic notification) async {}
-  @override
-  Future<void> claimUnassignedPendingTransactions() async {}
-  @override
-  Future<List<DebugNotification>> getDebugNotifications() async => [];
 }
 
 class E2EFakeBiometricLockNotifier extends BiometricLockNotifier {

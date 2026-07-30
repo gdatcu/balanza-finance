@@ -13,8 +13,6 @@ import 'package:balanza/features/auth/providers/biometric_provider.dart';
 import 'package:balanza/models/transaction.dart';
 import 'package:balanza/models/category.dart';
 
-import 'package:balanza/models/debug_notification.dart';
-
 class MockTransactionRepository implements TransactionRepository {
   @override
   Stream<List<Transaction>> getTransactionsStream(DateTime month) {
@@ -54,21 +52,6 @@ class MockTransactionRepository implements TransactionRepository {
 
   @override
   Future<void> deleteTransaction(String id) async {}
-
-  @override
-  Stream<List<Transaction>> getPendingTransactionsStream() => Stream.value([]);
-  @override
-  Future<List<Transaction>> getPendingTransactions() async => [];
-  @override
-  Future<void> approvePendingTransaction(String id) async {}
-  @override
-  Future<bool> checkDuplicateRecentTransaction(double amount, {String? merchant, int windowSeconds = 60}) async => false;
-  @override
-  Future<void> logDebugNotification(dynamic notification) async {}
-  @override
-  Future<void> claimUnassignedPendingTransactions() async {}
-  @override
-  Future<List<DebugNotification>> getDebugNotifications() async => [];
 }
 
 void main() {
@@ -183,8 +166,8 @@ void main() {
     expect(find.text('Settings'), findsOneWidget);
     expect(find.text('Configure Budget'), findsOneWidget);
 
-    final textFormField = find.byType(TextFormField).first;
-    expect(find.byType(TextFormField), findsNWidgets(2));
+    final textFormField = find.byType(TextFormField);
+    expect(textFormField, findsOneWidget);
 
     await tester.enterText(textFormField, '1500.0');
     await tester.pump();
