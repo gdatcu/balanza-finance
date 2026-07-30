@@ -199,32 +199,7 @@ class TransactionRepository {
   }
 
   Future<List<Transaction>> getPendingTransactions() async {
-    final List<Transaction> result = List.from(_localPendingTransactions);
-
-    final client = _client;
-    if (client != null) {
-      await claimUnassignedPendingTransactions();
-
-      try {
-        final response = await client
-            .from('transactions')
-            .select()
-            .eq('is_pending_review', true)
-            .order('created_at', ascending: false);
-
-        final remote = (response as List)
-            .map((json) => Transaction.fromJson(json as Map<String, dynamic>))
-            .toList();
-
-        for (final r in remote) {
-          if (!result.any((tx) => tx.id == r.id)) {
-            result.add(r);
-          }
-        }
-      } catch (_) {}
-    }
-
-    return result;
+    return List.from(_localPendingTransactions);
   }
 
   Future<void> approvePendingTransaction(String id) async {
@@ -235,18 +210,9 @@ class TransactionRepository {
     }
 
     if (found == null) {
-      final client = _client;
-      if (client != null) {
-        try {
-          final response = await client
-              .from('transactions')
-              .select()
-              .eq('id', id)
-              .maybeSingle();
-          if (response != null) {
-            found = Transaction.fromJson(response);
-          }
-        } catch (_) {}
+      final indexApproved = _localApprovedTransactions.indexWhere((tx) => tx.id == id);
+      if (indexApproved != -1) {
+        found = _localApprovedTransactions[indexApproved];
       }
     }
 
@@ -254,18 +220,7 @@ class TransactionRepository {
       final approvedTx = found.copyWith(isPendingReview: false);
       _localApprovedTransactions.removeWhere((tx) => tx.id == approvedTx.id);
       _localApprovedTransactions.insert(0, approvedTx);
-
-      final client = _client;
-      if (client != null) {
-        try {
-          await client
-              .from('transactions')
-              .update({'is_pending_review': false})
-              .eq('id', id);
-        } catch (_) {
-          await addTransaction(approvedTx);
-        }
-      }
+      await addTransaction(approvedTx);
     }
   }
 
@@ -457,7 +412,7 @@ class TransactionRepository {
     try {
       final response = await client
           .from('transactions')
-          .update(updatedTx.toJson())
+          .update(updatedTx.toDbJson())
           .eq('id', updatedTx.id)
           .select()
           .single();
@@ -468,7 +423,7 @@ class TransactionRepository {
         final fallbackTx = updatedTx.copyWith(categoryId: null);
         final response = await client
             .from('transactions')
-            .update(fallbackTx.toJson())
+            .update(fallbackTx.toDbJson())
             .eq('id', fallbackTx.id)
             .select()
             .single();

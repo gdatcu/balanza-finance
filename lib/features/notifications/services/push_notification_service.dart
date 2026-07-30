@@ -5,7 +5,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class PushNotificationService {
-  final SupabaseClient _supabaseClient;
+  final SupabaseClient? _supabaseClient;
   FirebaseMessaging? _firebaseMessaging;
   StreamSubscription<AuthState>? _authSubscription;
   StreamSubscription<String>? _tokenRefreshSubscription;
@@ -13,7 +13,7 @@ class PushNotificationService {
   PushNotificationService({
     SupabaseClient? supabaseClient,
     FirebaseMessaging? firebaseMessaging,
-  }) : _supabaseClient = supabaseClient ?? Supabase.instance.client {
+  }) : _supabaseClient = supabaseClient ?? _safeGetClient() {
     if (firebaseMessaging != null) {
       _firebaseMessaging = firebaseMessaging;
     } else {
@@ -26,6 +26,14 @@ class PushNotificationService {
           print('PushNotificationService FirebaseMessaging instance warning: $e');
         }
       }
+    }
+  }
+
+  static SupabaseClient? _safeGetClient() {
+    try {
+      return Supabase.instance.client;
+    } catch (_) {
+      return null;
     }
   }
 
@@ -65,9 +73,10 @@ class PushNotificationService {
   /// Upsert the retrieved FCM token into the user_push_tokens Supabase table.
   /// Captures device's current locale (e.g., 'en' or 'ro') using PlatformDispatcher.
   Future<bool> syncTokenToSupabase([String? customUserId]) async {
-    if (_firebaseMessaging == null) return false;
+    final client = _supabaseClient;
+    if (_firebaseMessaging == null || client == null) return false;
 
-    final userId = customUserId ?? _supabaseClient.auth.currentUser?.id;
+    final userId = customUserId ?? client.auth.currentUser?.id;
     if (userId == null) return false;
 
     final token = await getToken();
@@ -78,7 +87,7 @@ class PushNotificationService {
         : 'en';
 
     try {
-      await _supabaseClient.from('user_push_tokens').upsert({
+      await client.from('user_push_tokens').upsert({
         'user_id': userId,
         'fcm_token': token,
         'language': languageCode,
@@ -95,9 +104,12 @@ class PushNotificationService {
 
   /// Listens to Supabase auth state change and triggers token sync when user is authenticated.
   void initializeAuthListener() {
+    final client = _supabaseClient;
+    if (client == null) return;
+
     _authSubscription?.cancel();
-    _authSubscription = _supabaseClient.auth.onAuthStateChange.listen((data) async {
-      final user = data.session?.user ?? _supabaseClient.auth.currentUser;
+    _authSubscription = client.auth.onAuthStateChange.listen((data) async {
+      final user = data.session?.user ?? client.auth.currentUser;
       if (user != null && _firebaseMessaging != null) {
         await requestPermission();
         await syncTokenToSupabase(user.id);
@@ -108,7 +120,7 @@ class PushNotificationService {
     if (fm != null) {
       _tokenRefreshSubscription?.cancel();
       _tokenRefreshSubscription = fm.onTokenRefresh.listen((newToken) async {
-        final currentUserId = _supabaseClient.auth.currentUser?.id;
+        final currentUserId = client.auth.currentUser?.id;
         if (currentUserId != null) {
           await syncTokenToSupabase(currentUserId);
         }

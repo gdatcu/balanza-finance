@@ -167,7 +167,10 @@ class NotificationSyncService {
       // Read last authenticated user ID if available
       String userId = '00000000-0000-0000-0000-000000000000';
       try {
-        final currentAuthId = Supabase.instance.client.auth.currentUser?.id;
+        String? currentAuthId;
+        try {
+          currentAuthId = Supabase.instance.client.auth.currentUser?.id;
+        } catch (_) {}
         if (currentAuthId != null && currentAuthId.isNotEmpty) {
           userId = currentAuthId;
         } else {
