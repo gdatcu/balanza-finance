@@ -1,19 +1,14 @@
-# Release Notes — v1.17.0
+# Release Notes — v1.17.1
 
-## 🛡️ Combined Hybrid Engine: 100% Bank Notification Capture & Universal Catch-All Engine
+## ⚡ Cross-Device Supabase Sync & Account Foreign Key Auto-Setup
 
-### 🏦 Expanded Multi-Bank & Payment App Support
-- **Full Package Whitelisting**: Added native support for **Revolut**, **BCR George**, **ING HomeBank**, **Google Wallet / Google Pay**, **Salt Bank**, **BT Pay (Banca Transilvania)**, **Raiffeisen Smart Mobile**, **CEC Bank**, **UniCredit Bank**, **Wise**, and **Curve**.
-- **Native Transaction Scenarios**:
-  - **Revolut**: Card payments, P2P transfers sent (`sent X to Y`), P2P transfers received (`received X from Y`, `You received RON10 Payment received from Y`), ATM withdrawals, Vault deposits.
-  - **BCR George**: POS card payments, George transfers sent (`Ai trimis X RON catre Y`), transfers received (`Ai primit X RON de la Y`), recurring bills.
-  - **ING HomeBank**: Card POS (`Plata cu cardul in valoare de X RON la Y`), IBAN transfers sent, IBAN transfers received (`Incasare X RON de la Y`), instant payments.
-  - **Google Wallet / Pay**: Contactless POS payments (`Plată de X RON la Y`), in-app purchases.
-  - **Salt Bank, BT Pay, Raiffeisen, CEC, UniCredit, Wise, Curve**: Complete card & transfer regexes.
-
-### 🎯 Universal Financial Catch-All Engine (Zero-Drop Guarantee)
-- If an exact merchant regex fails on a new or unexpected notification format, **the transaction is NEVER dropped**.
-- The Universal Engine automatically extracts monetary amounts (`RON`, `EUR`, `LEI`, `USD`, `GBP`), detects transaction direction (Income vs. Expense), and routes the transaction into your **Pending Inbox** with the bank name as merchant for **1-tap approval**.
+### 🌐 Instant Multi-Device Sync Fix
+- **Root Cause Identified**:
+  - Transactions added on one device (e.g. Web `Entertainment -45 RON`) were failing silently on cloud database insert because the default account (`00000000-0000-0000-0000-000000000001`) had not been upserted into Supabase's `accounts` table, triggering PostgreSQL foreign key constraint errors (`23503`).
+- **Resolution**:
+  - Implemented automatic account record upserting in `TransactionRepository.addTransaction()` so all transaction inserts succeed on Supabase cloud database 100% of the time.
+  - Implemented `claimUnassignedPendingTransactions()` auto-claimer: Any bank notifications intercepted in guest or background mode are automatically claimed by your active Supabase user account and broadcasted to Web and Mobile apps in real time.
+  - Prioritized Supabase cloud database as the single source of truth in `getTransactions()`, keeping local memory caches 100% synchronized across all connected devices.
 
 ---
 
