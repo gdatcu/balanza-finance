@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../models/transaction.dart';
@@ -22,20 +23,41 @@ class TransactionRepository {
   static final List<Transaction> _localPendingTransactions = [];
   static final List<DebugNotification> _localDebugLogs = [];
 
-  Stream<List<Transaction>> getTransactionsStream(DateTime month) {
-    final client = _client;
-    if (client == null) {
-      return Stream.fromFuture(getTransactions(month));
-    }
+  Stream<List<Transaction>> getTransactionsStream(DateTime month) async* {
+    yield await getTransactions(month);
 
+    final client = _client;
+    if (client == null) return;
+
+    final controller = StreamController<List<Transaction>>();
+
+    StreamSubscription? realtimeSub;
     try {
-      return client
+      realtimeSub = client
           .from('transactions')
           .stream(primaryKey: ['id'])
           .order('date', ascending: false)
-          .asyncMap((_) async => await getTransactions(month));
-    } catch (_) {
-      return Stream.fromFuture(getTransactions(month));
+          .listen((_) async {
+        if (!controller.isClosed) {
+          controller.add(await getTransactions(month));
+        }
+      });
+    } catch (_) {}
+
+    final timer = Timer.periodic(const Duration(seconds: 3), (_) async {
+      if (!controller.isClosed) {
+        controller.add(await getTransactions(month));
+      }
+    });
+
+    try {
+      await for (final data in controller.stream) {
+        yield data;
+      }
+    } finally {
+      realtimeSub?.cancel();
+      timer.cancel();
+      controller.close();
     }
   }
 
@@ -92,19 +114,40 @@ class TransactionRepository {
     } catch (_) {}
   }
 
-  Stream<List<Transaction>> getPendingTransactionsStream() {
-    final client = _client;
-    if (client == null) {
-      return Stream.fromFuture(getPendingTransactions());
-    }
+  Stream<List<Transaction>> getPendingTransactionsStream() async* {
+    yield await getPendingTransactions();
 
+    final client = _client;
+    if (client == null) return;
+
+    final controller = StreamController<List<Transaction>>();
+
+    StreamSubscription? realtimeSub;
     try {
-      return client
+      realtimeSub = client
           .from('transactions')
           .stream(primaryKey: ['id'])
-          .asyncMap((_) async => await getPendingTransactions());
-    } catch (_) {
-      return Stream.fromFuture(getPendingTransactions());
+          .listen((_) async {
+        if (!controller.isClosed) {
+          controller.add(await getPendingTransactions());
+        }
+      });
+    } catch (_) {}
+
+    final timer = Timer.periodic(const Duration(seconds: 3), (_) async {
+      if (!controller.isClosed) {
+        controller.add(await getPendingTransactions());
+      }
+    });
+
+    try {
+      await for (final data in controller.stream) {
+        yield data;
+      }
+    } finally {
+      realtimeSub?.cancel();
+      timer.cancel();
+      controller.close();
     }
   }
 

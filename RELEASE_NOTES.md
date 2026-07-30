@@ -1,17 +1,15 @@
-# Release Notes — v1.16.2
+# Release Notes — v1.16.3
 
-## ⚡ Instant UI Refresh & Enhanced BCR / Revolut Notification Interception
+## ⚡ Instant Realtime Multi-Device Sync
 
-### 📱 Instant UI Refresh Fix
-- **Root Cause Identified**:
-  - When saving a new transaction (e.g. Starbucks), state invalidations were not triggered immediately, requiring a page refresh for the transaction to appear.
+### 🌐 Cross-Device Live Synchronization
+- **Root Cause Solved**:
+  - Previously, transactions added on one device (e.g. Phone) were saved to local memory and Supabase, but other devices (e.g. Web browser) did not receive live updates without manual page refresh because Supabase Realtime WebSockets were not polling as a fallback on web clients.
 - **Resolution**:
-  - Added immediate Riverpod state invalidation calls on transaction creation, update, and deletion in `TransactionInputSheet` and `TransactionDetailsScreen`.
-  - Added hybrid realtime multi-device sync in `TransactionRepository`. New transactions render **instantly**!
-
-### 🏦 Expanded BCR & Revolut Parser Regexes
-- **BCR George**: Added support for transfer notifications (`Ai trimis [amount] RON ... catre [recipient]`).
-- **Revolut**: Added support for currency-prefixed income notifications (`You received RON10 Payment received from [sender]`).
+  - Implemented dual Realtime Engine in `TransactionRepository`:
+    1. **Supabase Realtime WebSockets**: Listens for instant `INSERT`, `UPDATE`, and `DELETE` events on the `transactions` table.
+    2. **3-Second Background Ticker**: Automatically polls Supabase every 3 seconds for instant cross-device updates even if WebSocket connections are blocked by web browsers or firewalls.
+  - Adding a transaction on one device reflects **in real time** across all logged-in devices!
 
 ---
 

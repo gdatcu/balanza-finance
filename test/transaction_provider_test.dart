@@ -20,9 +20,16 @@ class MockTransactionRepository implements TransactionRepository {
     _controller.close();
   }
 
-  void _notify(DateTime month) async {
+  void _notify(DateTime month) {
+    final start = DateTime(month.year, month.month, 1);
+    final end = DateTime(month.year, month.month + 1, 0, 23, 59, 59, 999);
+    final filtered = transactions
+        .where((tx) => tx.date.isAfter(start.subtract(const Duration(milliseconds: 1))) &&
+                       tx.date.isBefore(end.add(const Duration(milliseconds: 1))))
+        .toList()
+      ..sort((a, b) => b.date.compareTo(a.date));
     if (!_controller.isClosed) {
-      _controller.add(await getTransactions(month));
+      _controller.add(filtered);
     }
   }
 
