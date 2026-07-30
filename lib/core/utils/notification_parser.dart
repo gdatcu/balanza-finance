@@ -94,25 +94,33 @@ class NotificationParser {
     // 1. Revolut (com.revolut.office)
     if (packageName == 'com.revolut.office') {
       final revExpenseRegex = RegExp(
-        r'(?:spent|paid|ai cheltuit|ai platit)\s+([\d.,\s]+)\s*(RON|EUR|LEI|USD|GBP)\s+(?:at|to|la)\s+(.*?)(?=\s*sold|\s*pe\s+\d{1,2}|\.$|$)',
+        r'(?:spent|paid|ai cheltuit|ai platit)\s+(?:RON|EUR|LEI|USD|GBP)?\s*([\d.,\s]+)\s*(RON|EUR|LEI|USD|GBP)?\s+(?:at|to|la)\s+(.*?)(?=\s*sold|\s*pe\s+\d{1,2}|\.$|$)',
         caseSensitive: false,
       );
       final revIncomeRegex = RegExp(
-        r'(?:ai primit|you received|received)\s+([\d.,\s]+)\s*(RON|EUR|LEI|USD|GBP)\s+(?:de la|from)\s+(.*?)(?=\s*in contul|\.$|$)',
+        r'(?:ai primit|you received|received|payment received)\s+(?:RON|EUR|LEI|USD|GBP)?\s*([\d.,\s]+)?\s*(RON|EUR|LEI|USD|GBP)?.*?(?:de la|from)\s+(.*?)(?=\s*in contul|\.|\.$|$)',
         caseSensitive: false,
       );
 
       final expMatch = revExpenseRegex.firstMatch(combined);
       if (expMatch != null) {
         rawAmount = expMatch.group(1);
-        currency = expMatch.group(2)?.toUpperCase() ?? 'RON';
+        currency = (expMatch.group(2) ?? 'RON').toUpperCase();
         merchant = expMatch.group(3)?.trim();
         isIncome = false;
       } else {
         final incMatch = revIncomeRegex.firstMatch(combined);
         if (incMatch != null) {
           rawAmount = incMatch.group(1);
-          currency = incMatch.group(2)?.toUpperCase() ?? 'RON';
+          if (rawAmount == null || rawAmount.isEmpty) {
+            final amtMatch = RegExp(r'([\d.,]+)\s*(RON|EUR|LEI|USD|GBP)|(RON|EUR|LEI|USD|GBP)\s*([\d.,]+)', caseSensitive: false).firstMatch(combined);
+            if (amtMatch != null) {
+              rawAmount = amtMatch.group(1) ?? amtMatch.group(4);
+              currency = (amtMatch.group(2) ?? amtMatch.group(3) ?? 'RON').toUpperCase();
+            }
+          } else {
+            currency = (incMatch.group(2) ?? 'RON').toUpperCase();
+          }
           merchant = incMatch.group(3)?.trim();
           isIncome = true;
         }
@@ -126,7 +134,7 @@ class NotificationParser {
         caseSensitive: false,
       );
       final bcrExpenseRegex = RegExp(
-        r'(?:plata|cumparare|pos|ai platit).*?-?\s*([\d.,\s]+)\s*(RON|LEI|EUR)\s+la\s+(.*?)(?=\s*din contul|\s*sold|\.$|$)',
+        r'(?:plata|cumparare|pos|ai platit|ai trimis|info plati).*?-?\s*([\d.,\s]+)\s*(RON|LEI|EUR)\s+(?:la|catre|din contul.*?\s+catre)\s+(.*?)(?=\s+in\s+\d{1,2}\/|\s*din contul|\s*sold|\.$|$)',
         caseSensitive: false,
       );
 

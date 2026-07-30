@@ -1,19 +1,17 @@
-# Release Notes — v1.16.1
+# Release Notes — v1.16.2
 
-## 🛒 Built-in Merchant Auto-Tagging & Smart Category Matching
+## ⚡ Instant UI Refresh & Enhanced BCR / Revolut Notification Interception
 
-### ⚡ Automatic Merchant Categorization
+### 📱 Instant UI Refresh Fix
 - **Root Cause Identified**:
-  - Bank notifications for popular merchants (such as **Kaufland** or **Starbucks**) fell back to `Other` because built-in merchant rules had not been initialized in background notification parsing.
+  - When saving a new transaction (e.g. Starbucks), state invalidations were not triggered immediately, requiring a page refresh for the transaction to appear.
 - **Resolution**:
-  - Created `defaultTaggingRules` containing keyword rules for major merchants & services:
-    - **Groceries**: Kaufland, Lidl, Carrefour, Mega Image, Profi, Auchan, Penny.
-    - **Coffee & Tea**: Starbucks, 5 to go, Tucano, McCafé.
-    - **Restaurants & Delivery**: McDonald's, KFC, Glovo, Tazz, Wolt.
-    - **Transport**: Uber, Bolt, OMV, Petrom.
-    - **Subscriptions**: Netflix, Spotify, YouTube.
-    - **Shopping**: eMAG, Zara, H&M.
-  - Updated `NotificationParser` and `home_view.dart` to auto-resolve merchant names dynamically. **Kaufland** automatically categorizes as **Groceries** and **Starbucks** automatically categorizes as **Coffee & Tea**!
+  - Added immediate Riverpod state invalidation calls on transaction creation, update, and deletion in `TransactionInputSheet` and `TransactionDetailsScreen`.
+  - Added hybrid realtime multi-device sync in `TransactionRepository`. New transactions render **instantly**!
+
+### 🏦 Expanded BCR & Revolut Parser Regexes
+- **BCR George**: Added support for transfer notifications (`Ai trimis [amount] RON ... catre [recipient]`).
+- **Revolut**: Added support for currency-prefixed income notifications (`You received RON10 Payment received from [sender]`).
 
 ---
 
