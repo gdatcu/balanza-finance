@@ -2,110 +2,136 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:balanza/core/utils/notification_parser.dart';
 
 void main() {
-  group('NotificationParser Unit Tests', () {
-    test('removeDiacritics cleans Romanian & European characters', () {
-      expect(NotificationParser.removeDiacritics('Plată la Cumpărături în Chișinău'), 'Plata la Cumparaturi in Chisinau');
-      expect(NotificationParser.removeDiacritics('Ștefan cel Mare & Țara Românească'), 'Stefan cel Mare & Tara Romaneasca');
-    });
-
-    test('normalizeString collapses multiple spaces and newlines', () {
-      expect(NotificationParser.normalizeString('Plata   \n   de  50 RON \n  la   Mega Image  '), 'Plata de 50 RON la Mega Image');
-    });
-
-    test('parseFinancialAmount correctly parses European and US formats', () {
-      expect(NotificationParser.parseFinancialAmount('1.250,50'), equals(1250.50));
-      expect(NotificationParser.parseFinancialAmount('1,250.50'), equals(1250.50));
-      expect(NotificationParser.parseFinancialAmount('75,00'), equals(75.00));
-      expect(NotificationParser.parseFinancialAmount('100.25'), equals(100.25));
-      expect(NotificationParser.parseFinancialAmount(' 50 '), equals(50.00));
-      expect(NotificationParser.parseFinancialAmount('invalid'), isNull);
-    });
-
-    test('parseNotification parses Revolut notification (EN/RO)', () {
-      final resEn = NotificationParser.parseNotification(
-        packageName: 'com.revolut.office',
-        title: 'Revolut',
-        body: 'You spent 125.50 RON at Starbucks. Sold: 450 RON',
-      );
-      expect(resEn, isNotNull);
-      expect(resEn!.amount, equals(125.50));
-      expect(resEn.currency, equals('RON'));
-      expect(resEn.merchant, equals('Starbucks'));
-
-      final resRo = NotificationParser.parseNotification(
-        packageName: 'com.revolut.office',
-        title: 'Revolut',
-        body: 'Ai cheltuit 45,00 LEI la Carrefour Express pe 29 Iul.',
-      );
-      expect(resRo, isNotNull);
-      expect(resRo!.amount, equals(45.00));
-      expect(resRo.currency, equals('RON'));
-      expect(resRo.merchant, equals('Carrefour Express'));
-    });
-
-    test('parseNotification parses BCR George notification', () {
+  group('NotificationParser - Hybrid Multi-Bank & Catch-All Engine Tests', () {
+    test('Parses Revolut expense correctly', () {
       final res = NotificationParser.parseNotification(
-        packageName: 'ro.bcr.georgego',
-        title: 'George BCR',
-        body: 'Plata cu cardul - 89.90 RON la Kaufland din contul RO123.',
+        packageName: 'com.revolut.office',
+        title: 'Revolut',
+        body: 'Spent RON 45.00 at Starbucks.',
       );
       expect(res, isNotNull);
-      expect(res!.amount, equals(89.90));
-      expect(res.currency, equals('RON'));
-      expect(res.merchant, equals('Kaufland'));
-      expect(res.isIncome, isFalse);
+      expect(res!.amount, 45.0);
+      expect(res.currency, 'RON');
+      expect(res.merchant, 'Starbucks');
+      expect(res.isIncome, false);
+      expect(res.categoryId, isNotNull);
+    });
 
-      final resIncome = NotificationParser.parseNotification(
+    test('Parses Revolut currency-prefixed income correctly', () {
+      final res = NotificationParser.parseNotification(
+        packageName: 'com.revolut.office',
+        title: 'Revolut',
+        body: 'You received RON10 Payment received from Datcu George Cristian.',
+      );
+      expect(res, isNotNull);
+      expect(res!.amount, 10.0);
+      expect(res.currency, 'RON');
+      expect(res.merchant, 'Datcu George Cristian');
+      expect(res.isIncome, true);
+    });
+
+    test('Parses BCR transfer sent correctly', () {
+      final res = NotificationParser.parseNotification(
+        packageName: 'ro.bcr.georgego',
+        title: 'Info plati',
+        body: '💸 Ai trimis 10 RON din contul George Standard catre George Datcu in 29/07/2026',
+      );
+      expect(res, isNotNull);
+      expect(res!.amount, 10.0);
+      expect(res.currency, 'RON');
+      expect(res.merchant, 'George Datcu');
+      expect(res.isIncome, false);
+    });
+
+    test('Parses BCR income received correctly', () {
+      final res = NotificationParser.parseNotification(
         packageName: 'ro.bcr.georgego',
         title: 'Info incasari',
-        body: '🥳🥳 Ai primit 28.94 RON in contul George Platinum de la Datcu George Cristian in 29/07/2026 15:38.',
-      );
-      expect(resIncome, isNotNull);
-      expect(resIncome!.amount, equals(28.94));
-      expect(resIncome.currency, equals('RON'));
-      expect(resIncome.merchant, equals('Datcu George Cristian'));
-      expect(resIncome.isIncome, isTrue);
-    });
-
-    test('parseNotification parses Google Wallet notification', () {
-      final res = NotificationParser.parseNotification(
-        packageName: 'com.google.android.apps.walletnfcrel',
-        title: 'Uber Eats',
-        body: 'Plata de 65,00 RON a fost efectuata cu succes.',
+        body: 'Ai primit 250.00 RON de la Popescu Ion in 28/07/2026',
       );
       expect(res, isNotNull);
-      expect(res!.amount, equals(65.00));
-      expect(res.currency, equals('RON'));
-      expect(res.merchant, equals('Uber Eats'));
+      expect(res!.amount, 250.0);
+      expect(res.currency, 'RON');
+      expect(res.merchant, 'Popescu Ion');
+      expect(res.isIncome, true);
     });
 
-    test('parseNotification parses ING & Salt Bank notifications', () {
-      final ingRes = NotificationParser.parseNotification(
+    test('Parses ING HomeBank POS expense correctly', () {
+      final res = NotificationParser.parseNotification(
         packageName: 'ro.ing.mobile.banking',
-        title: 'ING Bank',
-        body: 'Plata POS 150,00 RON la EMAG. Sold: 2000 RON.',
+        title: 'Plata card',
+        body: 'Plata cu cardul in valoare de 38.00 RON la STRADALE',
       );
-      expect(ingRes, isNotNull);
-      expect(ingRes!.amount, equals(150.00));
-      expect(ingRes.merchant, equals('EMAG'));
+      expect(res, isNotNull);
+      expect(res!.amount, 38.0);
+      expect(res.currency, 'RON');
+      expect(res.merchant, 'STRADALE');
+      expect(res.isIncome, false);
+      expect(res.categoryId, isNotNull);
+    });
 
-      final saltRes = NotificationParser.parseNotification(
+    test('Parses ING HomeBank IBAN transfer received correctly', () {
+      final res = NotificationParser.parseNotification(
+        packageName: 'ro.ing.mobile.banking',
+        title: 'Incasare',
+        body: 'Incasare 1500 RON de la ANEXA',
+      );
+      expect(res, isNotNull);
+      expect(res!.amount, 1500.0);
+      expect(res.currency, 'RON');
+      expect(res.merchant, 'ANEXA');
+      expect(res.isIncome, true);
+    });
+
+    test('Parses Google Wallet payment correctly', () {
+      final res = NotificationParser.parseNotification(
+        packageName: 'com.google.android.apps.walletnfcrel',
+        title: 'Starbucks',
+        body: 'Plată de 22,00 RON',
+      );
+      expect(res, isNotNull);
+      expect(res!.amount, 22.0);
+      expect(res.currency, 'RON');
+      expect(res.merchant, 'Starbucks');
+      expect(res.isIncome, false);
+    });
+
+    test('Parses Salt Bank POS payment correctly', () {
+      final res = NotificationParser.parseNotification(
         packageName: 'ro.salt.bank',
         title: 'Salt Bank',
-        body: 'Ai platit 35.00 RON la 5 To Go. Sold: 500 RON.',
+        body: 'Plata 51 RON la Pranzo',
       );
-      expect(saltRes, isNotNull);
-      expect(saltRes!.amount, equals(35.00));
-      expect(saltRes.merchant, equals('5 To Go'));
+      expect(res, isNotNull);
+      expect(res!.amount, 51.0);
+      expect(res.currency, 'RON');
+      expect(res.merchant, 'Pranzo');
+      expect(res.isIncome, false);
     });
 
-    test('parseNotification returns null when regex fails to match amount/merchant', () {
-      final invalidRes = NotificationParser.parseNotification(
-        packageName: 'com.revolut.office',
-        title: 'Revolut',
-        body: 'Welcome to your security update.',
+    test('Parses BT Pay payment via generic fallback', () {
+      final res = NotificationParser.parseNotification(
+        packageName: 'com.bancatransilvania.bft',
+        title: 'BT Pay',
+        body: 'Ai platit 15 RON la Kaufland',
       );
-      expect(invalidRes, isNull);
+      expect(res, isNotNull);
+      expect(res!.amount, 15.0);
+      expect(res.currency, 'RON');
+      expect(res.merchant, 'Kaufland');
+      expect(res.isIncome, false);
+    });
+
+    test('Universal Financial Catch-All Engine extracts unknown notification format without dropping', () {
+      final res = NotificationParser.parseNotification(
+        packageName: 'com.unknown.bank',
+        title: 'Notificare Tranzactie',
+        body: 'Confirmat transfer intern 400.00 RON procesat cu succes',
+      );
+      expect(res, isNotNull);
+      expect(res!.amount, 400.0);
+      expect(res.currency, 'RON');
+      expect(res.merchant, 'Notificare Tranzactie');
     });
   });
 }

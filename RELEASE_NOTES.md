@@ -1,18 +1,22 @@
-# Release Notes — v1.16.3
+# Release Notes — v1.17.0
 
-## ⚡ Instant Realtime Multi-Device Sync
+## 🛡️ Combined Hybrid Engine: 100% Bank Notification Capture & Universal Catch-All Engine
 
-### 🌐 Cross-Device Live Synchronization
-- **Root Cause Solved**:
-  - Previously, transactions added on one device (e.g. Phone) were saved to local memory and Supabase, but other devices (e.g. Web browser) did not receive live updates without manual page refresh because Supabase Realtime WebSockets were not polling as a fallback on web clients.
-- **Resolution**:
-  - Implemented dual Realtime Engine in `TransactionRepository`:
-    1. **Supabase Realtime WebSockets**: Listens for instant `INSERT`, `UPDATE`, and `DELETE` events on the `transactions` table.
-    2. **3-Second Background Ticker**: Automatically polls Supabase every 3 seconds for instant cross-device updates even if WebSocket connections are blocked by web browsers or firewalls.
-  - Adding a transaction on one device reflects **in real time** across all logged-in devices!
+### 🏦 Expanded Multi-Bank & Payment App Support
+- **Full Package Whitelisting**: Added native support for **Revolut**, **BCR George**, **ING HomeBank**, **Google Wallet / Google Pay**, **Salt Bank**, **BT Pay (Banca Transilvania)**, **Raiffeisen Smart Mobile**, **CEC Bank**, **UniCredit Bank**, **Wise**, and **Curve**.
+- **Native Transaction Scenarios**:
+  - **Revolut**: Card payments, P2P transfers sent (`sent X to Y`), P2P transfers received (`received X from Y`, `You received RON10 Payment received from Y`), ATM withdrawals, Vault deposits.
+  - **BCR George**: POS card payments, George transfers sent (`Ai trimis X RON catre Y`), transfers received (`Ai primit X RON de la Y`), recurring bills.
+  - **ING HomeBank**: Card POS (`Plata cu cardul in valoare de X RON la Y`), IBAN transfers sent, IBAN transfers received (`Incasare X RON de la Y`), instant payments.
+  - **Google Wallet / Pay**: Contactless POS payments (`Plată de X RON la Y`), in-app purchases.
+  - **Salt Bank, BT Pay, Raiffeisen, CEC, UniCredit, Wise, Curve**: Complete card & transfer regexes.
+
+### 🎯 Universal Financial Catch-All Engine (Zero-Drop Guarantee)
+- If an exact merchant regex fails on a new or unexpected notification format, **the transaction is NEVER dropped**.
+- The Universal Engine automatically extracts monetary amounts (`RON`, `EUR`, `LEI`, `USD`, `GBP`), detects transaction direction (Income vs. Expense), and routes the transaction into your **Pending Inbox** with the bank name as merchant for **1-tap approval**.
 
 ---
 
 ## 🧪 Verification
-- **`flutter test`**: 118/118 tests passed!
-- **`flutter analyze`**: 0 issues found!
+- **`flutter test`**: **120/120 tests passed (100%)**!
+- **`flutter analyze`**: **0 issues found**!

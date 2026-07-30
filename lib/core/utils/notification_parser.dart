@@ -229,11 +229,11 @@ class NotificationParser {
     // 6. Generic Fallback Regex for allowed bank packages
     if (merchant == null) {
       final genericIncomeRegex = RegExp(
-        r'(?:ai primit|incasare|received)\s+([\d.,\s]+)\s*(RON|LEI|EUR|USD)\s+(?:de la|from)\s+([A-Za-z0-9\s._-]+)',
+        r'(?:ai primit|incasare|received|transfer de la)\s+(?:RON|LEI|EUR|USD|GBP)?\s*([\d.,\s]+)\s*(RON|LEI|EUR|USD|GBP)?\s+(?:de la|from)\s+([A-Za-z0-9\s._-]+)',
         caseSensitive: false,
       );
       final genericExpenseRegex = RegExp(
-        r'([\d.,\s]+)\s*(RON|LEI|EUR|USD)\s+(?:la|at)\s+([A-Za-z0-9\s._-]+)',
+        r'(?:plata|cumparare|paid|spent|ai platit|ai trimis)?\s*([\d.,\s]+)\s*(RON|LEI|EUR|USD|GBP)\s+(?:la|at|catre|to)\s+([A-Za-z0-9\s._-]+)',
         caseSensitive: false,
       );
 
@@ -250,6 +250,35 @@ class NotificationParser {
           currency = expMatch.group(2)?.toUpperCase() ?? 'RON';
           merchant = expMatch.group(3)?.trim();
           isIncome = false;
+        }
+      }
+    }
+
+    // 7. Universal Financial Catch-All Engine (Zero-Drop Guarantee)
+    if (rawAmount == null || merchant == null || merchant.isEmpty) {
+      final amountRegex = RegExp(
+        r'(?:([\d]+(?:[.,][\d]{1,2})?)\s*(RON|EUR|LEI|USD|GBP))|(?:(RON|EUR|LEI|USD|GBP)\s*([\d]+(?:[.,][\d]{1,2})?))',
+        caseSensitive: false,
+      );
+
+      final amtMatch = amountRegex.firstMatch(combined);
+      if (amtMatch != null) {
+        rawAmount = amtMatch.group(1) ?? amtMatch.group(4);
+        currency = (amtMatch.group(2) ?? amtMatch.group(3) ?? 'RON').toUpperCase();
+
+        final lower = combined.toLowerCase();
+        isIncome = lower.contains('primit') ||
+            lower.contains('incasare') ||
+            lower.contains('received') ||
+            lower.contains('from') ||
+            lower.contains('de la') ||
+            lower.contains('inflow') ||
+            lower.contains('depus');
+
+        if (normalizedTitle.isNotEmpty && !normalizedTitle.contains('http') && normalizedTitle.length < 40) {
+          merchant = normalizedTitle;
+        } else {
+          merchant = _getFallbackBankName(packageName);
         }
       }
     }
@@ -291,5 +320,36 @@ class NotificationParser {
       categoryId: categoryId,
       isIncome: isIncome,
     );
+  }
+
+  static String _getFallbackBankName(String packageName) {
+    switch (packageName) {
+      case 'com.revolut.office':
+        return 'Revolut';
+      case 'ro.bcr.georgego':
+        return 'BCR George';
+      case 'ro.ing.mobile.banking':
+        return 'ING HomeBank';
+      case 'ro.salt.bank':
+        return 'Salt Bank';
+      case 'com.google.android.apps.walletnfcrel':
+      case 'com.google.android.gms':
+        return 'Google Wallet';
+      case 'com.bancatransilvania.bft':
+      case 'ro.bancatransilvania.btpay':
+        return 'BT Pay';
+      case 'ro.raiffeisen.smartmobile':
+        return 'Raiffeisen';
+      case 'ro.cec.mobile':
+        return 'CEC Bank';
+      case 'ro.unicredit.mobile':
+        return 'UniCredit Bank';
+      case 'com.transferwise.android':
+        return 'Wise';
+      case 'com.curvecard':
+        return 'Curve';
+      default:
+        return 'Bank Transaction';
+    }
   }
 }
