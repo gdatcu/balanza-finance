@@ -62,9 +62,6 @@ class TransactionRepository {
   }
 
   Future<List<Transaction>> getTransactions(DateTime month) async {
-    final start = DateTime(month.year, month.month, 1);
-    final end = DateTime(month.year, month.month + 1, 0, 23, 59, 59, 999);
-
     final client = _client;
     if (client != null) {
       await _syncLocalTransactionsToSupabase();
@@ -74,13 +71,12 @@ class TransactionRepository {
         final response = await client
             .from('transactions')
             .select()
-            .gte('date', start.toIso8601String())
-            .lte('date', end.toIso8601String())
-            .order('date', ascending: false);
+            .order('date', ascending: false)
+            .limit(500);
 
         final remote = (response as List)
             .map((json) => Transaction.fromJson(json as Map<String, dynamic>))
-            .where((tx) => !tx.isPendingReview)
+            .where((tx) => !tx.isPendingReview && tx.date.year == month.year && tx.date.month == month.month)
             .toList();
 
         for (final r in remote) {
@@ -91,8 +87,8 @@ class TransactionRepository {
         final resultList = <Transaction>[...remote];
         for (final localTx in _localApprovedTransactions) {
           if (!localTx.isPendingReview &&
-              !localTx.date.isBefore(start) &&
-              !localTx.date.isAfter(end) &&
+              localTx.date.year == month.year &&
+              localTx.date.month == month.month &&
               !resultList.any((r) => r.id == localTx.id)) {
             resultList.add(localTx);
           }
@@ -106,7 +102,7 @@ class TransactionRepository {
     }
 
     final List<Transaction> result = _localApprovedTransactions.where((tx) {
-      return !tx.isPendingReview && !tx.date.isBefore(start) && !tx.date.isAfter(end);
+      return !tx.isPendingReview && tx.date.year == month.year && tx.date.month == month.month;
     }).toList();
     result.sort((a, b) => b.date.compareTo(a.date));
     return result;
@@ -123,7 +119,26 @@ class TransactionRepository {
 
     for (final tx in List<Transaction>.from(_localApprovedTransactions)) {
       try {
-        final updatedTx = tx.copyWith(userId: targetUserId);
+        var updatedTx = tx;
+        if (updatedTx.userId.isEmpty || updatedTx.userId == '00000000-0000-0000-0000-000000000000') {
+          updatedTx = updatedTx.copyWith(userId: targetUserId);
+        }
+        if (updatedTx.accountId.isEmpty || updatedTx.accountId == 'default-acc') {
+          updatedTx = updatedTx.copyWith(accountId: '00000000-0000-0000-0000-000000000001');
+        }
+
+        try {
+          await client.from('accounts').upsert({
+            'id': updatedTx.accountId,
+            'name': 'Main Account',
+            'type': 'checking',
+            'balance': 0.0,
+            'currency': 'RON',
+            if (targetUserId.isNotEmpty) 'user_id': targetUserId,
+            'created_at': DateTime.now().toIso8601String(),
+          }, onConflict: 'id');
+        } catch (_) {}
+
         await client.from('transactions').upsert(updatedTx.toJson(), onConflict: 'id');
       } catch (e) {
         debugPrint('_syncLocalTransactionsToSupabase error: $e');

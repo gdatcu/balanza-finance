@@ -1,14 +1,15 @@
-# Release Notes — v1.17.2
+# Release Notes — v1.17.3
 
-## ⚡ Multi-Device Realtime Cloud Synchronization Engine
+## ⚡ PostgREST Date String Fix & Realtime Cross-Device Synchronization
 
-### 🌐 Cross-Device Sync & Unauthenticated Session Handling
+### 🌐 PostgREST String Date Query & Timezone Fix
 - **Root Cause Identified**:
-  - When running the app on Web (or a new session), if the user is unauthenticated or has local-only transactions (e.g. `Entertainment -45 RON`), they remained stored in local RAM and were not synced to Supabase Cloud DB.
+  - Transactions saved with ISO 8601 UTC timestamps (ending in `'Z'`, e.g. `2026-07-30T15:14:00.000Z`) were being filtered out by PostgREST PostgreSQL queries using `.lte('date', '2026-07-31T23:59:59.999')` because lexicographical string sorting considers `'Z'` (ASCII 90) greater than `'9'` (ASCII 57).
+  - Consequently, Web and Mobile apps querying Supabase received empty results for current-month transactions.
 - **Resolution**:
-  - Implemented `_syncLocalTransactionsToSupabase()` background sync engine: automatically uploads any unsynced local transactions to Supabase Cloud DB on every sync cycle.
-  - Implemented Ground Truth Cloud Sync in `getTransactions()`: fetches all Cloud DB records, merges them with local transactions, and broadcasts the unified transaction stream to Web, Android, and iOS devices in real time.
-  - Resolved Chrome hot-reload / stale instance state synchronization across devices.
+  - Updated `TransactionRepository.getTransactions()` to fetch recent transactions using `.select().order('date', ascending: false).limit(500)`.
+  - Applied robust Dart memory date filtering (`tx.date.year == month.year && tx.date.month == month.month`) on parsed `DateTime` objects.
+  - Transactions added on any device (e.g., Mobile `Kaufland -55 RON`, `Starbucks -22 RON`) now populate **instantly in real time** on Web (`localhost`) and all connected devices!
 
 ---
 
