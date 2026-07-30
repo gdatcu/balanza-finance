@@ -230,5 +230,20 @@
         "type": "String"
       }
     }
-  }
+  },
+  "dailyWorkingHours": "Ore de lucru pe zi",
+  "workingHoursUpdated": "Orele de lucru zilnice au fost actualizate",
+  "realityCheck": "Verificare Realitate",
+  "thatCostsYouTime": "Asta te costă {time} din viața ta",
+  "@thatCostsYouTime": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "noIncomeWarning": "Adaugă venituri pentru a calcula costul în timp",
+  "putInWishlist": "Pune în Lista de Dorințe",
+  "walkAway": "Renunță și pleacă",
+  "buyingAnyway": "Cumpăr oricum"
 }

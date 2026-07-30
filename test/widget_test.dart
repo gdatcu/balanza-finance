@@ -104,7 +104,7 @@ void main() {
     expect(find.text('Groceries Spend'), findsOneWidget);
     expect(find.text('-RON 50.00'), findsNWidgets(3));
 
-    final fab = find.byType(FloatingActionButton);
+    final fab = find.byIcon(Icons.add);
     expect(fab, findsOneWidget);
     await tester.tap(fab);
     await tester.pumpAndSettle();
@@ -166,9 +166,7 @@ void main() {
     expect(find.text('Settings'), findsOneWidget);
     expect(find.text('Configure Budget'), findsOneWidget);
 
-    final textFormField = find.byType(TextFormField);
-    expect(textFormField, findsOneWidget);
-
+    final textFormField = find.byType(TextFormField).first;
     await tester.enterText(textFormField, '1500.0');
     await tester.pump();
 

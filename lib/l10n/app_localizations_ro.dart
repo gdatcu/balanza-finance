@@ -519,4 +519,32 @@ class AppLocalizationsRo extends AppLocalizations {
   String remainingToSave(String amount) {
     return 'Mai ai de economisit $amount';
   }
+
+  @override
+  String get dailyWorkingHours => 'Ore de lucru pe zi';
+
+  @override
+  String get workingHoursUpdated =>
+      'Orele de lucru zilnice au fost actualizate';
+
+  @override
+  String get realityCheck => 'Verificare Realitate';
+
+  @override
+  String thatCostsYouTime(String time) {
+    return 'Asta te costă $time din viața ta';
+  }
+
+  @override
+  String get noIncomeWarning =>
+      'Adaugă venituri pentru a calcula costul în timp';
+
+  @override
+  String get putInWishlist => 'Pune în Lista de Dorințe';
+
+  @override
+  String get walkAway => 'Renunță și pleacă';
+
+  @override
+  String get buyingAnyway => 'Cumpăr oricum';
 }

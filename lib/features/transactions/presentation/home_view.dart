@@ -23,6 +23,7 @@ import '../../net_worth/presentation/net_worth_view.dart';
 import '../../savings_goals/presentation/savings_goals_view.dart';
 import '../../budgets/providers/category_budget_progress_provider.dart';
 import '../../budgets/presentation/category_budget_input_sheet.dart';
+import '../../analytics/presentation/reality_check_sheet.dart';
 
 enum ToshlSection {
   overview,
@@ -659,6 +660,14 @@ class _HomeViewState extends ConsumerState<HomeView> {
                     );
                   },
                 ),
+                ListTile(
+                  leading: const Icon(Icons.flash_on, color: Color(0xFFFF7A5A)),
+                  title: Text(AppLocalizations.of(context)!.realityCheck, style: const TextStyle(color: Colors.white)),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    RealityCheckSheet.show(context);
+                  },
+                ),
                 const Divider(color: Colors.white12),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -759,12 +768,35 @@ class _HomeViewState extends ConsumerState<HomeView> {
             ),
           ),
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () => _showAddTransaction(context),
-          backgroundColor: const Color(0xFFFF7A5A),
-          foregroundColor: Colors.white,
-          shape: const CircleBorder(),
-          child: const Icon(Icons.add, size: 28),
+        floatingActionButton: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            FloatingActionButton.extended(
+              heroTag: 'fab_reality_check',
+              onPressed: () => RealityCheckSheet.show(context),
+              backgroundColor: const Color(0xFF1E293B),
+              foregroundColor: const Color(0xFFFF7A5A),
+              elevation: 4,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(24),
+                side: const BorderSide(color: Color(0xFFFF7A5A), width: 1.5),
+              ),
+              icon: const Icon(Icons.flash_on, size: 20),
+              label: Text(
+                AppLocalizations.of(context)!.realityCheck,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+            const SizedBox(width: 12),
+            FloatingActionButton(
+              heroTag: 'fab_add_tx',
+              onPressed: () => _showAddTransaction(context),
+              backgroundColor: const Color(0xFFFF7A5A),
+              foregroundColor: Colors.white,
+              shape: const CircleBorder(),
+              child: const Icon(Icons.add, size: 28),
+            ),
+          ],
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
       ),

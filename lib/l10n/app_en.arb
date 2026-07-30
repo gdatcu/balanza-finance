@@ -230,5 +230,20 @@
         "type": "String"
       }
     }
-  }
+  },
+  "dailyWorkingHours": "Daily working hours",
+  "workingHoursUpdated": "Daily working hours updated successfully",
+  "realityCheck": "Reality Check",
+  "thatCostsYouTime": "That costs you {time} of your life",
+  "@thatCostsYouTime": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "noIncomeWarning": "Log income to enable Time Cost calculation",
+  "putInWishlist": "Put it in the Wishlist",
+  "walkAway": "Walk Away",
+  "buyingAnyway": "I'm buying it anyway"
 }

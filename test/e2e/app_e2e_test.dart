@@ -122,7 +122,7 @@ void main() {
     expect(find.text('Total Balance'), findsOneWidget);
 
     // 2. Open Add Transaction Modal
-    final fab = find.byType(FloatingActionButton);
+    final fab = find.byIcon(Icons.add);
     expect(fab, findsOneWidget);
     await tester.tap(fab);
     await tester.pumpAndSettle();
@@ -156,7 +156,7 @@ void main() {
 
     // 6. Change Budget in Settings
     expect(find.text('Settings'), findsOneWidget);
-    final budgetField = find.byType(TextFormField);
+    final budgetField = find.byType(TextFormField).first;
     await tester.enterText(budgetField, '2000.0');
 
     final saveBudgetBtn = find.text('Save Budget');

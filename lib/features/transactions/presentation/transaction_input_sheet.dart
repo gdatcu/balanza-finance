@@ -13,8 +13,9 @@ import '../utils/transaction_parser.dart';
 
 class TransactionInputSheet extends ConsumerStatefulWidget {
   final Transaction? transactionToEdit;
+  final double? initialAmount;
 
-  const TransactionInputSheet({super.key, this.transactionToEdit});
+  const TransactionInputSheet({super.key, this.transactionToEdit, this.initialAmount});
 
   @override
   ConsumerState<TransactionInputSheet> createState() => _TransactionInputSheetState();
@@ -48,6 +49,8 @@ class _TransactionInputSheetState extends ConsumerState<TransactionInputSheet> {
           : tx.amount.abs();
       _amountController.text = absAmt.toString();
       _noteController.text = tx.description ?? '';
+    } else if (widget.initialAmount != null && widget.initialAmount! > 0) {
+      _amountController.text = widget.initialAmount!.toStringAsFixed(2);
     }
     _amountController.addListener(_onAmountChanged);
     _noteController.addListener(_onNoteChanged);

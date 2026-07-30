@@ -517,4 +517,30 @@ class AppLocalizationsEn extends AppLocalizations {
   String remainingToSave(String amount) {
     return '$amount remaining to target';
   }
+
+  @override
+  String get dailyWorkingHours => 'Daily working hours';
+
+  @override
+  String get workingHoursUpdated => 'Daily working hours updated successfully';
+
+  @override
+  String get realityCheck => 'Reality Check';
+
+  @override
+  String thatCostsYouTime(String time) {
+    return 'That costs you $time of your life';
+  }
+
+  @override
+  String get noIncomeWarning => 'Log income to enable Time Cost calculation';
+
+  @override
+  String get putInWishlist => 'Put it in the Wishlist';
+
+  @override
+  String get walkAway => 'Walk Away';
+
+  @override
+  String get buyingAnyway => 'I\'m buying it anyway';
 }

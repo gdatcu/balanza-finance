@@ -1045,6 +1045,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{amount} remaining to target'**
   String remainingToSave(String amount);
+
+  /// No description provided for @dailyWorkingHours.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily working hours'**
+  String get dailyWorkingHours;
+
+  /// No description provided for @workingHoursUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily working hours updated successfully'**
+  String get workingHoursUpdated;
+
+  /// No description provided for @realityCheck.
+  ///
+  /// In en, this message translates to:
+  /// **'Reality Check'**
+  String get realityCheck;
+
+  /// No description provided for @thatCostsYouTime.
+  ///
+  /// In en, this message translates to:
+  /// **'That costs you {time} of your life'**
+  String thatCostsYouTime(String time);
+
+  /// No description provided for @noIncomeWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Log income to enable Time Cost calculation'**
+  String get noIncomeWarning;
+
+  /// No description provided for @putInWishlist.
+  ///
+  /// In en, this message translates to:
+  /// **'Put it in the Wishlist'**
+  String get putInWishlist;
+
+  /// No description provided for @walkAway.
+  ///
+  /// In en, this message translates to:
+  /// **'Walk Away'**
+  String get walkAway;
+
+  /// No description provided for @buyingAnyway.
+  ///
+  /// In en, this message translates to:
+  /// **'I\'m buying it anyway'**
+  String get buyingAnyway;
 }
 
 class _AppLocalizationsDelegate
