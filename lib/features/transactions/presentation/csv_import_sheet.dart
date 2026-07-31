@@ -466,6 +466,12 @@ class _CsvImportSheetState extends ConsumerState<CsvImportSheet> {
               final tx = _parsedTransactions[index];
               final subcategories = allCategories.where((c) => c.parentId == tx.categoryId).toList();
 
+              final parentIds = parentCategories.map((c) => c.id).toSet();
+              final safeParentValue = (tx.categoryId != null && parentIds.contains(tx.categoryId)) ? tx.categoryId : null;
+
+              final subcategoryIds = subcategories.map((c) => c.id).toSet();
+              final safeSubValue = (tx.subcategoryId != null && subcategoryIds.contains(tx.subcategoryId)) ? tx.subcategoryId : null;
+
               return Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
@@ -572,7 +578,7 @@ class _CsvImportSheetState extends ConsumerState<CsvImportSheet> {
                         Expanded(
                           child: DropdownButtonFormField<String>(
                             // ignore: deprecated_member_use
-                            value: tx.categoryId,
+                            value: safeParentValue,
                             isExpanded: true,
                             dropdownColor: const Color(0xFF1E293B),
                             style: const TextStyle(color: Colors.white, fontSize: 12),
@@ -600,7 +606,7 @@ class _CsvImportSheetState extends ConsumerState<CsvImportSheet> {
                           Expanded(
                             child: DropdownButtonFormField<String?>(
                               // ignore: deprecated_member_use
-                              value: tx.subcategoryId,
+                              value: safeSubValue,
                               isExpanded: true,
                               dropdownColor: const Color(0xFF1E293B),
                               style: const TextStyle(color: Colors.white, fontSize: 12),

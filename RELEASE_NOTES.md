@@ -1,11 +1,10 @@
-# Release Notes — v1.23.2
+# Release Notes — v1.23.3
 
-## 🐛 Fix PostgreSQL UUID Syntax Error for CSV Transaction Imports
+## 🛡️ Fix Dropdown Exception on Category Switch in CSV Importer
 
-### 🛠️ Supabase Database Insertion Fix (`CsvImportSheet`)
-- **Fix:** Fixed a PostgreSQL error (`code: 22P02 invalid input syntax for type uuid`) when saving imported CSV records.
-- **UUID v4 Generation:** Replaced legacy string prefixed IDs (`csv_...`) with standard RFC-compliant `Uuid().v4()` strings.
-- **Zero Database Changes Needed:** No database schema alterations or migrations required on Supabase.
+### 🛠️ Dropdown Value Sanitization (`CsvImportSheet`)
+- **Fix:** Fixed a Flutter assertion error (`There should be exactly one item with [DropdownButton]'s value...`) when switching transaction parent categories or subcategories in the CSV preview modal.
+- **Safe Value Guard:** Added `safeParentValue` and `safeSubValue` checks to ensure selected category IDs are strictly validated against available dropdown items before rendering.
 
 ---
 
