@@ -23,6 +23,7 @@ import '../../net_worth/presentation/net_worth_view.dart';
 import '../../savings_goals/presentation/savings_goals_view.dart';
 import '../../budgets/providers/category_budget_progress_provider.dart';
 import '../../budgets/presentation/category_budget_input_sheet.dart';
+import '../../cash_flow/presentation/cash_flow_view.dart';
 import '../../analytics/presentation/reality_check_sheet.dart';
 import '../../analytics/presentation/time_burn_calendar_view.dart';
 import '../../wishlist/presentation/wishlist_view.dart';
@@ -689,6 +690,16 @@ class _HomeViewState extends ConsumerState<HomeView> {
                     Navigator.of(context).pop();
                     Navigator.of(context).push(
                       MaterialPageRoute(builder: (context) => const WishlistView()),
+                    );
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.insights, color: Color(0xFF10B981)),
+                  title: const Text('Cash Flow & Bills', style: TextStyle(color: Colors.white)),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => const CashFlowView()),
                     );
                   },
                 ),
