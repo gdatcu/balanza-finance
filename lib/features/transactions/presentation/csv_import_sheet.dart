@@ -403,6 +403,7 @@ class _CsvImportSheetState extends ConsumerState<CsvImportSheet> {
                         // Parent Category Dropdown
                         Expanded(
                           child: DropdownButtonFormField<String>(
+                            // ignore: deprecated_member_use
                             value: tx.categoryId,
                             isExpanded: true,
                             dropdownColor: const Color(0xFF1E293B),
@@ -430,6 +431,7 @@ class _CsvImportSheetState extends ConsumerState<CsvImportSheet> {
                           const SizedBox(width: 8),
                           Expanded(
                             child: DropdownButtonFormField<String?>(
+                              // ignore: deprecated_member_use
                               value: tx.subcategoryId,
                               isExpanded: true,
                               dropdownColor: const Color(0xFF1E293B),
