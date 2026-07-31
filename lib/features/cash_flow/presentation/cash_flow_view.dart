@@ -279,7 +279,9 @@ class CashFlowView extends ConsumerWidget {
           // Paid Switch
           Switch(
             value: bill.isPaidThisMonth,
-            activeColor: const Color(0xFF10B981),
+            thumbColor: WidgetStateProperty.resolveWith(
+              (states) => states.contains(WidgetState.selected) ? const Color(0xFF10B981) : null,
+            ),
             onChanged: (_) {
               ref.read(recurringBillsProvider.notifier).togglePaidThisMonth(bill.id);
             },

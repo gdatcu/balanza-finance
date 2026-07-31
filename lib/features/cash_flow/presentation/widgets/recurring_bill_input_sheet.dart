@@ -92,7 +92,6 @@ class _RecurringBillInputSheetState extends ConsumerState<RecurringBillInputShee
     final bottomPadding = MediaQuery.of(context).viewInsets.bottom;
     final allCategories = ref.watch(supabaseCategoriesProvider).value ?? defaultCategories;
     final parentCategories = allCategories.where((c) => c.parentId == null).toList();
-    final subcategories = allCategories.where((c) => c.parentId == _categoryId).toList();
 
     return Container(
       padding: EdgeInsets.fromLTRB(20, 16, 20, 16 + bottomPadding),
@@ -251,6 +250,7 @@ class _RecurringBillInputSheetState extends ConsumerState<RecurringBillInputShee
 
               // Category Picker
               DropdownButtonFormField<String>(
+                // ignore: deprecated_member_use
                 value: _categoryId,
                 dropdownColor: const Color(0xFF1E293B),
                 style: const TextStyle(color: Colors.white),
