@@ -51,5 +51,32 @@ CARD_PAYMENT,Current,2026-07-14 12:00:00,2026-07-14 12:01:00,Froo Market,-32.00,
       expect(results[1].matchedMerchant, 'froo');
       expect(results[1].subcategoryId, '00000000-0000-0000-0000-000000000c16'); // Groceries
     });
+
+    test('Parses BCR George CSV format with Debit/Credit columns and auto-tags Froo, Carrefour & Golden Coffe', () {
+      const bcrCsv = '''Issuing date of the statement,Issuing time of the statement,Starting date,End date,Currency,BNR exchange rate,Statement issued for account,Product type,Account owner,First opening accounting balance,Transaction completion date,Transaction completion hour,Transaction's details,Operation's reference,Debit (amount),Credit (amount),Total debit (amount),Total credit (amount),Final accounting balance,Blocked amounts,Available balance,Credit lines available limit
+31.07.2026,13:19,01.07.2026,21.07.2026,RON,,RO14RNCB0857129143320008,Cont GEORGE 3.0,Datcu George,0,01.07.2026,18:49,"Google Pay, Tranzactie comerciant - Tranz: Ref 902646733553. Locatie: 22328650 RO CARREFOUR MK BIRUINTEI C POPESTI LE. Data_Ora: 30-06-2026 19:05:55",Ref123,19.85,0,0,0,0,0,0,0
+31.07.2026,13:19,01.07.2026,21.07.2026,RON,,RO14RNCB0857129143320008,Cont GEORGE 3.0,Datcu George,0,02.07.2026,17:01,"Google Pay, Tranzactie comerciant - Tranz: Ref 902658278402. Locatie: 05573370 RO Froo Popesti Le. Data_Ora: 01-07-2026 15:41:32",Ref124,28.26,0,0,0,0,0,0,0
+31.07.2026,13:19,01.07.2026,21.07.2026,RON,,RO14RNCB0857129143320008,Cont GEORGE 3.0,Datcu George,0,10.07.2026,14:43,"Referinta 260710S966095119, Plata Instant - Transfer",Ref125,0,"8,037.01",0,0,0,0,0,0''';
+
+      final results = CsvBankStatementParser.parseCsvContent(
+        rawCsv: bcrCsv,
+        rules: defaultTaggingRules,
+        categories: defaultCategories,
+      );
+
+      expect(results.length, 3);
+
+      expect(results[0].date, DateTime(2026, 7, 1));
+      expect(results[0].amount, -19.85);
+      expect(results[0].matchedMerchant, 'carrefour');
+
+      expect(results[1].date, DateTime(2026, 7, 2));
+      expect(results[1].amount, -28.26);
+      expect(results[1].matchedMerchant, 'froo');
+
+      expect(results[2].date, DateTime(2026, 7, 10));
+      expect(results[2].amount, 8037.01);
+      expect(results[2].isIncome, isTrue);
+    });
   });
 }

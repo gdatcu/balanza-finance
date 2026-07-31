@@ -75,34 +75,84 @@ class CsvBankStatementParser {
 
     final headers = rows[headerIndex].map((h) => h.toLowerCase().trim()).toList();
 
-    int dateCol = _findColumn(headers, ['date', 'data', 'started date', 'data tranzactie', 'data tranzactiei']);
-    int descCol = _findColumn(headers, ['description', 'descriere', 'detalii', 'detalii tranzactie', 'merchant', 'beneficiar']);
+    int dateCol = _findColumn(headers, [
+      'transaction completion date',
+      'data tranzactiei',
+      'data tranzactie',
+      'completion date',
+      'started date',
+      'date',
+      'data',
+    ]);
+    int descCol = _findColumn(headers, [
+      "transaction's details",
+      'transaction details',
+      'details',
+      'descriere',
+      'description',
+      'detalii',
+      'detalii tranzactie',
+      'merchant',
+      'beneficiar',
+      'narrative',
+    ]);
+
+    int debitCol = _findColumn(headers, ['debit (amount)', 'debit', 'cheltuiala', 'suma debit', 'outflow']);
+    int creditCol = _findColumn(headers, ['credit (amount)', 'credit', 'venit', 'suma credit', 'inflow']);
     int amtCol = _findColumn(headers, ['amount', 'suma', 'valoare', 'suma (ron)', 'suma (eur)']);
     int currCol = _findColumn(headers, ['currency', 'moneda', 'valuta']);
     int typeCol = _findColumn(headers, ['type', 'tip', 'tip tranzactie']);
 
     if (dateCol == -1) dateCol = 0;
     if (descCol == -1) descCol = headers.length > 1 ? 1 : 0;
-    if (amtCol == -1) amtCol = headers.length > 2 ? 2 : (headers.length > 1 ? 1 : 0);
 
     final results = <ParsedCsvTransaction>[];
 
     for (int i = headerIndex + 1; i < rows.length; i++) {
       final row = rows[i];
-      if (row.length <= dateCol || row.length <= descCol || row.length <= amtCol) continue;
+      if (row.length <= dateCol || row.length <= descCol) continue;
 
       final rawDate = row[dateCol].trim();
-      final rawDesc = row[descCol].trim();
-      final rawAmt = row[amtCol].trim();
+      var rawDesc = row[descCol].trim();
       final rawCurr = (currCol != -1 && currCol < row.length) ? row[currCol].trim().toUpperCase() : 'RON';
       final rawType = (typeCol != -1 && typeCol < row.length) ? row[typeCol].trim().toLowerCase() : '';
 
-      if (rawDate.isEmpty || rawDesc.isEmpty || rawAmt.isEmpty) continue;
+      if (rawDate.isEmpty || rawDesc.isEmpty) continue;
 
-      final date = _parseDate(rawDate);
-      final parsedAmt = _parseAmount(rawAmt, rawType);
+      // Extract cleaner description if 'Locatie:' is present (e.g. BCR statements)
+      if (rawDesc.contains('Locatie:')) {
+        final locIndex = rawDesc.indexOf('Locatie:');
+        final afterLoc = rawDesc.substring(locIndex + 8).trim();
+        final endIdx = afterLoc.indexOf('. Data_Ora:');
+        if (endIdx != -1) {
+          rawDesc = afterLoc.substring(0, endIdx).trim();
+        } else {
+          rawDesc = afterLoc;
+        }
+      }
+
+      // Determine amount from debit/credit columns or single amount column
+      double parsedAmt = 0.0;
+
+      if (debitCol != -1 && creditCol != -1 && row.length > debitCol && row.length > creditCol) {
+        final debitStr = row[debitCol].trim();
+        final creditStr = row[creditCol].trim();
+        final debitVal = _parseAmount(debitStr, '');
+        final creditVal = _parseAmount(creditStr, '');
+
+        if (debitVal > 0) {
+          parsedAmt = -debitVal.abs();
+        } else if (creditVal > 0) {
+          parsedAmt = creditVal.abs();
+        }
+      } else if (amtCol != -1 && row.length > amtCol) {
+        final rawAmt = row[amtCol].trim();
+        parsedAmt = _parseAmount(rawAmt, rawType);
+      }
+
       if (parsedAmt == 0) continue;
 
+      final date = _parseDate(rawDate);
       final isIncome = parsedAmt > 0;
       final currency = rawCurr.isEmpty ? 'RON' : rawCurr;
 
