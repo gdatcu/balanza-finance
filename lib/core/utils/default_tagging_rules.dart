@@ -60,8 +60,15 @@ final List<TaggingRule> defaultTaggingRules = [
   // Coffee & Tea (Food -> coffee_tea '00000000-0000-0000-0000-000000000c10')
   const TaggingRule(id: 'rule-goldencoffe', keyword: 'golden coffe', category: 'Food', subCategory: 'coffee_tea', categoryId: '00000000-0000-0000-0000-000000000c10'),
 
+  // Income -> Salary & Grants ('00000000-0000-0000-0000-000000000c05')
+  const TaggingRule(id: 'rule-luxoft', keyword: 'luxoft', category: 'Income', subCategory: 'salary', categoryId: '00000000-0000-0000-0000-000000000c05'),
+  const TaggingRule(id: 'rule-ajpis', keyword: 'ajpis', category: 'Income', subCategory: 'grants', categoryId: '00000000-0000-0000-0000-000000000c05'),
+  const TaggingRule(id: 'rule-alocatia', keyword: 'alocatia', category: 'Income', subCategory: 'grants', categoryId: '00000000-0000-0000-0000-000000000c05'),
+
   // Groceries (Food -> groceries '00000000-0000-0000-0000-000000000c16')
   const TaggingRule(id: 'rule-dingradini', keyword: 'dingradini', category: 'Food', subCategory: 'groceries', categoryId: '00000000-0000-0000-0000-000000000c16'),
+  const TaggingRule(id: 'rule-zoomseri', keyword: 'zoomseri', category: 'Food', subCategory: 'groceries', categoryId: '00000000-0000-0000-0000-000000000c16'),
+  const TaggingRule(id: 'rule-lastrada', keyword: 'la strada', category: 'Food', subCategory: 'groceries', categoryId: '00000000-0000-0000-0000-000000000c16'),
 
   // Utilities -> Electricity ('00000000-0000-0000-0000-000000000c14')
   const TaggingRule(id: 'rule-ppc', keyword: 'ppc energie', category: 'Utilities', subCategory: 'electricity', categoryId: '00000000-0000-0000-0000-000000000c14'),

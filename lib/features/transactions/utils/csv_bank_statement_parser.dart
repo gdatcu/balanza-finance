@@ -118,14 +118,80 @@ class CsvBankStatementParser {
 
     for (int i = headerIndex + 1; i < rows.length; i++) {
       final row = rows[i];
+      if (row.isEmpty) continue;
+
+      final fullRowStr = row.join(' ').toLowerCase();
+      // Skip metadata header/footer lines in ING CSVs
+      if (fullRowStr.contains('titular cont:') ||
+          fullRowStr.contains('cnp:') ||
+          fullRowStr.contains('ing bank n.v.') ||
+          fullRowStr.contains('roxana petria') ||
+          fullRowStr.contains('sef serviciu') ||
+          fullRowStr.contains('åef serviciu')) {
+        continue;
+      }
+
       if (row.length <= dateCol || row.length <= descCol) continue;
 
-      final rawDate = row[dateCol].trim();
+      var rawDate = row[dateCol].trim();
       var rawDesc = row[descCol].trim();
       final rawCurr = (currCol != -1 && currCol < row.length) ? row[currCol].trim().toUpperCase() : 'RON';
       final rawType = (typeCol != -1 && typeCol < row.length) ? row[typeCol].trim().toLowerCase() : '';
 
-      if (rawDate.isEmpty || rawDesc.isEmpty) continue;
+      if (rawDate.isEmpty && rawDesc.isEmpty) continue;
+      if (rawDate.isEmpty) continue; // Sub-row handled in parent loop
+
+      // ING Multi-line Sub-detail aggregation
+      String merchantDetail = '';
+      String ordonatorDetail = '';
+      String beneficiarDetail = '';
+      String extraDetails = '';
+
+      int j = i + 1;
+      while (j < rows.length) {
+        final nextRow = rows[j];
+        if (nextRow.length > dateCol && nextRow[dateCol].trim().isNotEmpty) {
+          break; // Next transaction started
+        }
+
+        final subText = nextRow.join(' ').trim();
+        final lowerSub = subText.toLowerCase();
+
+        if (lowerSub.contains('tranzactie la:')) {
+          final idx = lowerSub.indexOf('tranzactie la:');
+          merchantDetail = subText.substring(idx + 14).trim();
+        } else if (lowerSub.contains('ordonator:')) {
+          final idx = lowerSub.indexOf('ordonator:');
+          ordonatorDetail = subText.substring(idx + 10).trim();
+        } else if (lowerSub.contains('beneficiar:')) {
+          final idx = lowerSub.indexOf('beneficiar:');
+          beneficiarDetail = subText.substring(idx + 11).trim();
+        } else if (lowerSub.contains('detalii:')) {
+          final idx = lowerSub.indexOf('detalii:');
+          extraDetails = subText.substring(idx + 8).trim();
+        }
+
+        j++;
+      }
+
+      // Advance loop index past sub-rows
+      i = j - 1;
+
+      // Construct rich aggregated description
+      final descBuffer = StringBuffer(rawDesc);
+      if (merchantDetail.isNotEmpty) {
+        descBuffer.write(' $merchantDetail');
+      }
+      if (ordonatorDetail.isNotEmpty) {
+        descBuffer.write(' Ordonator: $ordonatorDetail');
+      }
+      if (beneficiarDetail.isNotEmpty) {
+        descBuffer.write(' Beneficiar: $beneficiarDetail');
+      }
+      if (extraDetails.isNotEmpty) {
+        descBuffer.write(' $extraDetails');
+      }
+      rawDesc = descBuffer.toString();
 
       // Extract cleaner description if 'Locatie:' is present (e.g. BCR statements)
       if (rawDesc.contains('Locatie:')) {
@@ -294,7 +360,49 @@ class CsvBankStatementParser {
     return -1;
   }
 
+  static final Map<String, int> _roMonths = {
+    'ianuarie': 1,
+    'ian': 1,
+    'februarie': 2,
+    'feb': 2,
+    'martie': 3,
+    'mar': 3,
+    'aprilie': 4,
+    'apr': 4,
+    'mai': 5,
+    'iunie': 6,
+    'iun': 6,
+    'iulie': 7,
+    'iul': 7,
+    'august': 8,
+    'aug': 8,
+    'septembrie': 9,
+    'sep': 9,
+    'octombrie': 10,
+    'oct': 10,
+    'noiembrie': 11,
+    'noi': 11,
+    'decembrie': 12,
+    'dec': 12,
+  };
+
   static DateTime _parseDate(String raw) {
+    final lower = raw.trim().toLowerCase();
+
+    // Check for Romanian month names (e.g. "24 iulie 2026", "10 iulie 2026")
+    for (final entry in _roMonths.entries) {
+      if (lower.contains(entry.key)) {
+        final parts = lower.split(RegExp(r'\s+'));
+        if (parts.length >= 3) {
+          final day = int.tryParse(parts[0]);
+          final year = int.tryParse(parts[2]);
+          if (day != null && year != null) {
+            return DateTime(year, entry.value, day);
+          }
+        }
+      }
+    }
+
     final clean = raw.replaceAll('/', '-').replaceAll('.', '-');
     final parts = clean.split(RegExp(r'[\s\-T]'));
     if (parts.isEmpty) return DateTime.now();

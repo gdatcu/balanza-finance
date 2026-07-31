@@ -84,5 +84,51 @@ CARD_PAYMENT,Current,2026-07-14 12:00:00,2026-07-14 12:01:00,Froo Market,-32.00,
       expect(results[2].isInternalTransfer, isTrue);
       expect(results[2].isSelected, isFalse);
     });
+
+    test('Parses ING HomeBank multi-line CSV statement with Romanian dates and sub-details', () {
+      const ingCsv = '''Titular cont: DL George-cristian Datcu,,,,,,,
+CNP: 1930113340434,,,,,,,
+Data,,,Detalii tranzactie,Debit,,Credit,Balanta
+24 iulie 2026,,,Incasare,,,"9.572,00","9.572,00"
+,,,Data: 24-07-2026,,,,
+,,,Ordonator:LUXOFT PROFESSIONAL ROMANIA SRL,,,,
+,,,Din contul:RO98CITI0000000798993054,,,,
+,,,Detalii:/ROC/AVANS IULIE2026 60641000 //RFB,,,,
+10 iulie 2026,,,Cumparare POS,"102,99",,,"189,01"
+,,,Data finalizarii (decontarii): 10-07-2026,,,,
+,,,Numar card:**** 3984,,,,
+,,,Tranzactie la:PayU*fashiondays.ro  RO  ROMANIA,,,,
+10 iulie 2026,,,Transfer Home'Bank,"8.037,01",,,"0,00"
+,,,Beneficiar:George Cristian Datcu,,,,
+,,,In contul:RO14RNCB0857129143320008,,,,
+,,,Detalii:transfer intre conturi,,,,''';
+
+      final results = CsvBankStatementParser.parseCsvContent(
+        rawCsv: ingCsv,
+        rules: defaultTaggingRules,
+        categories: defaultCategories,
+      );
+
+      expect(results.length, 3);
+
+      // Luxoft Salary Income
+      expect(results[0].date, DateTime(2026, 7, 24));
+      expect(results[0].amount, 9572.00);
+      expect(results[0].isIncome, isTrue);
+      expect(results[0].matchedMerchant, 'luxoft');
+      expect(results[0].categoryId, '00000000-0000-0000-0000-0000000000c5');
+
+      // Fashion Days Shopping Expense
+      expect(results[1].date, DateTime(2026, 7, 10));
+      expect(results[1].amount, -102.99);
+      expect(results[1].matchedMerchant, 'fashiondays');
+      expect(results[1].subcategoryId, '00000000-0000-0000-0000-000000000c19');
+
+      // Internal Transfer
+      expect(results[2].date, DateTime(2026, 7, 10));
+      expect(results[2].amount, -8037.01);
+      expect(results[2].isInternalTransfer, isTrue);
+      expect(results[2].isSelected, isFalse);
+    });
   });
 }

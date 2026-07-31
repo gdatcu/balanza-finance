@@ -1,25 +1,19 @@
-# Release Notes — v1.22.2
+# Release Notes — v1.23.0
 
-## 🤖 Smart Auto-Tagging Fallback & Internal Transfer Filtering
+## 🏦 Full ING HomeBank Multi-Line Statement Support & Romanian Date Normalization
 
-### ⚡ Auto-Tagging Fallback Engine Fix
-- **Merged Rule Fallbacks:** Combined remote Supabase rules with default fallback rules (`defaultTaggingRules`) so auto-tagging functions 100% of the time, even when stream providers are loading or offline.
-- **Location Prefix Cleaner:** Automatically strips location codes (e.g. `0450PRPR RO`, `22328650 RO`, `05573370 RO`) before matching merchant keywords.
-
-### 🔄 Automatic Internal Transfer Detection & Filtering
-- **Smart Money Movement Filter:** Automatically detects internal bank transfers, card reimbursements, self-payments, and round-ups (e.g., *Platitor: Datcu George... Beneficiar: Datcu George*, *Transfer intre conturi*, *Alimentare cont*).
-- **Auto-Unselect:** Flags internal transfers with a `[Internal Transfer]` badge and **unselects them by default** so they do not bloat monthly spending budgets.
-
-### 🎛️ Preview List Tabs & Bulk Actions
-- **Filter Tabs:** Toggle between `All`, `Spending & Income Only`, and `Transfers`.
-- **Bulk Action Toolbar:**
-  - `Select All` / `Deselect All`
-  - `Uncheck Internal Transfers` (1-click unchecks all non-budget money movements)
-  - `Discard Selected Items` (Bulk remove checked items from preview)
-- **Checkbox Selection & Counter:** Dynamic action button displaying exact approved item count: `Import (X) Selected`.
+### 🚀 ING HomeBank CSV Parser Engine (`CsvBankStatementParser`)
+- **Multi-Line Sub-Detail Aggregator:** ING HomeBank exports use a multi-line format where a transaction's main row has a generic description (`Cumparare POS` or `Incasare`) and sub-details appear in subsequent rows starting with `,,,`. The parser now consolidates these sub-details to extract actual merchant and payer names:
+  - `Tranzactie la: PayU*fashiondays.ro` ➔ Extracted as merchant ➔ Auto-tagged as **Shopping / Clothing**.
+  - `Tranzactie la: LA STRADA-ZOOMSERI` ➔ Extracted as store ➔ Auto-tagged as **Food / Groceries**.
+  - `Ordonator: LUXOFT PROFESSIONAL ROMANIA SRL` ➔ Extracted as employer ➔ Auto-tagged as **Income / Salary**.
+  - `Ordonator: A.J.P.I.S. - ILFOV` ➔ Extracted as agency ➔ Auto-tagged as **Income / Grants**.
+  - `Beneficiar: George Cristian Datcu` / `transfer intre conturi` ➔ Flagged as **Internal Transfer** (unselected by default).
+- **Romanian Date Normalization:** Parses dates with Romanian month names (`24 iulie 2026`, `10 iulie 2026`) directly into standard ISO dates (`2026-07-24`, `2026-07-10`) instead of defaulting to current date.
+- **Header & Metadata Filtering:** Filters out ING statement cover headers (`Titular cont:`, `CNP:`, `ING Bank N.V.`, signature footers) automatically.
 
 ---
 
 ## 🧪 Verification & Release Quality
 - **`flutter analyze`**: 0 issues found!
-- **`flutter test`**: All 118/118 unit, widget, and integration tests passed!
+- **`flutter test`**: All 119/119 unit, widget, and integration tests passed!
