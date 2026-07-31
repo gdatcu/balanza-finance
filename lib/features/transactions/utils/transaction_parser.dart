@@ -75,11 +75,4 @@ class CategoryMatcher {
 
     return categories.first;
   }
-
-  static Category _findByName(List<Category> categories, String targetName) {
-    return categories.firstWhere(
-      (c) => c.name.toLowerCase() == targetName,
-      orElse: () => categories.first,
-    );
-  }
 }

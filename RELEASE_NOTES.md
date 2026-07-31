@@ -1,4 +1,4 @@
-# Release Notes — v1.21.0
+# Release Notes — v1.21.1
 
 ## 🏷️ Subcategories & Enhanced Auto-Tagging Engine
 
