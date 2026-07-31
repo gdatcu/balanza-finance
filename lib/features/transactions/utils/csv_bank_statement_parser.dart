@@ -282,16 +282,36 @@ class CsvBankStatementParser {
   }
 
   static bool _checkIsInternalTransfer(String desc) {
-    final lower = desc.toLowerCase();
+    final clean = desc.toLowerCase().replaceAll('-', ' ');
+
+    // Revolut exchanges, top-ups & self payments
+    if (clean.contains('exchanged to') ||
+        clean.contains('exchanged from') ||
+        clean.contains('top up') ||
+        clean.contains('topup') ||
+        clean.contains('vault transfer') ||
+        clean.contains('schimb valutar') ||
+        clean.contains('alimentare cont') ||
+        clean.contains('credit card reimbursement') ||
+        clean.contains('transfer intre conturi') ||
+        clean.contains('transfer economii')) {
+      return true;
+    }
+
+    // Revolut self-payments with truncated name (e.g. "To George-Cristia Datcu", "Payment from DATCU GEORGE CRISTIAN")
+    if ((clean.contains('datcu') && clean.contains('george')) ||
+        (clean.contains('datcu') && clean.contains('cristia'))) {
+      return true;
+    }
 
     // Check Payer == Beneficiary in BCR/ING/BT statements
-    if (lower.contains('platitor:') && lower.contains('beneficiar:')) {
-      final platitorIdx = lower.indexOf('platitor:');
-      final beneficiarIdx = lower.indexOf('beneficiar:');
+    if (clean.contains('platitor:') && clean.contains('beneficiar:')) {
+      final platitorIdx = clean.indexOf('platitor:');
+      final beneficiarIdx = clean.indexOf('beneficiar:');
 
       if (platitorIdx != -1 && beneficiarIdx != -1 && beneficiarIdx > platitorIdx) {
-        final platitorPart = lower.substring(platitorIdx + 9, beneficiarIdx);
-        final beneficiarPart = lower.substring(beneficiarIdx + 11);
+        final platitorPart = clean.substring(platitorIdx + 9, beneficiarIdx);
+        final beneficiarPart = clean.substring(beneficiarIdx + 11);
 
         final platitorName = platitorPart.split(';').first.trim();
         final beneficiarName = beneficiarPart.split(';').first.trim();
@@ -308,14 +328,7 @@ class CsvBankStatementParser {
       }
     }
 
-    if (lower.contains('transfer') ||
-        lower.contains('plata instant') ||
-        lower.contains('alimentare cont') ||
-        lower.contains('credit card reimbursement') ||
-        lower.contains('schimb valutar') ||
-        lower.contains('top-up') ||
-        lower.contains('topup') ||
-        lower.contains('vault transfer')) {
+    if (clean.contains('transfer') || clean.contains('plata instant')) {
       return true;
     }
 

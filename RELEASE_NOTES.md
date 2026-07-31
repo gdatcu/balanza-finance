@@ -1,19 +1,20 @@
-# Release Notes — v1.23.0
+# Release Notes — v1.23.1
 
-## 🏦 Full ING HomeBank Multi-Line Statement Support & Romanian Date Normalization
+## ⚡ Revolut Statement Truncated Name Normalization & Digital Services Auto-Tagging
 
-### 🚀 ING HomeBank CSV Parser Engine (`CsvBankStatementParser`)
-- **Multi-Line Sub-Detail Aggregator:** ING HomeBank exports use a multi-line format where a transaction's main row has a generic description (`Cumparare POS` or `Incasare`) and sub-details appear in subsequent rows starting with `,,,`. The parser now consolidates these sub-details to extract actual merchant and payer names:
-  - `Tranzactie la: PayU*fashiondays.ro` ➔ Extracted as merchant ➔ Auto-tagged as **Shopping / Clothing**.
-  - `Tranzactie la: LA STRADA-ZOOMSERI` ➔ Extracted as store ➔ Auto-tagged as **Food / Groceries**.
-  - `Ordonator: LUXOFT PROFESSIONAL ROMANIA SRL` ➔ Extracted as employer ➔ Auto-tagged as **Income / Salary**.
-  - `Ordonator: A.J.P.I.S. - ILFOV` ➔ Extracted as agency ➔ Auto-tagged as **Income / Grants**.
-  - `Beneficiar: George Cristian Datcu` / `transfer intre conturi` ➔ Flagged as **Internal Transfer** (unselected by default).
-- **Romanian Date Normalization:** Parses dates with Romanian month names (`24 iulie 2026`, `10 iulie 2026`) directly into standard ISO dates (`2026-07-24`, `2026-07-10`) instead of defaulting to current date.
-- **Header & Metadata Filtering:** Filters out ING statement cover headers (`Titular cont:`, `CNP:`, `ING Bank N.V.`, signature footers) automatically.
+### 🔄 Revolut Internal Transfer & Self-Payment Detection
+- **Truncated Name Normalization:** Revolut statement exports truncate contact names (e.g. `To George-Cristia Datcu` missing the `n` at the end). The internal transfer engine now normalizes name tokens and hyphens so all self-transfers are accurately detected and unselected by default.
+- **Top-Ups & Currency Exchanges:** Automatically detects and excludes `Exchanged to RON`, `Exchanged to EUR`, `Top-up by *`, and `Payment from DATCU GEORGE CRISTIAN` from monthly spending calculations.
+
+### 🏷️ New Digital Services Auto-Tagging Rules
+- Added rule auto-tagging support for:
+  - **Google One** ➔ Subscriptions (`00000000-0000-0000-0000-000000000c13`)
+  - **Scaled Agile** ➔ Tech & Education (`00000000-0000-0000-0000-000000000c21`)
+  - **ChatGPT / OpenAI** ➔ Subscriptions (`00000000-0000-0000-0000-000000000c13`)
+  - **Apple.com / iCloud** ➔ Subscriptions (`00000000-0000-0000-0000-000000000c13`)
 
 ---
 
 ## 🧪 Verification & Release Quality
 - **`flutter analyze`**: 0 issues found!
-- **`flutter test`**: All 119/119 unit, widget, and integration tests passed!
+- **`flutter test`**: All 120/120 unit, widget, and integration tests passed!

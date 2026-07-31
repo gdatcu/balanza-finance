@@ -40,11 +40,17 @@ final List<TaggingRule> defaultTaggingRules = [
   const TaggingRule(id: 'rule-netflix', keyword: 'netflix', category: 'Entertainment', subCategory: 'subscriptions', categoryId: '00000000-0000-0000-0000-000000000c13'),
   const TaggingRule(id: 'rule-spotify', keyword: 'spotify', category: 'Entertainment', subCategory: 'subscriptions', categoryId: '00000000-0000-0000-0000-000000000c13'),
   const TaggingRule(id: 'rule-youtube', keyword: 'youtube', category: 'Entertainment', subCategory: 'subscriptions', categoryId: '00000000-0000-0000-0000-000000000c13'),
+  const TaggingRule(id: 'rule-googleone', keyword: 'google one', category: 'Entertainment', subCategory: 'subscriptions', categoryId: '00000000-0000-0000-0000-000000000c13'),
+  const TaggingRule(id: 'rule-chatgpt', keyword: 'chatgpt', category: 'Entertainment', subCategory: 'subscriptions', categoryId: '00000000-0000-0000-0000-000000000c13'),
+  const TaggingRule(id: 'rule-openai', keyword: 'openai', category: 'Entertainment', subCategory: 'subscriptions', categoryId: '00000000-0000-0000-0000-000000000c13'),
+  const TaggingRule(id: 'rule-apple', keyword: 'apple.com', category: 'Entertainment', subCategory: 'subscriptions', categoryId: '00000000-0000-0000-0000-000000000c13'),
+  const TaggingRule(id: 'rule-icloud', keyword: 'icloud', category: 'Entertainment', subCategory: 'subscriptions', categoryId: '00000000-0000-0000-0000-000000000c13'),
 
   // Shopping -> Gadgets & Tech ('00000000-0000-0000-0000-000000000c21')
   const TaggingRule(id: 'rule-emag', keyword: 'emag', category: 'Shopping', subCategory: 'gadgets', categoryId: '00000000-0000-0000-0000-000000000c21'),
   const TaggingRule(id: 'rule-altex', keyword: 'altex', category: 'Shopping', subCategory: 'gadgets', categoryId: '00000000-0000-0000-0000-000000000c21'),
   const TaggingRule(id: 'rule-flanco', keyword: 'flanco', category: 'Shopping', subCategory: 'gadgets', categoryId: '00000000-0000-0000-0000-000000000c21'),
+  const TaggingRule(id: 'rule-scaledagile', keyword: 'scaled agile', category: 'Shopping', subCategory: 'gadgets', categoryId: '00000000-0000-0000-0000-000000000c21'),
 
   // Shopping -> Clothing & Fashion ('00000000-0000-0000-0000-000000000c19')
   const TaggingRule(id: 'rule-zara', keyword: 'zara', category: 'Shopping', subCategory: 'clothing', categoryId: '00000000-0000-0000-0000-000000000c19'),

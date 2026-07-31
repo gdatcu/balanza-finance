@@ -130,5 +130,50 @@ Data,,,Detalii tranzactie,Debit,,Credit,Balanta
       expect(results[2].isInternalTransfer, isTrue);
       expect(results[2].isSelected, isFalse);
     });
+
+    test('Parses complete Revolut CSV with digital subscriptions & truncated self-name internal transfers', () {
+      const revCsv = '''Type,Product,Started Date,Completed Date,Description,Amount,Fee,Currency,State,Balance
+Exchange,Current,2026-07-01 20:17:42,2026-07-01 20:17:42,Exchanged to RON,5.2,0,RON,COMPLETED,26.2
+Transfer,Current,2026-07-12 22:35:51,2026-07-12 22:35:52,To George-Cristia Datcu,-1.2,0,RON,COMPLETED,0
+Deposit,Current,2026-07-20 22:33:00,2026-07-20 22:33:04,Top-up by *1911,140,0,RON,COMPLETED,140
+Card Payment,Current,2026-07-20 22:34:52,2026-07-21 11:07:38,Netflix,-115.91,0,RON,COMPLETED,0
+Card Payment,Current,2026-07-25 9:25:10,2026-07-26 14:52:52,Google One,-10.99,0,RON,COMPLETED,4.77
+Deposit,Current,2026-07-30 15:21:56,2026-07-30 15:21:57,Payment from DATCU GEORGE CRISTIAN,10,0,RON,COMPLETED,10
+Card Payment,Current,2026-07-30 20:17:37,,Scaled Agile #,-473.48,0,RON,PENDING,''';
+
+      final results = CsvBankStatementParser.parseCsvContent(
+        rawCsv: revCsv,
+        rules: defaultTaggingRules,
+        categories: defaultCategories,
+      );
+
+      expect(results.length, 7);
+
+      // Exchanged to RON -> Internal Transfer
+      expect(results[0].isInternalTransfer, isTrue);
+      expect(results[0].isSelected, isFalse);
+
+      // Truncated self transfer "To George-Cristia Datcu" -> Internal Transfer
+      expect(results[1].isInternalTransfer, isTrue);
+      expect(results[1].isSelected, isFalse);
+
+      // Top-up by *1911 -> Internal Transfer
+      expect(results[2].isInternalTransfer, isTrue);
+      expect(results[2].isSelected, isFalse);
+
+      // Netflix -> Auto-tagged
+      expect(results[3].matchedMerchant, 'netflix');
+
+      // Google One -> Auto-tagged Subscriptions
+      expect(results[4].matchedMerchant, 'google one');
+      expect(results[4].subcategoryId, '00000000-0000-0000-0000-000000000c13');
+
+      // Payment from DATCU GEORGE CRISTIAN -> Internal Transfer
+      expect(results[5].isInternalTransfer, isTrue);
+      expect(results[5].isSelected, isFalse);
+
+      // Scaled Agile # -> Auto-tagged Gadgets / Tech
+      expect(results[6].matchedMerchant, 'scaled agile');
+    });
   });
 }
