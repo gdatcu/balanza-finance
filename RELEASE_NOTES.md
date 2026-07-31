@@ -1,17 +1,11 @@
-# Release Notes — v1.23.1
+# Release Notes — v1.23.2
 
-## ⚡ Revolut Statement Truncated Name Normalization & Digital Services Auto-Tagging
+## 🐛 Fix PostgreSQL UUID Syntax Error for CSV Transaction Imports
 
-### 🔄 Revolut Internal Transfer & Self-Payment Detection
-- **Truncated Name Normalization:** Revolut statement exports truncate contact names (e.g. `To George-Cristia Datcu` missing the `n` at the end). The internal transfer engine now normalizes name tokens and hyphens so all self-transfers are accurately detected and unselected by default.
-- **Top-Ups & Currency Exchanges:** Automatically detects and excludes `Exchanged to RON`, `Exchanged to EUR`, `Top-up by *`, and `Payment from DATCU GEORGE CRISTIAN` from monthly spending calculations.
-
-### 🏷️ New Digital Services Auto-Tagging Rules
-- Added rule auto-tagging support for:
-  - **Google One** ➔ Subscriptions (`00000000-0000-0000-0000-000000000c13`)
-  - **Scaled Agile** ➔ Tech & Education (`00000000-0000-0000-0000-000000000c21`)
-  - **ChatGPT / OpenAI** ➔ Subscriptions (`00000000-0000-0000-0000-000000000c13`)
-  - **Apple.com / iCloud** ➔ Subscriptions (`00000000-0000-0000-0000-000000000c13`)
+### 🛠️ Supabase Database Insertion Fix (`CsvImportSheet`)
+- **Fix:** Fixed a PostgreSQL error (`code: 22P02 invalid input syntax for type uuid`) when saving imported CSV records.
+- **UUID v4 Generation:** Replaced legacy string prefixed IDs (`csv_...`) with standard RFC-compliant `Uuid().v4()` strings.
+- **Zero Database Changes Needed:** No database schema alterations or migrations required on Supabase.
 
 ---
 

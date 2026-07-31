@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:uuid/uuid.dart';
 import '../../../core/utils/category_localizer.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/default_tagging_rules.dart';
@@ -133,7 +134,7 @@ class _CsvImportSheetState extends ConsumerState<CsvImportSheet> {
 
       for (final item in selectedItems) {
         final tx = Transaction(
-          id: 'csv_${DateTime.now().microsecondsSinceEpoch}_${item.description.hashCode}',
+          id: const Uuid().v4(),
           userId: '00000000-0000-0000-0000-000000000000',
           accountId: '00000000-0000-0000-0000-000000000001',
           amount: item.amount,
