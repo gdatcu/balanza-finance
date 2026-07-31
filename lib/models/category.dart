@@ -31,6 +31,7 @@ class Category {
   final String? color;
   final String? userId;
   final bool isIncome;
+  final String? parentId;
   final DateTime createdAt;
 
   const Category({
@@ -40,8 +41,11 @@ class Category {
     this.color,
     this.userId,
     this.isIncome = false,
+    this.parentId,
     required this.createdAt,
   });
+
+  bool get isSubcategory => parentId != null && parentId!.isNotEmpty;
 
   factory Category.fromJson(Map<String, dynamic> json) {
     final id = json['id'] as String;
@@ -67,6 +71,7 @@ class Category {
       color: json['color'] as String?,
       userId: json['user_id'] as String?,
       isIncome: isKnownIncome,
+      parentId: json['parent_id'] as String?,
       createdAt: DateTime.parse(json['created_at'] as String),
     );
   }
@@ -79,6 +84,7 @@ class Category {
       if (color != null) 'color': color,
       'user_id': userId,
       'is_income': isIncome,
+      if (parentId != null) 'parent_id': parentId,
       'created_at': createdAt.toIso8601String(),
     };
   }
@@ -90,6 +96,7 @@ class Category {
     String? color,
     String? userId,
     bool? isIncome,
+    String? parentId,
     DateTime? createdAt,
   }) {
     return Category(
@@ -99,6 +106,7 @@ class Category {
       color: color ?? this.color,
       userId: userId ?? this.userId,
       isIncome: isIncome ?? this.isIncome,
+      parentId: parentId ?? this.parentId,
       createdAt: createdAt ?? this.createdAt,
     );
   }

@@ -1,34 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../models/tagging_rule.dart';
+import '../../../core/utils/default_tagging_rules.dart';
 
-/// AsyncNotifier to fetch and cache remote tagging rules from Supabase.
+/// AsyncNotifier to fetch and cache remote tagging rules from Supabase, merged with defaultTaggingRules.
 class TaggingRulesNotifier extends AsyncNotifier<List<TaggingRule>> {
-  static const List<TaggingRule> defaultFallbackRules = [
-    TaggingRule(id: 'default-1', keyword: 'uber eats', category: 'restaurants', categoryId: '00000000-0000-0000-0000-000000000c11', tag: 'delivery'),
-    TaggingRule(id: 'default-2', keyword: 'uber', category: 'Transport', tag: 'ride'),
-    TaggingRule(id: 'default-3', keyword: 'bolt', category: 'Transport', tag: 'ride'),
-    TaggingRule(id: 'default-4', keyword: 'starbucks', category: 'coffee_tea', categoryId: '00000000-0000-0000-0000-000000000c10', tag: 'coffee'),
-    TaggingRule(id: 'default-5', keyword: '5togo', category: 'coffee_tea', categoryId: '00000000-0000-0000-0000-000000000c10', tag: 'coffee'),
-    TaggingRule(id: 'default-6', keyword: 'lidl', category: 'groceries', categoryId: '00000000-0000-0000-0000-000000000c16', tag: 'groceries'),
-    TaggingRule(id: 'default-7', keyword: 'kaufland', category: 'groceries', categoryId: '00000000-0000-0000-0000-000000000c16', tag: 'groceries'),
-    TaggingRule(id: 'default-8', keyword: 'mega image', category: 'groceries', categoryId: '00000000-0000-0000-0000-000000000c16', tag: 'groceries'),
-    TaggingRule(id: 'default-9', keyword: 'carrefour', category: 'groceries', categoryId: '00000000-0000-0000-0000-000000000c16', tag: 'groceries'),
-    TaggingRule(id: 'default-10', keyword: 'netflix', category: 'subscriptions', categoryId: '00000000-0000-0000-0000-000000000c13', tag: 'subscription'),
-    TaggingRule(id: 'default-11', keyword: 'spotify', category: 'subscriptions', categoryId: '00000000-0000-0000-0000-000000000c13', tag: 'subscription'),
-    TaggingRule(id: 'default-12', keyword: 'animax', category: 'pet_care', categoryId: '00000000-0000-0000-0000-000000000c12', tag: 'pet'),
-    TaggingRule(id: 'default-13', keyword: 'zooplus', category: 'pet_care', categoryId: '00000000-0000-0000-0000-000000000c12', tag: 'pet'),
-    TaggingRule(id: 'default-14', keyword: 'trattoria', category: 'restaurants', categoryId: '00000000-0000-0000-0000-000000000c11', tag: 'dining'),
-    TaggingRule(id: 'default-15', keyword: 'digi', category: 'Utilities', tag: 'internet'),
-    TaggingRule(id: 'default-16', keyword: 'enel', category: 'Utilities', tag: 'electricity'),
-    TaggingRule(id: 'default-17', keyword: 'rate', category: 'credit_installments', categoryId: '00000000-0000-0000-0000-000000000c15', tag: 'credit'),
-    TaggingRule(id: 'default-18', keyword: 'credit', category: 'credit_installments', categoryId: '00000000-0000-0000-0000-000000000c15', tag: 'credit'),
-    TaggingRule(id: 'default-19', keyword: 'bonuri', category: 'meal_tickets', categoryId: '00000000-0000-0000-0000-000000000c17', tag: 'tickets'),
-    TaggingRule(id: 'default-20', keyword: 'freelance', category: 'side_hustle', categoryId: '00000000-0000-0000-0000-000000000c18', tag: 'extra'),
-    TaggingRule(id: 'default-21', keyword: 'salariu', category: 'Salary', tag: 'income'),
-    TaggingRule(id: 'default-22', keyword: 'altele', category: 'other', categoryId: '00000000-0000-0000-0000-000000000c14', tag: 'other'),
-  ];
-
   @override
   Future<List<TaggingRule>> build() async {
     try {
@@ -38,18 +14,24 @@ class TaggingRulesNotifier extends AsyncNotifier<List<TaggingRule>> {
           .select()
           .eq('is_active', true);
 
-      final rules = (response as List)
+      final remoteRules = (response as List)
           .map((json) => TaggingRule.fromJson(json as Map<String, dynamic>))
           .toList();
 
-      if (rules.isEmpty) {
-        return defaultFallbackRules;
+      if (remoteRules.isEmpty) {
+        return defaultTaggingRules;
       }
 
-      return rules;
+      // Merge remote rules with defaultTaggingRules so client always has complete merchant rules
+      final Map<String, TaggingRule> ruleMap = {
+        for (final r in defaultTaggingRules) r.keyword.toLowerCase(): r,
+        for (final r in remoteRules) r.keyword.toLowerCase(): r,
+      };
+
+      return ruleMap.values.toList();
     } catch (_) {
-      // Return default fallback rules if table does not exist or network fails
-      return defaultFallbackRules;
+      // Return default tagging rules if table does not exist or network fails
+      return defaultTaggingRules;
     }
   }
 

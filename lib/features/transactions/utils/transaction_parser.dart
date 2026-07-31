@@ -54,43 +54,17 @@ class CategoryMatcher {
 
     final catStr = result.category.trim().toLowerCase();
     final subCatStr = (result.subCategory ?? '').trim().toLowerCase();
-    final tagStr = (result.tag ?? '').trim().toLowerCase();
 
-    // 1. Direct exact category name match
+    // 1. Direct subcategory name match if present
+    if (subCatStr.isNotEmpty) {
+      for (final c in categories) {
+        if (c.name.toLowerCase() == subCatStr) return c;
+      }
+    }
+
+    // 2. Direct category name match
     for (final c in categories) {
       if (c.name.toLowerCase() == catStr) return c;
-    }
-
-    // 2. Subcategory & legacy category mapping overrides
-    if (catStr == 'food' || catStr == 'mâncare') {
-      if (subCatStr.contains('coffee') || tagStr.contains('coffee')) {
-        return _findByName(categories, 'coffee_tea');
-      }
-      if (subCatStr.contains('grocer') || tagStr.contains('grocer')) {
-        return _findByName(categories, 'groceries');
-      }
-      if (subCatStr.contains('delivery') || subCatStr.contains('fast food') || subCatStr.contains('dining') || subCatStr.contains('restaurant')) {
-        return _findByName(categories, 'restaurants');
-      }
-      return _findByName(categories, 'food');
-    }
-
-    if (catStr == 'income') {
-      if (subCatStr.contains('employment') || subCatStr.contains('salary')) {
-        return _findByName(categories, 'salary');
-      }
-      return _findByName(categories, 'side_hustle');
-    }
-
-    if (catStr == 'health') {
-      return _findByName(categories, 'other');
-    }
-
-    if (catStr == 'entertainment') {
-      if (subCatStr.contains('subscription') || tagStr.contains('subscription')) {
-        return _findByName(categories, 'subscriptions');
-      }
-      return _findByName(categories, 'entertainment');
     }
 
     // 3. Fallback partial matching

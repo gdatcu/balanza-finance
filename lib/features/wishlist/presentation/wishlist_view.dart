@@ -223,17 +223,22 @@ class WishlistView extends ConsumerWidget {
                                 Expanded(
                                   child: ElevatedButton(
                                     onPressed: () async {
-                                      await ref.read(wishlistProvider.notifier).markBought(item.id);
-                                      if (context.mounted) {
-                                        showModalBottomSheet(
-                                          context: context,
-                                          isScrollControlled: true,
-                                          backgroundColor: const Color(0xFF0F172A),
-                                          shape: const RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-                                          ),
-                                          builder: (context) => TransactionInputSheet(initialAmount: item.amount),
-                                        );
+                                      final result = await showModalBottomSheet<bool>(
+                                        context: context,
+                                        isScrollControlled: true,
+                                        backgroundColor: const Color(0xFF0F172A),
+                                        shape: const RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                                        ),
+                                        builder: (context) => TransactionInputSheet(
+                                          initialAmount: item.amount,
+                                          initialDescription: (item.title != 'Pre-purchase Item' && item.title != 'Achiziție în reflecție')
+                                              ? item.title
+                                              : null,
+                                        ),
+                                      );
+                                      if (result == true) {
+                                        await ref.read(wishlistProvider.notifier).markBought(item.id);
                                       }
                                     },
                                     style: ElevatedButton.styleFrom(

@@ -1,42 +1,66 @@
 import '../../models/tagging_rule.dart';
 
 final List<TaggingRule> defaultTaggingRules = [
-  // Groceries ('00000000-0000-0000-0000-000000000c16')
-  const TaggingRule(id: 'rule-kaufland', keyword: 'kaufland', category: 'groceries', categoryId: '00000000-0000-0000-0000-000000000c16'),
-  const TaggingRule(id: 'rule-lidl', keyword: 'lidl', category: 'groceries', categoryId: '00000000-0000-0000-0000-000000000c16'),
-  const TaggingRule(id: 'rule-carrefour', keyword: 'carrefour', category: 'groceries', categoryId: '00000000-0000-0000-0000-000000000c16'),
-  const TaggingRule(id: 'rule-mega', keyword: 'mega image', category: 'groceries', categoryId: '00000000-0000-0000-0000-000000000c16'),
-  const TaggingRule(id: 'rule-profi', keyword: 'profi', category: 'groceries', categoryId: '00000000-0000-0000-0000-000000000c16'),
-  const TaggingRule(id: 'rule-auchan', keyword: 'auchan', category: 'groceries', categoryId: '00000000-0000-0000-0000-000000000c16'),
-  const TaggingRule(id: 'rule-penny', keyword: 'penny', category: 'groceries', categoryId: '00000000-0000-0000-0000-000000000c16'),
+  // Groceries (Food -> groceries '00000000-0000-0000-0000-000000000c16')
+  const TaggingRule(id: 'rule-kaufland', keyword: 'kaufland', category: 'Food', subCategory: 'groceries', categoryId: '00000000-0000-0000-0000-000000000c16'),
+  const TaggingRule(id: 'rule-lidl', keyword: 'lidl', category: 'Food', subCategory: 'groceries', categoryId: '00000000-0000-0000-0000-000000000c16'),
+  const TaggingRule(id: 'rule-carrefour', keyword: 'carrefour', category: 'Food', subCategory: 'groceries', categoryId: '00000000-0000-0000-0000-000000000c16'),
+  const TaggingRule(id: 'rule-mega', keyword: 'mega image', category: 'Food', subCategory: 'groceries', categoryId: '00000000-0000-0000-0000-000000000c16'),
+  const TaggingRule(id: 'rule-froo', keyword: 'froo', category: 'Food', subCategory: 'groceries', categoryId: '00000000-0000-0000-0000-000000000c16'),
+  const TaggingRule(id: 'rule-profi', keyword: 'profi', category: 'Food', subCategory: 'groceries', categoryId: '00000000-0000-0000-0000-000000000c16'),
+  const TaggingRule(id: 'rule-auchan', keyword: 'auchan', category: 'Food', subCategory: 'groceries', categoryId: '00000000-0000-0000-0000-000000000c16'),
+  const TaggingRule(id: 'rule-penny', keyword: 'penny', category: 'Food', subCategory: 'groceries', categoryId: '00000000-0000-0000-0000-000000000c16'),
 
-  // Coffee & Tea ('00000000-0000-0000-0000-000000000c10')
-  const TaggingRule(id: 'rule-starbucks', keyword: 'starbucks', category: 'coffee_tea', categoryId: '00000000-0000-0000-0000-000000000c10'),
-  const TaggingRule(id: 'rule-5togo', keyword: '5togo', category: 'coffee_tea', categoryId: '00000000-0000-0000-0000-000000000c10'),
-  const TaggingRule(id: 'rule-5togo2', keyword: '5 to go', category: 'coffee_tea', categoryId: '00000000-0000-0000-0000-000000000c10'),
-  const TaggingRule(id: 'rule-tucano', keyword: 'tucano', category: 'coffee_tea', categoryId: '00000000-0000-0000-0000-000000000c10'),
-  const TaggingRule(id: 'rule-mccafe', keyword: 'mccafe', category: 'coffee_tea', categoryId: '00000000-0000-0000-0000-000000000c10'),
+  // Coffee & Tea (Food -> coffee_tea '00000000-0000-0000-0000-000000000c10')
+  const TaggingRule(id: 'rule-starbucks', keyword: 'starbucks', category: 'Food', subCategory: 'coffee_tea', categoryId: '00000000-0000-0000-0000-000000000c10'),
+  const TaggingRule(id: 'rule-5togo', keyword: '5togo', category: 'Food', subCategory: 'coffee_tea', categoryId: '00000000-0000-0000-0000-000000000c10'),
+  const TaggingRule(id: 'rule-5togo2', keyword: '5 to go', category: 'Food', subCategory: 'coffee_tea', categoryId: '00000000-0000-0000-0000-000000000c10'),
+  const TaggingRule(id: 'rule-tucano', keyword: 'tucano', category: 'Food', subCategory: 'coffee_tea', categoryId: '00000000-0000-0000-0000-000000000c10'),
+  const TaggingRule(id: 'rule-mccafe', keyword: 'mccafe', category: 'Food', subCategory: 'coffee_tea', categoryId: '00000000-0000-0000-0000-000000000c10'),
 
-  // Restaurants & Fast Food ('00000000-0000-0000-0000-000000000c11')
-  const TaggingRule(id: 'rule-mcdonalds', keyword: 'mcdonald', category: 'restaurants', categoryId: '00000000-0000-0000-0000-000000000c11'),
-  const TaggingRule(id: 'rule-kfc', keyword: 'kfc', category: 'restaurants', categoryId: '00000000-0000-0000-0000-000000000c11'),
-  const TaggingRule(id: 'rule-glovo', keyword: 'glovo', category: 'restaurants', categoryId: '00000000-0000-0000-0000-000000000c11'),
-  const TaggingRule(id: 'rule-tazz', keyword: 'tazz', category: 'restaurants', categoryId: '00000000-0000-0000-0000-000000000c11'),
-  const TaggingRule(id: 'rule-wolt', keyword: 'wolt', category: 'restaurants', categoryId: '00000000-0000-0000-0000-000000000c11'),
+  // Restaurants & Fast Food (Food -> restaurants '00000000-0000-0000-0000-000000000c11')
+  const TaggingRule(id: 'rule-mcdonalds', keyword: 'mcdonald', category: 'Food', subCategory: 'restaurants', categoryId: '00000000-0000-0000-0000-000000000c11'),
+  const TaggingRule(id: 'rule-kfc', keyword: 'kfc', category: 'Food', subCategory: 'restaurants', categoryId: '00000000-0000-0000-0000-000000000c11'),
+  const TaggingRule(id: 'rule-glovo', keyword: 'glovo', category: 'Food', subCategory: 'restaurants', categoryId: '00000000-0000-0000-0000-000000000c11'),
+  const TaggingRule(id: 'rule-tazz', keyword: 'tazz', category: 'Food', subCategory: 'restaurants', categoryId: '00000000-0000-0000-0000-000000000c11'),
+  const TaggingRule(id: 'rule-wolt', keyword: 'wolt', category: 'Food', subCategory: 'restaurants', categoryId: '00000000-0000-0000-0000-000000000c11'),
 
-  // Transport ('00000000-0000-0000-0000-0000000000c2')
-  const TaggingRule(id: 'rule-uber', keyword: 'uber', category: 'Transport', categoryId: '00000000-0000-0000-0000-0000000000c2'),
-  const TaggingRule(id: 'rule-bolt', keyword: 'bolt', category: 'Transport', categoryId: '00000000-0000-0000-0000-0000000000c2'),
-  const TaggingRule(id: 'rule-omv', keyword: 'omv', category: 'Transport', categoryId: '00000000-0000-0000-0000-0000000000c2'),
-  const TaggingRule(id: 'rule-petrom', keyword: 'petrom', category: 'Transport', categoryId: '00000000-0000-0000-0000-0000000000c2'),
+  // Transport -> Rideshare & Taxi ('00000000-0000-0000-0000-00000000c24a')
+  const TaggingRule(id: 'rule-uber', keyword: 'uber', category: 'Transport', subCategory: 'rideshare_taxi', categoryId: '00000000-0000-0000-0000-00000000c24a'),
+  const TaggingRule(id: 'rule-bolt', keyword: 'bolt', category: 'Transport', subCategory: 'rideshare_taxi', categoryId: '00000000-0000-0000-0000-00000000c24a'),
 
-  // Subscriptions ('00000000-0000-0000-0000-000000000c13')
-  const TaggingRule(id: 'rule-netflix', keyword: 'netflix', category: 'subscriptions', categoryId: '00000000-0000-0000-0000-000000000c13'),
-  const TaggingRule(id: 'rule-spotify', keyword: 'spotify', category: 'subscriptions', categoryId: '00000000-0000-0000-0000-000000000c13'),
-  const TaggingRule(id: 'rule-youtube', keyword: 'youtube', category: 'subscriptions', categoryId: '00000000-0000-0000-0000-000000000c13'),
+  // Transport -> Fuel & Gas ('00000000-0000-0000-0000-00000000c24b')
+  const TaggingRule(id: 'rule-omv', keyword: 'omv', category: 'Transport', subCategory: 'fuel_gas', categoryId: '00000000-0000-0000-0000-00000000c24b'),
+  const TaggingRule(id: 'rule-petrom', keyword: 'petrom', category: 'Transport', subCategory: 'fuel_gas', categoryId: '00000000-0000-0000-0000-00000000c24b'),
+  const TaggingRule(id: 'rule-rompetrol', keyword: 'rompetrol', category: 'Transport', subCategory: 'fuel_gas', categoryId: '00000000-0000-0000-0000-00000000c24b'),
+  const TaggingRule(id: 'rule-lukoil', keyword: 'lukoil', category: 'Transport', subCategory: 'fuel_gas', categoryId: '00000000-0000-0000-0000-00000000c24b'),
+  const TaggingRule(id: 'rule-mol', keyword: 'mol', category: 'Transport', subCategory: 'fuel_gas', categoryId: '00000000-0000-0000-0000-00000000c24b'),
 
-  // Shopping ('00000000-0000-0000-0000-0000000000c7')
-  const TaggingRule(id: 'rule-emag', keyword: 'emag', category: 'Shopping', categoryId: '00000000-0000-0000-0000-0000000000c7'),
-  const TaggingRule(id: 'rule-zara', keyword: 'zara', category: 'Shopping', categoryId: '00000000-0000-0000-0000-0000000000c7'),
-  const TaggingRule(id: 'rule-hm', keyword: 'h&m', category: 'Shopping', categoryId: '00000000-0000-0000-0000-0000000000c7'),
+  // Subscriptions (Entertainment -> subscriptions '00000000-0000-0000-0000-000000000c13')
+  const TaggingRule(id: 'rule-netflix', keyword: 'netflix', category: 'Entertainment', subCategory: 'subscriptions', categoryId: '00000000-0000-0000-0000-000000000c13'),
+  const TaggingRule(id: 'rule-spotify', keyword: 'spotify', category: 'Entertainment', subCategory: 'subscriptions', categoryId: '00000000-0000-0000-0000-000000000c13'),
+  const TaggingRule(id: 'rule-youtube', keyword: 'youtube', category: 'Entertainment', subCategory: 'subscriptions', categoryId: '00000000-0000-0000-0000-000000000c13'),
+
+  // Shopping -> Gadgets & Tech ('00000000-0000-0000-0000-000000000c21')
+  const TaggingRule(id: 'rule-emag', keyword: 'emag', category: 'Shopping', subCategory: 'gadgets', categoryId: '00000000-0000-0000-0000-000000000c21'),
+  const TaggingRule(id: 'rule-altex', keyword: 'altex', category: 'Shopping', subCategory: 'gadgets', categoryId: '00000000-0000-0000-0000-000000000c21'),
+  const TaggingRule(id: 'rule-flanco', keyword: 'flanco', category: 'Shopping', subCategory: 'gadgets', categoryId: '00000000-0000-0000-0000-000000000c21'),
+
+  // Shopping -> Clothing & Fashion ('00000000-0000-0000-0000-000000000c19')
+  const TaggingRule(id: 'rule-zara', keyword: 'zara', category: 'Shopping', subCategory: 'clothing', categoryId: '00000000-0000-0000-0000-000000000c19'),
+  const TaggingRule(id: 'rule-hm', keyword: 'h&m', category: 'Shopping', subCategory: 'clothing', categoryId: '00000000-0000-0000-0000-000000000c19'),
+  const TaggingRule(id: 'rule-fashiondays', keyword: 'fashion days', category: 'Shopping', subCategory: 'clothing', categoryId: '00000000-0000-0000-0000-000000000c19'),
+
+  // Health & Medical -> Pharmacy ('00000000-0000-0000-0000-00000000c20a')
+  const TaggingRule(id: 'rule-catena', keyword: 'catena', category: 'healthcare', subCategory: 'pharmacy', categoryId: '00000000-0000-0000-0000-00000000c20a'),
+  const TaggingRule(id: 'rule-drmax', keyword: 'dr.max', category: 'healthcare', subCategory: 'pharmacy', categoryId: '00000000-0000-0000-0000-00000000c20a'),
+  const TaggingRule(id: 'rule-helpnet', keyword: 'help net', category: 'healthcare', subCategory: 'pharmacy', categoryId: '00000000-0000-0000-0000-00000000c20a'),
+  const TaggingRule(id: 'rule-sensiblu', keyword: 'sensiblu', category: 'healthcare', subCategory: 'pharmacy', categoryId: '00000000-0000-0000-0000-00000000c20a'),
+  // Utilities -> Mobile & Phone ('00000000-0000-0000-0000-000000000c4d')
+  const TaggingRule(id: 'rule-orange', keyword: 'orange', category: 'Utilities', subCategory: 'mobile_phone', categoryId: '00000000-0000-0000-0000-000000000c4d'),
+  const TaggingRule(id: 'rule-vodafone', keyword: 'vodafone', category: 'Utilities', subCategory: 'mobile_phone', categoryId: '00000000-0000-0000-0000-000000000c4d'),
+  const TaggingRule(id: 'rule-telekom', keyword: 'telekom', category: 'Utilities', subCategory: 'mobile_phone', categoryId: '00000000-0000-0000-0000-000000000c4d'),
+  const TaggingRule(id: 'rule-digi', keyword: 'digi', category: 'Utilities', subCategory: 'mobile_phone', categoryId: '00000000-0000-0000-0000-000000000c4d'),
+  const TaggingRule(id: 'rule-rcs', keyword: 'rcs', category: 'Utilities', subCategory: 'mobile_phone', categoryId: '00000000-0000-0000-0000-000000000c4d'),
+  const TaggingRule(id: 'rule-yoxo', keyword: 'yoxo', category: 'Utilities', subCategory: 'mobile_phone', categoryId: '00000000-0000-0000-0000-000000000c4d'),
 ];

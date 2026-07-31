@@ -10,12 +10,19 @@ import 'categories_data.dart';
 
 import '../providers/tagging_rules_provider.dart';
 import '../utils/transaction_parser.dart';
+import '../../settings/providers/locale_provider.dart';
 
 class TransactionInputSheet extends ConsumerStatefulWidget {
   final Transaction? transactionToEdit;
   final double? initialAmount;
+  final String? initialDescription;
 
-  const TransactionInputSheet({super.key, this.transactionToEdit, this.initialAmount});
+  const TransactionInputSheet({
+    super.key,
+    this.transactionToEdit,
+    this.initialAmount,
+    this.initialDescription,
+  });
 
   @override
   ConsumerState<TransactionInputSheet> createState() => _TransactionInputSheetState();
@@ -28,6 +35,7 @@ class _TransactionInputSheetState extends ConsumerState<TransactionInputSheet> {
 
   bool _isIncome = false;
   String? _selectedCategoryId;
+  String? _selectedSubcategoryId;
   DateTime _selectedDate = DateTime.now();
   String _selectedCurrency = 'RON';
   String? _lastAutoTaggedRuleId;
@@ -43,6 +51,7 @@ class _TransactionInputSheetState extends ConsumerState<TransactionInputSheet> {
       final tx = widget.transactionToEdit!;
       _isIncome = tx.amount > 0;
       _selectedCategoryId = tx.categoryId;
+      _selectedSubcategoryId = tx.subcategoryId;
       _selectedDate = tx.date;
       _selectedCurrency = tx.originalCurrency;
       _emotionalStatus = tx.emotionalStatus;
@@ -51,8 +60,13 @@ class _TransactionInputSheetState extends ConsumerState<TransactionInputSheet> {
           : tx.amount.abs();
       _amountController.text = absAmt.toString();
       _noteController.text = tx.description ?? '';
-    } else if (widget.initialAmount != null && widget.initialAmount! > 0) {
-      _amountController.text = widget.initialAmount!.toStringAsFixed(2);
+    } else {
+      if (widget.initialAmount != null && widget.initialAmount! > 0) {
+        _amountController.text = widget.initialAmount!.toStringAsFixed(2);
+      }
+      if (widget.initialDescription != null && widget.initialDescription!.isNotEmpty) {
+        _noteController.text = widget.initialDescription!;
+      }
     }
     _amountController.addListener(_onAmountChanged);
     _noteController.addListener(_onNoteChanged);
@@ -77,10 +91,30 @@ class _TransactionInputSheetState extends ConsumerState<TransactionInputSheet> {
 
       _lastAutoTaggedRuleId = result.matchedRule.id;
 
-      if (_selectedCategoryId != matchedCat.id || _isIncome != matchedCat.isIncome) {
+      String? mainCatId;
+      String? subCatId;
+
+      if (matchedCat.isSubcategory) {
+        subCatId = matchedCat.id;
+        mainCatId = matchedCat.parentId;
+      } else {
+        mainCatId = matchedCat.id;
+        if (result.subCategory != null && result.subCategory!.isNotEmpty) {
+          final matchedSub = categories.firstWhere(
+            (c) => c.parentId == mainCatId && (c.name.toLowerCase() == result.subCategory!.toLowerCase() || c.id == result.subCategory),
+            orElse: () => matchedCat,
+          );
+          if (matchedSub.isSubcategory) {
+            subCatId = matchedSub.id;
+          }
+        }
+      }
+
+      if (_selectedCategoryId != mainCatId || _selectedSubcategoryId != subCatId || _isIncome != matchedCat.isIncome) {
         setState(() {
           _isIncome = matchedCat.isIncome;
-          _selectedCategoryId = matchedCat.id;
+          _selectedCategoryId = mainCatId;
+          _selectedSubcategoryId = subCatId;
         });
 
         if (mounted) {
@@ -144,6 +178,7 @@ class _TransactionInputSheetState extends ConsumerState<TransactionInputSheet> {
           userId: widget.transactionToEdit!.userId,
           accountId: _selectedAccountId,
           categoryId: _selectedCategoryId,
+          subcategoryId: _selectedSubcategoryId,
           amount: finalAmount,
           description: _noteController.text.trim().isEmpty ? null : _noteController.text.trim(),
           date: _selectedDate,
@@ -182,6 +217,7 @@ class _TransactionInputSheetState extends ConsumerState<TransactionInputSheet> {
         userId: '00000000-0000-0000-0000-000000000000', // Default mock user id
         accountId: _selectedAccountId,
         categoryId: _selectedCategoryId,
+        subcategoryId: _selectedSubcategoryId,
         amount: finalAmount,
         description: _noteController.text.trim().isEmpty ? null : _noteController.text.trim(),
         date: _selectedDate,
@@ -380,64 +416,135 @@ class _TransactionInputSheetState extends ConsumerState<TransactionInputSheet> {
                 ],
                 const SizedBox(height: 16),
 
-                // Dynamic Categories Dropdown fetching from Supabase
+                // Dynamic Categories & Subcategories Dropdown fetching from Supabase
                 categoriesAsync.when(
                   data: (categories) {
-                    final filtered = categories.where((c) {
-                      return _isIncome ? c.isIncome : !c.isIncome;
+                    final parentCategories = categories.where((c) {
+                      final matchesType = _isIncome ? c.isIncome : !c.isIncome;
+                      return matchesType && !c.isSubcategory;
                     }).toList();
 
                     if (_selectedCategoryId == null ||
-                        !filtered.any((c) => c.id == _selectedCategoryId)) {
-                      _selectedCategoryId = filtered.isNotEmpty ? filtered.first.id : null;
+                        !parentCategories.any((c) => c.id == _selectedCategoryId)) {
+                      _selectedCategoryId = parentCategories.isNotEmpty ? parentCategories.first.id : null;
                     }
 
-                    return DropdownButtonFormField<String>(
-                      decoration: InputDecoration(
-                        labelText: AppLocalizations.of(context)!.category,
-                        prefixIcon: Icon(Icons.category, color: _isIncome ? const Color(0xFF10B981) : const Color(0xFFFF7A5A)),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(
-                            color: _isIncome ? const Color(0xFF10B981) : const Color(0xFFFF7A5A),
-                            width: 2,
-                          ),
-                        ),
-                      ),
-                      // ignore: deprecated_member_use
-                      value: _selectedCategoryId,
-                      items: filtered.map((cat) {
-                        final color = getCategoryColor(cat.color);
-                        final icon = getCategoryIcon(cat.icon);
-                        return DropdownMenuItem<String>(
-                          value: cat.id,
-                          child: Row(
-                            children: [
-                              CircleAvatar(
-                                radius: 14,
-                                backgroundColor: color.withValues(alpha: 0.2),
-                                child: Icon(icon, size: 16, color: color),
+                    final subcategories = categories.where((c) {
+                      return c.parentId == _selectedCategoryId;
+                    }).toList();
+
+                    if (_selectedSubcategoryId != null &&
+                        !subcategories.any((c) => c.id == _selectedSubcategoryId)) {
+                      _selectedSubcategoryId = null;
+                    }
+
+                    final isRo = ref.watch(localeProvider).languageCode == 'ro';
+
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        DropdownButtonFormField<String>(
+                          decoration: InputDecoration(
+                            labelText: AppLocalizations.of(context)!.category,
+                            prefixIcon: Icon(Icons.category, color: _isIncome ? const Color(0xFF10B981) : const Color(0xFFFF7A5A)),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(
+                                color: _isIncome ? const Color(0xFF10B981) : const Color(0xFFFF7A5A),
+                                width: 2,
                               ),
-                              const SizedBox(width: 12),
-                              Text(CategoryLocalizer.getLocalizedName(context, cat.name)),
-                            ],
+                            ),
                           ),
-                        );
-                      }).toList(),
-                      onChanged: (val) {
-                        setState(() {
-                          _selectedCategoryId = val;
-                        });
-                      },
-                      validator: (value) {
-                        if (value == null) {
-                          return AppLocalizations.of(context)!.pleaseSelectCategory;
-                        }
-                        return null;
-                      },
+                          // ignore: deprecated_member_use
+                          value: _selectedCategoryId,
+                          items: parentCategories.map((cat) {
+                            final color = getCategoryColor(cat.color);
+                            final icon = getCategoryIcon(cat.icon);
+                            return DropdownMenuItem<String>(
+                              value: cat.id,
+                              child: Row(
+                                children: [
+                                  CircleAvatar(
+                                    radius: 14,
+                                    backgroundColor: color.withValues(alpha: 0.2),
+                                    child: Icon(icon, size: 16, color: color),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Text(CategoryLocalizer.getLocalizedName(context, cat.name)),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: (val) {
+                            setState(() {
+                              _selectedCategoryId = val;
+                              _selectedSubcategoryId = null;
+                            });
+                          },
+                          validator: (value) {
+                            if (value == null) {
+                              return AppLocalizations.of(context)!.pleaseSelectCategory;
+                            }
+                            return null;
+                          },
+                        ),
+                        if (subcategories.isNotEmpty) ...[
+                          const SizedBox(height: 16),
+                          DropdownButtonFormField<String>(
+                            decoration: InputDecoration(
+                              labelText: isRo ? 'Subcategorie (Opțional)' : 'Subcategory (Optional)',
+                              prefixIcon: Icon(Icons.subdirectory_arrow_right, color: _isIncome ? const Color(0xFF10B981) : const Color(0xFFFF7A5A)),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide(
+                                  color: _isIncome ? const Color(0xFF10B981) : const Color(0xFFFF7A5A),
+                                  width: 2,
+                                ),
+                              ),
+                            ),
+                            // ignore: deprecated_member_use
+                            value: _selectedSubcategoryId,
+                            items: [
+                              DropdownMenuItem<String>(
+                                value: null,
+                                child: Text(
+                                  isRo ? '-- Fără subcategorie --' : '-- No Subcategory --',
+                                  style: const TextStyle(color: Colors.grey),
+                                ),
+                              ),
+                              ...subcategories.map((subCat) {
+                                final color = getCategoryColor(subCat.color);
+                                final icon = getCategoryIcon(subCat.icon);
+                                return DropdownMenuItem<String>(
+                                  value: subCat.id,
+                                  child: Row(
+                                    children: [
+                                      CircleAvatar(
+                                        radius: 12,
+                                        backgroundColor: color.withValues(alpha: 0.2),
+                                        child: Icon(icon, size: 14, color: color),
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Text(CategoryLocalizer.getLocalizedName(context, subCat.name)),
+                                    ],
+                                  ),
+                                );
+                              }),
+                            ],
+                            onChanged: (val) {
+                              setState(() {
+                                _selectedSubcategoryId = val;
+                              });
+                            },
+                          ),
+                        ],
+                      ],
                     );
                   },
                   loading: () => const Center(

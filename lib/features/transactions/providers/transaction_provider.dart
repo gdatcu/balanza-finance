@@ -125,7 +125,18 @@ final supabaseCategoriesProvider = FutureProvider<List<Category>>((ref) async {
       isIncome: cat.isIncome || defaultCat.isIncome,
     );
   }
-  return categoryMap.values.toList();
+
+  final List<Category> uniqueCategories = [];
+  final Set<String> seenNames = {};
+  for (final cat in categoryMap.values) {
+    final norm = cat.name.trim().toLowerCase();
+    if (!seenNames.contains(norm)) {
+      seenNames.add(norm);
+      uniqueCategories.add(cat);
+    }
+  }
+
+  return uniqueCategories;
 });
 
 /// Provider for Category Summaries, aggregating transactions by category for the current month.

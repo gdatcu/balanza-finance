@@ -86,8 +86,53 @@ class CategoryLocalizer {
       case 'educație & dezvoltare':
       case 'educatie & dezvoltare':
         return 'Education';
+      case 'rideshare_taxi':
+        return 'Rideshare & Taxi';
+      case 'fuel_gas':
+        return 'Fuel & Gas';
+      case 'public_transit':
+        return 'Public Transit';
+      case 'car_maintenance':
+        return 'Car Maintenance';
+      case 'electricity':
+        return 'Electricity';
+      case 'internet_tv':
+        return 'Internet & TV';
+      case 'water_gas':
+        return 'Water & Heating';
+      case 'mobile_phone':
+      case 'mobile phone':
+        return 'Mobile & Phone';
+      case 'pharmacy':
+        return 'Pharmacy';
+      case 'doctor_clinic':
+        return 'Doctor & Clinic';
+      case 'home_living':
+        return 'Home & Decor';
+      case 'events_outings':
+        return 'Events & Outings';
+      case 'hobbies_sports':
+        return 'Hobbies & Sports';
+      case 'rent_payment':
+        return 'Monthly Rent';
+      case 'housing_maintenance':
+        return 'Housing Maintenance';
+      case 'main_salary':
+        return 'Main Salary';
+      case 'bonus':
+        return 'Bonus & Rewards';
+      case 'stocks_etfs':
+        return 'Stocks & ETFs';
+      case 'crypto':
+        return 'Crypto';
+      case 'real_estate':
+        return 'Real Estate';
+      case 'gift_received':
+        return 'Gifts Received';
+      case 'gift_given':
+        return 'Gifts Given';
       default:
-        return name;
+        return _toTitleCase(name);
     }
   }
 
@@ -178,13 +223,60 @@ class CategoryLocalizer {
       case 'educație & dezvoltare':
       case 'educatie & dezvoltare':
         return 'Educație & Dezvoltare';
+      case 'rideshare_taxi':
+        return 'Uber & Taxi';
+      case 'fuel_gas':
+        return 'Combustibil & Auto';
+      case 'public_transit':
+        return 'Transport în comun';
+      case 'car_maintenance':
+        return 'Întreținere Auto';
+      case 'electricity':
+        return 'Energie Electrică';
+      case 'internet_tv':
+        return 'Internet & TV';
+      case 'water_gas':
+        return 'Apă & Gaz';
+      case 'mobile_phone':
+      case 'mobile phone':
+        return 'Telefonie & Mobil';
+      case 'pharmacy':
+        return 'Farmacie';
+      case 'doctor_clinic':
+        return 'Doctor & Clinică';
+      case 'home_living':
+        return 'Casă & Decorațiuni';
+      case 'events_outings':
+        return 'Evenimente & Ieșiri';
+      case 'hobbies_sports':
+        return 'Hobby & Sport';
+      case 'rent_payment':
+        return 'Chirie Lunară';
+      case 'housing_maintenance':
+        return 'Întreținere Bloc / Casă';
+      case 'main_salary':
+        return 'Salariu Principal';
+      case 'bonus':
+        return 'Bonus & Premii';
+      case 'stocks_etfs':
+        return 'Acțiuni & ETF-uri';
+      case 'crypto':
+        return 'Criptomonede';
+      case 'real_estate':
+        return 'Imobiliare';
+      case 'gift_received':
+        return 'Cadouri Primite';
+      case 'gift_given':
+        return 'Cadouri Oferite';
       default:
-        return name;
+        return _toTitleCase(name);
     }
   }
 
   static String getLocalizedName(BuildContext context, String name) {
     final localizations = AppLocalizations.of(context)!;
+    final locale = Localizations.localeOf(context).languageCode;
+
     switch (name.toLowerCase()) {
       case 'food':
         return localizations.categoryFood;
@@ -272,7 +364,19 @@ class CategoryLocalizer {
       case 'educatie & dezvoltare':
         return localizations.categoryEducation;
       default:
-        return name;
+        return locale == 'ro' ? getCategoryNameRo(name) : getCategoryNameEn(name);
     }
+  }
+
+  static String _toTitleCase(String text) {
+    if (!text.contains('_')) {
+      if (text.isEmpty) return text;
+      return text[0].toUpperCase() + text.substring(1);
+    }
+    return text
+        .split('_')
+        .where((w) => w.isNotEmpty)
+        .map((w) => w[0].toUpperCase() + w.substring(1).toLowerCase())
+        .join(' ');
   }
 }

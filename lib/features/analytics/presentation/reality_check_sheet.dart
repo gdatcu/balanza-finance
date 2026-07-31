@@ -30,6 +30,13 @@ class RealityCheckSheet extends ConsumerStatefulWidget {
 
 class _RealityCheckSheetState extends ConsumerState<RealityCheckSheet> {
   String _inputAmountStr = '';
+  final TextEditingController _itemTitleController = TextEditingController();
+
+  @override
+  void dispose() {
+    _itemTitleController.dispose();
+    super.dispose();
+  }
 
   void _onKeyPress(String val) {
     setState(() {
@@ -62,6 +69,7 @@ class _RealityCheckSheetState extends ConsumerState<RealityCheckSheet> {
   void _clear() {
     setState(() {
       _inputAmountStr = '';
+      _itemTitleController.clear();
     });
   }
 
@@ -74,8 +82,12 @@ class _RealityCheckSheetState extends ConsumerState<RealityCheckSheet> {
     final isRo = ref.read(localeProvider).languageCode == 'ro';
     final scaffold = ScaffoldMessenger.of(context);
     final nav = Navigator.of(context);
+    final itemTitle = _itemTitleController.text.trim();
 
-    await ref.read(wishlistProvider.notifier).addItem(amount);
+    await ref.read(wishlistProvider.notifier).addItem(
+          amount,
+          title: itemTitle.isNotEmpty ? itemTitle : null,
+        );
     if (!mounted) return;
 
     nav.pop();
@@ -96,6 +108,7 @@ class _RealityCheckSheetState extends ConsumerState<RealityCheckSheet> {
   }
 
   void _onBuyingAnyway(double amount) {
+    final itemTitle = _itemTitleController.text.trim();
     Navigator.of(context).pop();
     showModalBottomSheet(
       context: context,
@@ -104,7 +117,10 @@ class _RealityCheckSheetState extends ConsumerState<RealityCheckSheet> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
-      builder: (context) => TransactionInputSheet(initialAmount: amount),
+      builder: (context) => TransactionInputSheet(
+        initialAmount: amount,
+        initialDescription: itemTitle.isNotEmpty ? itemTitle : null,
+      ),
     );
   }
 
@@ -217,6 +233,27 @@ class _RealityCheckSheetState extends ConsumerState<RealityCheckSheet> {
                         color: (timeCostResult != null && timeCostResult.timeCostHours > 0)
                             ? const Color(0xFFF59E0B)
                             : Colors.grey.shade400,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: _itemTitleController,
+                    style: const TextStyle(color: Colors.white, fontSize: 14),
+                    decoration: InputDecoration(
+                      hintText: isRo ? 'Ce dorești să cumperi? (ex: Căști)' : 'What are you buying? (e.g., Headphones)',
+                      hintStyle: TextStyle(color: Colors.grey.shade500, fontSize: 13),
+                      prefixIcon: const Icon(Icons.shopping_bag_outlined, color: Color(0xFFFF7A5A), size: 20),
+                      filled: true,
+                      fillColor: const Color(0xFF0F172A),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(color: Color(0xFFFF7A5A), width: 1.5),
                       ),
                     ),
                   ),

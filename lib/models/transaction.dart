@@ -3,6 +3,7 @@ class Transaction {
   final String userId;
   final String accountId;
   final String? categoryId;
+  final String? subcategoryId;
   final double amount;
   final String? description;
   final DateTime date;
@@ -16,6 +17,7 @@ class Transaction {
     required this.userId,
     required this.accountId,
     this.categoryId,
+    this.subcategoryId,
     required this.amount,
     this.description,
     required this.date,
@@ -31,6 +33,7 @@ class Transaction {
       userId: json['user_id'] as String,
       accountId: json['account_id'] as String,
       categoryId: json['category_id'] as String?,
+      subcategoryId: json['subcategory_id'] as String? ?? json['sub_category_id'] as String?,
       amount: (json['amount'] as num).toDouble(),
       description: json['description'] as String?,
       date: DateTime.parse(json['date'] as String),
@@ -49,6 +52,7 @@ class Transaction {
       'user_id': userId,
       'account_id': accountId,
       'category_id': categoryId,
+      if (subcategoryId != null) 'subcategory_id': subcategoryId,
       'amount': amount,
       'description': description,
       'date': date.toIso8601String(),
@@ -64,6 +68,7 @@ class Transaction {
     String? userId,
     String? accountId,
     String? categoryId,
+    String? subcategoryId,
     double? amount,
     String? description,
     DateTime? date,
@@ -77,6 +82,7 @@ class Transaction {
       userId: userId ?? this.userId,
       accountId: accountId ?? this.accountId,
       categoryId: categoryId ?? this.categoryId,
+      subcategoryId: subcategoryId ?? this.subcategoryId,
       amount: amount ?? this.amount,
       description: description ?? this.description,
       date: date ?? this.date,

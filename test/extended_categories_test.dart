@@ -11,7 +11,7 @@ import 'package:balanza/features/transactions/providers/transaction_provider.dar
 void main() {
   group('Extended Categories Data Tests', () {
     test('defaultCategories contains all 8 new lifestyle categories', () {
-      final categoryNames = defaultCategories.map((c) => c.name).toList();
+      final categoryNames = defaultCategories.map((c) => c.name.toLowerCase()).toList();
       expect(categoryNames, contains('clothing'));
       expect(categoryNames, contains('healthcare'));
       expect(categoryNames, contains('gadgets'));

@@ -13,6 +13,7 @@ import 'package:balanza/features/settings/providers/updater_provider.dart';
 import 'package:balanza/features/auth/providers/biometric_provider.dart';
 import 'package:balanza/models/net_worth_item.dart';
 import 'package:balanza/features/transactions/providers/transaction_provider.dart';
+import 'package:balanza/core/utils/default_tagging_rules.dart';
 
 class MockSupabaseClient extends Fake implements SupabaseClient {
   @override
@@ -36,11 +37,13 @@ void main() {
   });
 
   group('Tagging Rules Provider Tests', () {
-    test('TaggingRulesNotifier returns default fallback rules when Supabase not initialized', () async {
+    test('TaggingRulesNotifier returns default tagging rules when Supabase not initialized', () async {
       final notifier = TaggingRulesNotifier();
       final rules = await notifier.build();
-      expect(rules.length, TaggingRulesNotifier.defaultFallbackRules.length);
-      expect(rules.first.keyword, 'uber eats');
+      expect(rules.length, defaultTaggingRules.length);
+      expect(rules.any((r) => r.keyword == 'uber'), isTrue);
+      expect(rules.any((r) => r.keyword == 'froo'), isTrue);
+      expect(rules.any((r) => r.keyword == 'catena'), isTrue);
     });
   });
 
