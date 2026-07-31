@@ -1,20 +1,22 @@
-# Release Notes — v1.22.1
+# Release Notes — v1.22.2
 
-## 🚀 Enhanced BCR George Statement Support & Improved Column Detection
+## 🤖 Smart Auto-Tagging Fallback & Internal Transfer Filtering
 
-### 🏦 BCR George CSV Parser Enhancements (`CsvBankStatementParser`)
-- **Dual-Column Debit/Credit Support:** Fixed parser support for BCR George statement exports that split transactions across `Debit (amount)` and `Credit (amount)` columns.
-- **Accurate Date Extraction:** Prioritized `Transaction completion date` over statement generation headers (`Issuing date of the statement`), eliminating incorrect date assignments.
-- **Location & Merchant Extraction:** Cleansed BCR description strings (extracting store names from `"Locatie: ..."` blocks), enabling instant auto-tagging for:
-  - **Froo** → Food / Groceries
-  - **Carrefour** → Food / Groceries
-  - **Mega Image** → Food / Groceries
-  - **Kaufland** → Food / Groceries
-  - **Golden Coffe** → Food / Coffee & Tea
-  - **MOL** → Transport / Fuel & Gas
-  - **Fashion Days / PayU** → Shopping / Clothing
-  - **Vodafone / PayU** → Utilities / Mobile Phone
-  - **PPC Energie** → Utilities / Electricity
+### ⚡ Auto-Tagging Fallback Engine Fix
+- **Merged Rule Fallbacks:** Combined remote Supabase rules with default fallback rules (`defaultTaggingRules`) so auto-tagging functions 100% of the time, even when stream providers are loading or offline.
+- **Location Prefix Cleaner:** Automatically strips location codes (e.g. `0450PRPR RO`, `22328650 RO`, `05573370 RO`) before matching merchant keywords.
+
+### 🔄 Automatic Internal Transfer Detection & Filtering
+- **Smart Money Movement Filter:** Automatically detects internal bank transfers, card reimbursements, self-payments, and round-ups (e.g., *Platitor: Datcu George... Beneficiar: Datcu George*, *Transfer intre conturi*, *Alimentare cont*).
+- **Auto-Unselect:** Flags internal transfers with a `[Internal Transfer]` badge and **unselects them by default** so they do not bloat monthly spending budgets.
+
+### 🎛️ Preview List Tabs & Bulk Actions
+- **Filter Tabs:** Toggle between `All`, `Spending & Income Only`, and `Transfers`.
+- **Bulk Action Toolbar:**
+  - `Select All` / `Deselect All`
+  - `Uncheck Internal Transfers` (1-click unchecks all non-budget money movements)
+  - `Discard Selected Items` (Bulk remove checked items from preview)
+- **Checkbox Selection & Counter:** Dynamic action button displaying exact approved item count: `Import (X) Selected`.
 
 ---
 

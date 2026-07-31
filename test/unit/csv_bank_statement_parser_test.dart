@@ -69,14 +69,20 @@ CARD_PAYMENT,Current,2026-07-14 12:00:00,2026-07-14 12:01:00,Froo Market,-32.00,
       expect(results[0].date, DateTime(2026, 7, 1));
       expect(results[0].amount, -19.85);
       expect(results[0].matchedMerchant, 'carrefour');
+      expect(results[0].isInternalTransfer, isFalse);
+      expect(results[0].isSelected, isTrue);
 
       expect(results[1].date, DateTime(2026, 7, 2));
       expect(results[1].amount, -28.26);
       expect(results[1].matchedMerchant, 'froo');
+      expect(results[1].isInternalTransfer, isFalse);
+      expect(results[1].isSelected, isTrue);
 
       expect(results[2].date, DateTime(2026, 7, 10));
       expect(results[2].amount, 8037.01);
       expect(results[2].isIncome, isTrue);
+      expect(results[2].isInternalTransfer, isTrue);
+      expect(results[2].isSelected, isFalse);
     });
   });
 }

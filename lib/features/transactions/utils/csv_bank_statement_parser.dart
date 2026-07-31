@@ -12,6 +12,8 @@ class ParsedCsvTransaction {
   final String? subcategoryId;
   final String? matchedMerchant;
   final bool isIncome;
+  final bool isInternalTransfer;
+  final bool isSelected;
 
   const ParsedCsvTransaction({
     required this.date,
@@ -22,6 +24,8 @@ class ParsedCsvTransaction {
     this.subcategoryId,
     this.matchedMerchant,
     required this.isIncome,
+    this.isInternalTransfer = false,
+    this.isSelected = true,
   });
 
   ParsedCsvTransaction copyWith({
@@ -33,6 +37,8 @@ class ParsedCsvTransaction {
     String? subcategoryId,
     String? matchedMerchant,
     bool? isIncome,
+    bool? isInternalTransfer,
+    bool? isSelected,
   }) {
     return ParsedCsvTransaction(
       date: date ?? this.date,
@@ -43,6 +49,8 @@ class ParsedCsvTransaction {
       subcategoryId: subcategoryId ?? this.subcategoryId,
       matchedMerchant: matchedMerchant ?? this.matchedMerchant,
       isIncome: isIncome ?? this.isIncome,
+      isInternalTransfer: isInternalTransfer ?? this.isInternalTransfer,
+      isSelected: isSelected ?? this.isSelected,
     );
   }
 }
@@ -186,6 +194,8 @@ class CsvBankStatementParser {
         }
       }
 
+      final isInternalTransfer = _checkIsInternalTransfer(rawDesc);
+
       results.add(
         ParsedCsvTransaction(
           date: date,
@@ -196,11 +206,54 @@ class CsvBankStatementParser {
           subcategoryId: subcategoryId,
           matchedMerchant: matchedMerchant,
           isIncome: isIncome,
+          isInternalTransfer: isInternalTransfer,
+          isSelected: !isInternalTransfer,
         ),
       );
     }
 
     return results;
+  }
+
+  static bool _checkIsInternalTransfer(String desc) {
+    final lower = desc.toLowerCase();
+
+    // Check Payer == Beneficiary in BCR/ING/BT statements
+    if (lower.contains('platitor:') && lower.contains('beneficiar:')) {
+      final platitorIdx = lower.indexOf('platitor:');
+      final beneficiarIdx = lower.indexOf('beneficiar:');
+
+      if (platitorIdx != -1 && beneficiarIdx != -1 && beneficiarIdx > platitorIdx) {
+        final platitorPart = lower.substring(platitorIdx + 9, beneficiarIdx);
+        final beneficiarPart = lower.substring(beneficiarIdx + 11);
+
+        final platitorName = platitorPart.split(';').first.trim();
+        final beneficiarName = beneficiarPart.split(';').first.trim();
+
+        if (platitorName.isNotEmpty && beneficiarName.isNotEmpty) {
+          final pWords = platitorName.split(RegExp(r'\s+'));
+          final bWords = beneficiarName.split(RegExp(r'\s+'));
+          if (pWords.isNotEmpty && bWords.isNotEmpty) {
+            if (pWords[0] == bWords[0] && (pWords.length == 1 || bWords.contains(pWords[1]))) {
+              return true;
+            }
+          }
+        }
+      }
+    }
+
+    if (lower.contains('transfer') ||
+        lower.contains('plata instant') ||
+        lower.contains('alimentare cont') ||
+        lower.contains('credit card reimbursement') ||
+        lower.contains('schimb valutar') ||
+        lower.contains('top-up') ||
+        lower.contains('topup') ||
+        lower.contains('vault transfer')) {
+      return true;
+    }
+
+    return false;
   }
 
   static List<String> _tokenizeRow(String line, String delimiter) {

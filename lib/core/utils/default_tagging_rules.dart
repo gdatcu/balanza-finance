@@ -50,6 +50,25 @@ final List<TaggingRule> defaultTaggingRules = [
   const TaggingRule(id: 'rule-zara', keyword: 'zara', category: 'Shopping', subCategory: 'clothing', categoryId: '00000000-0000-0000-0000-000000000c19'),
   const TaggingRule(id: 'rule-hm', keyword: 'h&m', category: 'Shopping', subCategory: 'clothing', categoryId: '00000000-0000-0000-0000-000000000c19'),
   const TaggingRule(id: 'rule-fashiondays', keyword: 'fashion days', category: 'Shopping', subCategory: 'clothing', categoryId: '00000000-0000-0000-0000-000000000c19'),
+  const TaggingRule(id: 'rule-fashiondays2', keyword: 'fashiondays', category: 'Shopping', subCategory: 'clothing', categoryId: '00000000-0000-0000-0000-000000000c19'),
+  const TaggingRule(id: 'rule-ccc', keyword: 'ccc', category: 'Shopping', subCategory: 'clothing', categoryId: '00000000-0000-0000-0000-000000000c19'),
+
+  // Restaurants (Food -> restaurants '00000000-0000-0000-0000-000000000c11')
+  const TaggingRule(id: 'rule-oceanulindian', keyword: 'oceanul indian', category: 'Food', subCategory: 'restaurants', categoryId: '00000000-0000-0000-0000-000000000c11'),
+  const TaggingRule(id: 'rule-cevabun', keyword: 'ceva bun', category: 'Food', subCategory: 'restaurants', categoryId: '00000000-0000-0000-0000-000000000c11'),
+
+  // Coffee & Tea (Food -> coffee_tea '00000000-0000-0000-0000-000000000c10')
+  const TaggingRule(id: 'rule-goldencoffe', keyword: 'golden coffe', category: 'Food', subCategory: 'coffee_tea', categoryId: '00000000-0000-0000-0000-000000000c10'),
+
+  // Groceries (Food -> groceries '00000000-0000-0000-0000-000000000c16')
+  const TaggingRule(id: 'rule-dingradini', keyword: 'dingradini', category: 'Food', subCategory: 'groceries', categoryId: '00000000-0000-0000-0000-000000000c16'),
+
+  // Utilities -> Electricity ('00000000-0000-0000-0000-000000000c14')
+  const TaggingRule(id: 'rule-ppc', keyword: 'ppc energie', category: 'Utilities', subCategory: 'electricity', categoryId: '00000000-0000-0000-0000-000000000c14'),
+
+  // Pets / Medical / Vet -> Pharmacy or Other
+  const TaggingRule(id: 'rule-tjpetshop', keyword: 'tj pet shop', category: 'healthcare', subCategory: 'pharmacy', categoryId: '00000000-0000-0000-0000-00000000c20a'),
+  const TaggingRule(id: 'rule-tjvet', keyword: 'tj vet', category: 'healthcare', subCategory: 'pharmacy', categoryId: '00000000-0000-0000-0000-00000000c20a'),
 
   // Health & Medical -> Pharmacy ('00000000-0000-0000-0000-00000000c20a')
   const TaggingRule(id: 'rule-catena', keyword: 'catena', category: 'healthcare', subCategory: 'pharmacy', categoryId: '00000000-0000-0000-0000-00000000c20a'),
