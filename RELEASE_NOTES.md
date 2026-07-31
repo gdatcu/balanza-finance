@@ -1,43 +1,30 @@
-# Release Notes — v1.21.1
+# Release Notes — v1.22.0
 
-## 🏷️ Subcategories & Enhanced Auto-Tagging Engine
+## 🏦 Bank CSV Importer & Financial Health Score (0–100)
 
-### 🏷️ Subcategories for ALL Categories
-- **Complete Hierarchy:** Added subcategories across all 13 top-level categories:
-  - **Food:** *Groceries*, *Restaurants & Dining*, *Coffee & Tea*
-  - **Transport:** *Rideshare & Taxi*, *Fuel & Gas*, *Public Transit*, *Car Maintenance*
-  - **Rent / Housing:** *Monthly Rent*, *Housing Maintenance*
-  - **Utilities:** *Electricity*, *Internet & TV*, *Water & Heating*, *Mobile & Phone*
-  - **Salary / Income:** *Main Salary*, *Meal Tickets*, *Side Hustle*, *Bonus & Rewards*
-  - **Entertainment:** *Subscriptions*, *Events & Outings*, *Hobbies & Sports*
-  - **Shopping:** *Clothing & Fashion*, *Gadgets & Tech*, *Home & Decor*
-  - **Investments:** *Stocks & ETFs*, *Crypto*, *Real Estate*
-  - **Gifts:** *Gifts Received*, *Gifts Given*
-  - **Healthcare:** *Pharmacy*, *Doctor & Clinic*
-  - **Travel:** *Flights & Transit*, *Hotels & Stay*
-  - **Personal Care:** *Barber & Salon*
-  - **Education:** *Courses & Books*
+### 🏦 Bank CSV Statement Importer (`CsvImportSheet`)
+- **Multi-Bank Export Parser:** Zero-dependency CSV parser (`CsvBankStatementParser`) supporting comma `,` and semicolon `;` delimited bank statements from:
+  - **Banca Transilvania (BT)**
+  - **Revolut**
+  - **ING Bank**
+  - **BCR / George**
+  - **Raiffeisen Bank**
+  - **Universal CSV format**
+- **Automated Merchant Auto-Tagging:** Every imported line is automatically passed through Balanza's Auto-Tagging engine to pre-assign Category and Subcategory chips (e.g. *Uber* → Transport / Rideshare Taxi, *Mega Image* → Food / Groceries, *Catena* → Healthcare / Pharmacy).
+- **Interactive Review & Edit:** Review, modify category/subcategory dropdowns, or exclude individual lines before confirming bulk import.
+- **Drawer Access:** Added *"Import Bank CSV"* entry in navigation drawer.
 
-### ⚡ Dual-Level Subcategory Auto-Tagging
-- **Automated Merchant Classification:** Note input auto-tags both Main Category and Subcategory simultaneously for major Romanian merchants:
-  - **Uber / Bolt:** Transport → Rideshare & Taxi
-  - **Froo / Mega Image / Lidl / Kaufland / Carrefour / Profi:** Food → Groceries
-  - **Catena / Dr.Max / HelpNet / Sensiblu:** Healthcare → Pharmacy
-  - **Orange / Vodafone / Telekom / Digi / Yoxo:** Utilities → Mobile & Phone
-  - **OMV / Petrom / Rompetrol / Lukoil / Mol:** Transport → Fuel & Gas
-  - **eMAG / Altex / Flanco:** Shopping → Gadgets & Tech
-  - **Starbucks / 5togo / Tucano:** Food → Coffee & Tea
-  - **McDonald's / KFC / Glovo / Tazz / Wolt:** Food → Restaurants & Dining
-
-### 🎨 UI & Localization Polish
-- **Title Case Formatter:** Subcategories display gracefully in Title Case across all UI dropdowns and pickers (e.g. "Rideshare Taxi", "Mobile Phone", "Barber Salon").
-- **Cascading Subcategory Picker:** Subcategory dropdown dynamically updates and filters based on the selected parent category.
-
-### 🗄️ Supabase Migration Script
-- **Idempotent Migration (`supabase_subcategories_migration.sql`):** SQL migration script for Supabase DB schema updates, policy management, and tagging rules table updates.
+### 🩺 Financial Health Score (0–100) (`FinancialHealthCard`)
+- **Dynamic 0–100 Fitness Index:** Real-time health meter calculated across 4 core financial pillars:
+  1. **Savings Rate Score (0–30 pts):** % of income saved per month.
+  2. **Budget Pacing Score (0–25 pts):** Spending velocity relative to calendar day.
+  3. **Emergency Buffer Score (0–25 pts):** Months of living expenses covered by net liquid assets.
+  4. **Debt-to-Income Score (0–20 pts):** Debt installment obligations vs total income.
+- **Actionable Recommendations:** Targeted tips to boost score (e.g. *"Build 3-6 Month Emergency Fund"*, *"Slow Down Budget Velocity"*).
+- **Dashboard Integration:** Displayed on the main Overview dashboard.
 
 ---
 
 ## 🧪 Verification & Release Quality
 - **`flutter analyze`**: 0 issues found!
-- **`flutter test`**: All 114/114 unit, widget, and integration tests passed!
+- **`flutter test`**: All 117/117 unit, widget, and integration tests passed!

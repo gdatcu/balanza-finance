@@ -26,6 +26,8 @@ import '../../budgets/presentation/category_budget_input_sheet.dart';
 import '../../analytics/presentation/reality_check_sheet.dart';
 import '../../analytics/presentation/time_burn_calendar_view.dart';
 import '../../wishlist/presentation/wishlist_view.dart';
+import '../../analytics/presentation/financial_health_card.dart';
+import 'csv_import_sheet.dart';
 
 enum ToshlSection {
   overview,
@@ -690,6 +692,14 @@ class _HomeViewState extends ConsumerState<HomeView> {
                     );
                   },
                 ),
+                ListTile(
+                  leading: const Icon(Icons.file_upload_outlined, color: Color(0xFF3B82F6)),
+                  title: const Text('Import Bank CSV', style: TextStyle(color: Colors.white)),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    CsvImportSheet.show(context);
+                  },
+                ),
                 const Divider(color: Colors.white12),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -871,6 +881,8 @@ class _HomeViewState extends ConsumerState<HomeView> {
           if (_section == ToshlSection.overview) ...[
             if (advisorState != null) WealthAdvisorCard(state: advisorState),
             _buildAdvisorWidget(context),
+            const SizedBox(height: 16),
+            const FinancialHealthCard(),
             const SizedBox(height: 16),
             _buildOverviewCard(totalBalance, totalIncome, totalExpenses),
             const SizedBox(height: 16),
